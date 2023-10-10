@@ -1,0 +1,69 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "PhysicsEngine",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "PhysicsEngine::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-PhysicsEngine-Debug-d66a76cfdca7b566bd57.json",
+					"name" : "PhysicsEngine",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "PhysicsEngineCommon::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-PhysicsEngineCommon-Debug-406c93bd3bda7a706da4.json",
+					"name" : "PhysicsEngineCommon",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/Olivier/source/repos/Sae/2nd_grade/Module1/PhysicsEngine/cmake-build-debug-system",
+		"source" : "C:/Users/Olivier/source/repos/Sae/2nd_grade/Module1/PhysicsEngine"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 5
+	}
+}

@@ -1,0 +1,8 @@
+{
+  "name": "physics-engine",
+  "version-string": "1.0",
+  "dependencies": [
+    "gtest",
+    "sdl2"
+  ]
+}
