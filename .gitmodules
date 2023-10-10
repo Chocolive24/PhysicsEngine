@@ -1,0 +1,3 @@
+[submodule "libs/Math922"]
+	path = libs/Math922
+	url = https://github.com/SAE-Geneve/Math922

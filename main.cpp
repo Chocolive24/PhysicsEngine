@@ -2,31 +2,62 @@
 // Created by Olivier on 10.10.2023.
 //
 
+#include <array>
 #include <iostream>
 
-#include "include/dumb.h"
+#include "Body.h"
+#include "Planet.h"
+#include "Random.h"
 
 #include "SDL.h"
 
 constexpr int WindowWidth = 880;
 constexpr int WindowHeight = 680;
 
-SDL_Window *window;
+SDL_Window* window;
 SDL_Renderer* renderer;
 bool quit = false;
 SDL_Event event;
 
-int Time = 0;
+unsigned long long Time = 0;
+float deltaTime;
+
+std::array<Planet, 20> planets;
+
+const Vec2F RotationCenter(WindowWidth / 2.f, WindowHeight / 2.f);
+
+void InitSDL();
+void CalculatePlanetMovements();
+void RenderScreen();
+void Update();
+void DrawCircle(float centerX, float centerY, float r, std::size_t pointNbr);
+void DrawFilledCircle(float centerX, float centerY, float r, std::size_t pointNbr);
+
+int main()
+{
+    InitSDL();
+
+    for(std::size_t i = 0; i < planets.size(); i++)
+    {
+        Vec2F rndPos(Random::Range(400.f, 600.f), Random::Range(100.f, 500.f));
+        Planet p(Body(rndPos, Vec2F::Zero), Random::Range(3.f, 10.f),
+                 Random::Range(100.f, 500.f));
+
+        planets[i] = p;
+    }
+
+    Time = SDL_GetTicks64();
+
+    Update();
+
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+    return 0;
+}
 
 void InitSDL()
 {
-//    planet.Position = Vec2F(400.f, 100.f);
-//
-//    // Rotation center.
-//    Vec2F c(WindowWidth / 2.f, WindowHeight / 2.f);
-//
-//    radius = c - planet.Position;
-
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         std::cout << "Failed to initialize the SDL2 library Error :" <<  " " << SDL_GetError() << "\n";
@@ -55,45 +86,6 @@ void InitSDL()
 
     // Enable VSync
     SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
-
-    Time = SDL_GetTicks64();
-}
-
-void DrawCircle(float centerX, float centerY, float radius, int pointNbr)
-{
-    auto angleIncrement = static_cast<float>((2.0f * M_PI) / pointNbr);
-
-    SDL_Point points[pointNbr];
-
-    for (int i = 0; i < pointNbr; i++)
-    {
-        float angle = static_cast<float>(i) * angleIncrement;
-        float x = centerX + (radius * cos(angle));
-        float y = centerY + (radius * sin(angle));
-
-        points[i] = {static_cast<int>(x), static_cast<int>(y)};
-    }
-
-    for (int i = 1; i < pointNbr; i++)
-    {
-        SDL_RenderDrawLine(renderer,points[i-1].x, points[i-1].y, points[i].x, points[i].y);
-    }
-
-    SDL_RenderDrawLine(renderer, points[0].x, points[0].y,points[pointNbr-1].x, points[pointNbr-1].y);
-}
-
-void DrawFilledCircle(float centerX, float centerY, float radius, int pointNbr)
-{
-    auto angleIncrement = static_cast<float>((2.0f * M_PI) / pointNbr);
-
-    for (int i = 0; i < pointNbr; i++)
-    {
-        float angle = static_cast<float>(i) * angleIncrement;
-        float x = centerX + (radius * cos(angle));
-        float y = centerY + (radius * sin(angle));
-
-        SDL_RenderDrawLineF(renderer, centerX, centerY, x, y);
-    }
 }
 
 void Update()
@@ -108,66 +100,96 @@ void Update()
             }
         }
 
-        const float deltaTime = (SDL_GetTicks64() - Time) / 1000.f;
-
+        deltaTime = (static_cast<float>(SDL_GetTicks64() - Time)) / 1000.f;
         Time = SDL_GetTicks64();
 
-        // Clear the screen
-        SDL_RenderClear(renderer);
+        CalculatePlanetMovements();
 
-        // Set the draw color to red
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-
-        SDL_Rect rect;
-
-        rect.x = 100;
-        rect.y = 100;
-        rect.w = 100;
-        rect.h = 100;
-
-        SDL_RenderFillRect(renderer, &rect);
-
-//        // Rotation center.
-//        Vec2F c(WindowWidth / 2.f, WindowHeight / 2.f);
-//
-//        DrawFilledCircle(c.X, c.Y, 5, 100);
-//
-//        // Radius of circle.
-//        Vec2F r = c - planet.Position;
-//
-//        std::cout << r.Length() << std::endl;
-//
-//        DrawCircle(c.X, c.Y, radius.Length(), 100);
-//
-//        // v = tangent of radius.
-//        planet.Velocity = Vec2F(-r.Y, r.X).Normalized() * 500.f;
-//
-//        Vec2F a = planet.Velocity * planet.Velocity / r.Length();
-//
-//        planet.Velocity += a * deltaTime;
-//
-//        planet.Position += planet.Velocity * deltaTime;
-//
-//        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-//
-//        DrawFilledCircle(planet.Position.X, planet.Position.Y, 10, 200);
-
-        // Set the draw color to black
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-
-        // Update the screen
-        SDL_RenderPresent(renderer);
+        RenderScreen();
     }
 }
 
-int main(int argc, char *argv[])
+void CalculatePlanetMovements()
 {
-    InitSDL();
+    for (auto& p : planets)
+    {
+        Body& planetBody = p.GetBody();
+        float planetSpeed = p.GetSpeed();
 
-    Update();
+        // Radius of circle.
+        Vec2F r = RotationCenter - planetBody.Position;
 
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-    return 0;
+        // v = tangent of radius.
+        planetBody.Velocity = Vec2F(-r.Y, r.X).Normalized() * planetSpeed;
+
+        // a = v^2 / r
+        Vec2F a = (planetBody.Velocity * planetBody.Velocity) / r.Length();
+
+        planetBody.Velocity += a.Normalized() * planetSpeed * deltaTime;
+
+        planetBody.Position += planetBody.Velocity * deltaTime;
+    }
+}
+
+void RenderScreen()
+{
+    // Clear the screen
+    SDL_RenderClear(renderer);
+
+    // Set the draw color to red
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+
+    DrawFilledCircle(RotationCenter.X, RotationCenter.Y, 5, 200);
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+
+    for(auto& p : planets)
+    {
+        Body planetBody = p.GetBody();
+
+        DrawFilledCircle(planetBody.Position.X, planetBody.Position.Y, p.GetRadius(), 200);
+    }
+
+    // Set the draw color to black
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+
+    // Update the screen
+    SDL_RenderPresent(renderer);
+}
+
+void DrawCircle(float centerX, float centerY, float r, std::size_t pointNbr)
+{
+    auto angleIncrement = (2.0f * MathUtility::Pi) / static_cast<float>(pointNbr);
+
+    SDL_Point points[pointNbr];
+
+    for (std::size_t i = 0; i < pointNbr; i++)
+    {
+        float angle = static_cast<float>(i) * angleIncrement;
+        float x = centerX + (r * MathUtility::Cos(Radian(angle)));
+        float y = centerY + (r * MathUtility::Sin(Radian(angle)));
+
+        points[i] = {static_cast<int>(x), static_cast<int>(y)};
+    }
+
+    for (int i = 1; i < pointNbr; i++)
+    {
+        SDL_RenderDrawLine(renderer,points[i-1].x, points[i-1].y, points[i].x, points[i].y);
+    }
+
+    SDL_RenderDrawLine(renderer, points[0].x, points[0].y,points[pointNbr-1].x, points[pointNbr-1].y);
+}
+
+void DrawFilledCircle(float centerX, float centerY, float r, std::size_t pointNbr)
+{
+    auto angleIncrement = (2.0f * MathUtility::Pi) / static_cast<float>(pointNbr);
+
+    for (std::size_t i = 0; i < pointNbr; i++)
+    {
+        float angle = static_cast<float>(i) * angleIncrement;
+        float x = centerX + (r * MathUtility::Cos(Radian(angle)));
+        float y = centerY + (r * MathUtility::Sin(Radian(angle)));
+
+        SDL_RenderDrawLineF(renderer, centerX, centerY, x, y);
+    }
 }
