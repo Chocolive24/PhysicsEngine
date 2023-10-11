@@ -40,7 +40,7 @@ int main()
     for(std::size_t i = 0; i < planets.size(); i++)
     {
         Vec2F rndPos(Random::Range(400.f, 600.f), Random::Range(100.f, 500.f));
-        Planet p(Body(rndPos, Vec2F::Zero), Random::Range(3.f, 10.f),
+        Planet p(Body(rndPos, Vec2F(0.f, 0.f)), Random::Range(3.f, 10.f),
                  Random::Range(100.f, 500.f));
 
         planets[i] = p;

@@ -18,9 +18,6 @@ target_link_libraries(PhysicsEngine PRIVATE PhysicsEngineCommon SDL2::SDL2)
 # Disable SDL main
 add_definitions(-DSDL_MAIN_HANDLED)
 
-# Lib Math922
-add_subdirectory(libs/Math922)
-
 # Tests
 SET(TEST_DIR ${CMAKE_SOURCE_DIR}/tests)
 file(GLOB TEST_FILES ${TEST_DIR}/*.cpp )
@@ -35,8 +32,8 @@ foreach(test_file ${TEST_FILES} )
     IF(MSVC)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX2 /Oi /Oy-")
     else()
-        set_target_properties(${test_name} PROPERTIES COMPILE_FLAGS "-save-temps -march=haswell -ffast-math -fno-omit-frame-pointer")
+        set_target_properties(PhysicsEngine${test_name} PROPERTIES COMPILE_FLAGS "-save-temps -march=haswell -ffast-math -fno-omit-frame-pointer")
     ENDIF()
 
-    set_target_properties (${test_name} PROPERTIES FOLDER Courses)
+    set_target_properties (PhysicsEngine${test_name} PROPERTIES FOLDER Courses)
 endforeach()

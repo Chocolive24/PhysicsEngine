@@ -5,8 +5,8 @@
 class Body
 {
 public:
-    Vec2F Position = Vec2F::Zero;
-    Vec2F Velocity = Vec2F::Zero;
+    Vec2F Position = {0.f, 0.f};
+    Vec2F Velocity = {0.f ,0.f};
 
     constexpr Body() noexcept = default;
     Body(Vec2F pos, Vec2F vel) noexcept;

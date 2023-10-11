@@ -5,7 +5,7 @@
 class Planet
 {
 private:
-    Body _body{Vec2F::Zero, Vec2F::Zero};
+    Body _body{Vec2F(0.f, 0.f), Vec2F(0.f, 0.f)};
     float _radius{0.f};
     float _speed{0.f};
 
