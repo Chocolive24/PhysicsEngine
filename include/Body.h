@@ -9,5 +9,5 @@ public:
     Vec2F Velocity = {0.f ,0.f};
 
     constexpr Body() noexcept = default;
-    Body(Vec2F pos, Vec2F vel) noexcept;
+    constexpr Body(Vec2F pos, Vec2F vel) noexcept : Position(pos), Velocity(vel){}
 };
