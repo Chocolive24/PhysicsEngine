@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(PhysicsEngine)
+project(PhysicsEngineCommon)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -33,7 +33,7 @@ foreach(test_file ${TEST_FILES} )
     get_filename_component(test_name ${test_file} NAME_WE)
     add_executable(PhysicsEngine${test_name} ${test_file})
 
-    target_link_libraries(PhysicsEngine${test_name} PUBLIC PhysicsEngineCommon)
+    target_link_libraries(PhysicsEngine${test_name} PUBLIC Common)
     target_link_libraries(PhysicsEngine${test_name} PRIVATE GTest::gtest GTest::gtest_main)
 
     target_include_directories(PhysicsEngine${test_name} PUBLIC include/)

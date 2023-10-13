@@ -4,7 +4,7 @@
 
 #include "InputManager.h"
 
-void InputManager::HandleInputs(bool& quit)
+void InputManager::HandleInputs(bool& quit) noexcept
 {
     while (SDL_PollEvent(&event))
     {

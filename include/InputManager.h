@@ -7,5 +7,5 @@ class InputManager
 public:
     SDL_Event event;
 
-    void HandleInputs(bool& quit);
+    void HandleInputs(bool& quit) noexcept;
 };

@@ -1,9 +1,9 @@
-#include "GraphicsManager.h"
+#include "RenderingManager.h"
 #include "MathUtility.h"
 
 #include <iostream>
 
-void GraphicsManager::Init()
+void RenderingManager::Init() noexcept
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
@@ -12,10 +12,10 @@ void GraphicsManager::Init()
     }
 
     Window = SDL_CreateWindow("SDL2 Window",
-                                              SDL_WINDOWPOS_CENTERED,
-                                              SDL_WINDOWPOS_CENTERED,
-                                              GraphicsManager::WindowWidth, GraphicsManager::WindowHeight,
-                                              SDL_WINDOW_RESIZABLE);
+                              SDL_WINDOWPOS_CENTERED,
+                              SDL_WINDOWPOS_CENTERED,
+                              RenderingManager::WindowWidth, RenderingManager::WindowHeight,
+                              SDL_WINDOW_RESIZABLE);
 
     if (!Window)
     {
@@ -35,14 +35,14 @@ void GraphicsManager::Init()
     SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
 }
 
-void GraphicsManager::UnInit()
+void RenderingManager::UnInit() const noexcept
 {
     SDL_DestroyRenderer(Renderer);
     SDL_DestroyWindow(Window);
     SDL_Quit();
 }
 
-void GraphicsManager::DrawCircle(float centerX, float centerY, float r, std::size_t pointNbr)
+void RenderingManager::DrawCircle(float centerX, float centerY, float r, std::size_t pointNbr) const noexcept
 {
     auto angleIncrement = (2.0f * MathUtility::Pi) / static_cast<float>(pointNbr);
 
@@ -65,7 +65,7 @@ void GraphicsManager::DrawCircle(float centerX, float centerY, float r, std::siz
     SDL_RenderDrawLine(Renderer, points[0].x, points[0].y, points[pointNbr - 1].x, points[pointNbr - 1].y);
 }
 
-void GraphicsManager::DrawFilledCircle(float centerX, float centerY, float r, std::size_t pointNbr)
+void RenderingManager::DrawFilledCircle(float centerX, float centerY, float r, std::size_t pointNbr) const noexcept
 {
     auto angleIncrement = (2.0f * MathUtility::Pi) / static_cast<float>(pointNbr);
 

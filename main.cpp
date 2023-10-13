@@ -2,31 +2,32 @@
 // Created by Olivier on 10.10.2023.
 //
 
+#include "Timer.h"
+#include "Planet.h"
+#include "Random.h"
+#include "RenderingManager.h"
+#include "InputManager.h"
+
 #include <array>
 #include <iostream>
 
-#include "Body.h"
-#include "Planet.h"
-#include "Random.h"
-#include "GraphicsManager.h"
-#include "InputManager.h"
-
-GraphicsManager graphicsManager;
-InputManager inputManager;
-
-unsigned long long Time = 0;
-
-std::array<Planet, 20> planets;
-
-const Vec2F RotationCenter(GraphicsManager::WindowWidth / 2.f, GraphicsManager::WindowHeight / 2.f);
-
-void CalculatePlanetMovements(float deltaTime);
-void RunGameLoop();
-void RenderScreen();
+void CalculatePlanetMovements(std::array<Planet, 20>& planets, Vec2F rotationCenter);
+void RunGameLoop(RenderingManager& renderingManager, InputManager& inputManager,
+                 std::array<Planet, 20>& planets, Vec2F rotationCenter);
+void RenderScreen(RenderingManager& renderingManager, std::array<Planet, 20>& planets, Vec2F rotationCenter);
 
 int main()
 {
-    graphicsManager.Init();
+    RenderingManager renderingManager{};
+    renderingManager.Init();
+
+    InputManager inputManager{};
+
+    Timer::Init();
+
+    const Vec2F rotationCenter(RenderingManager::WindowWidth / 2.f, RenderingManager::WindowHeight / 2.f);
+
+    std::array<Planet, 20> planets;
 
     for(auto& planet : planets)
     {
@@ -37,15 +38,14 @@ int main()
         planet = p;
     }
 
-    Time = SDL_GetTicks64();
+    RunGameLoop(renderingManager, inputManager, planets, rotationCenter);
 
-    RunGameLoop();
-
-    graphicsManager.UnInit();
+    renderingManager.UnInit();
     return 0;
 }
 
-void RunGameLoop()
+void RunGameLoop(RenderingManager& renderingManager, InputManager& inputManager,
+                 std::array<Planet, 20>& planets, Vec2F rotationCenter)
 {
     bool quit = false;
 
@@ -53,24 +53,23 @@ void RunGameLoop()
     {
         inputManager.HandleInputs(quit);
 
-        const float deltaTime = (static_cast<float>(SDL_GetTicks64() - Time)) / 1000.f;
-        Time = SDL_GetTicks64();
+        Timer::Tick();
 
-        CalculatePlanetMovements(deltaTime);
+        CalculatePlanetMovements(planets, rotationCenter);
 
-        RenderScreen();
+        RenderScreen(renderingManager, planets, rotationCenter);
     }
 }
 
-void CalculatePlanetMovements(float deltaTime)
+void CalculatePlanetMovements(std::array<Planet, 20>& planets, Vec2F rotationCenter)
 {
     for (auto& p : planets)
     {
         PhysicsEngine::Body& planetBody = p.GetBody();
-        float planetSpeed = planetBody.Velocity.Length();
+        float planetSpeed = 100.f;
 
         // Radius of circle.
-        Vec2F r = RotationCenter - planetBody.Position;
+        Vec2F r = rotationCenter - planetBody.Position;
 
         // v = tangent of radius.
         planetBody.Velocity = Vec2F(-r.Y, r.X).Normalized() * planetSpeed;
@@ -78,36 +77,36 @@ void CalculatePlanetMovements(float deltaTime)
         // a = v^2 / r
         Vec2F a = (planetBody.Velocity * planetBody.Velocity) / r.Length();
 
-        planetBody.Velocity += a.Normalized() * planetSpeed * deltaTime;
+        planetBody.Velocity += a.Normalized() * planetSpeed * Timer::DeltaTime();
 
-        planetBody.Position += planetBody.Velocity * deltaTime;
+        planetBody.Position += planetBody.Velocity * Timer::DeltaTime();
     }
 }
 
-void RenderScreen()
+void RenderScreen(RenderingManager& renderingManager, std::array<Planet, 20>& planets, Vec2F rotationCenter)
 {
-    SDL_RenderClear(graphicsManager.Renderer);
+    SDL_RenderClear(renderingManager.Renderer);
 
     constexpr SDL_Color sunColor{255, 0, 0, 255};
 
-    SDL_SetRenderDrawColor(graphicsManager.Renderer, sunColor.r, sunColor.g, sunColor.b, sunColor.a);
+    SDL_SetRenderDrawColor(renderingManager.Renderer, sunColor.r, sunColor.g, sunColor.b, sunColor.a);
 
-    graphicsManager.DrawFilledCircle(RotationCenter.X, RotationCenter.Y, 5, 200);
+    renderingManager.DrawFilledCircle(rotationCenter.X, rotationCenter.Y, 5, 200);
 
     constexpr SDL_Color planetsColor{0, 0, 255, 255};
 
-    SDL_SetRenderDrawColor(graphicsManager.Renderer, planetsColor.r, planetsColor.g, planetsColor.b, planetsColor.a);
+    SDL_SetRenderDrawColor(renderingManager.Renderer, planetsColor.r, planetsColor.g, planetsColor.b, planetsColor.a);
 
     for(auto& p : planets)
     {
         PhysicsEngine::Body planetBody = p.GetBody();
 
-        graphicsManager.DrawFilledCircle(planetBody.Position.X, planetBody.Position.Y, p.GetRadius(), 200);
+        renderingManager.DrawFilledCircle(planetBody.Position.X, planetBody.Position.Y, p.GetRadius(), 200);
     }
 
     constexpr SDL_Color backgroundColor{0, 0, 0, 255};
 
-    SDL_SetRenderDrawColor(graphicsManager.Renderer, backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
+    SDL_SetRenderDrawColor(renderingManager.Renderer, backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
 
-    SDL_RenderPresent(graphicsManager.Renderer);
+    SDL_RenderPresent(renderingManager.Renderer);
 }
