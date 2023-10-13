@@ -5,13 +5,13 @@
 class Planet
 {
 private:
-    Body _body{Vec2F(0.f, 0.f), Vec2F(0.f, 0.f)};
+    PhysicsEngine::Body _body{Vec2F(0.f, 0.f), Vec2F(0.f, 0.f)};
     float _radius{0.f};
 
 public:
     constexpr Planet() noexcept = default;
-    constexpr Planet(Body body, float r) noexcept : _body(body), _radius(r){}
+    constexpr Planet(PhysicsEngine::Body body, float r) noexcept : _body(body), _radius(r){}
 
-    [[nodiscard]] constexpr Body& GetBody() noexcept { return _body; }
+    [[nodiscard]] constexpr PhysicsEngine::Body& GetBody() noexcept { return _body; }
     [[nodiscard]] constexpr float GetRadius() const noexcept { return _radius; }
 };

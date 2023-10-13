@@ -1,5 +1,7 @@
 #include "gtest/gtest.h"
-#include "../include/Body.h"
+#include "Body.h"
+
+using namespace PhysicsEngine;
 
 struct PairOfVec2FFixture : public ::testing::TestWithParam<std::pair<Vec2F, Vec2F>>{};
 

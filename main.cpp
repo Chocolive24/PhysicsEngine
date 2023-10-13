@@ -8,38 +8,30 @@
 #include "Body.h"
 #include "Planet.h"
 #include "Random.h"
+#include "GraphicsManager.h"
+#include "InputManager.h"
 
-#include "SDL.h"
-
-constexpr int WindowWidth = 880;
-constexpr int WindowHeight = 680;
-
-SDL_Window* window;
-SDL_Renderer* renderer;
-
-SDL_Event event;
+GraphicsManager graphicsManager;
+InputManager inputManager;
 
 unsigned long long Time = 0;
 
 std::array<Planet, 20> planets;
 
-const Vec2F RotationCenter(WindowWidth / 2.f, WindowHeight / 2.f);
+const Vec2F RotationCenter(GraphicsManager::WindowWidth / 2.f, GraphicsManager::WindowHeight / 2.f);
 
-void InitSDL();
 void CalculatePlanetMovements(float deltaTime);
-void RenderScreen();
 void RunGameLoop();
-void DrawCircle(float centerX, float centerY, float r, std::size_t pointNbr);
-void DrawFilledCircle(float centerX, float centerY, float r, std::size_t pointNbr);
+void RenderScreen();
 
 int main()
 {
-    InitSDL();
+    graphicsManager.Init();
 
     for(auto& planet : planets)
     {
         Vec2F rndPos(Random::Range(400.f, 600.f), Random::Range(100.f, 500.f));
-        Planet p(Body(rndPos, Vec2F(Random::Range(100.f, 500.f), 0.f)),
+        Planet p(PhysicsEngine::Body(rndPos, Vec2F(Random::Range(100.f, 500.f), 0.f)),
                  Random::Range(3.f, 10.f));
 
         planet = p;
@@ -49,42 +41,8 @@ int main()
 
     RunGameLoop();
 
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    graphicsManager.UnInit();
     return 0;
-}
-
-void InitSDL()
-{
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
-    {
-        std::cout << "Failed to initialize the SDL2 library Error :" <<  " " << SDL_GetError() << "\n";
-        exit(-1);
-    }
-
-    window = SDL_CreateWindow("SDL2 Window",
-                              SDL_WINDOWPOS_CENTERED,
-                              SDL_WINDOWPOS_CENTERED,
-                              WindowWidth, WindowHeight,
-                              SDL_WINDOW_RESIZABLE);
-
-    if (!window)
-    {
-        std::cout << "Failed to create window. Error :" <<  " " << SDL_GetError() << "\n";
-        exit(-1);
-    }
-
-    renderer = SDL_CreateRenderer(window, 0, SDL_RENDERER_ACCELERATED);
-
-    if (renderer == nullptr)
-    {
-        std::cout << "Renderer could not be created! Error :" << " " << SDL_GetError() << "\n";
-        exit(1);
-    }
-
-    // Enable VSync
-    SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
 }
 
 void RunGameLoop()
@@ -93,13 +51,7 @@ void RunGameLoop()
 
     while (!quit)
     {
-        while (SDL_PollEvent(&event))
-        {
-            if (event.type == SDL_QUIT)
-            {
-                quit = true;
-            }
-        }
+        inputManager.HandleInputs(quit);
 
         const float deltaTime = (static_cast<float>(SDL_GetTicks64() - Time)) / 1000.f;
         Time = SDL_GetTicks64();
@@ -114,7 +66,7 @@ void CalculatePlanetMovements(float deltaTime)
 {
     for (auto& p : planets)
     {
-        Body& planetBody = p.GetBody();
+        PhysicsEngine::Body& planetBody = p.GetBody();
         float planetSpeed = planetBody.Velocity.Length();
 
         // Radius of circle.
@@ -134,65 +86,28 @@ void CalculatePlanetMovements(float deltaTime)
 
 void RenderScreen()
 {
-    SDL_RenderClear(renderer);
+    SDL_RenderClear(graphicsManager.Renderer);
 
     constexpr SDL_Color sunColor{255, 0, 0, 255};
 
-    SDL_SetRenderDrawColor(renderer, sunColor.r, sunColor.g, sunColor.b, sunColor.a);
+    SDL_SetRenderDrawColor(graphicsManager.Renderer, sunColor.r, sunColor.g, sunColor.b, sunColor.a);
 
-    DrawFilledCircle(RotationCenter.X, RotationCenter.Y, 5, 200);
+    graphicsManager.DrawFilledCircle(RotationCenter.X, RotationCenter.Y, 5, 200);
 
     constexpr SDL_Color planetsColor{0, 0, 255, 255};
 
-    SDL_SetRenderDrawColor(renderer, planetsColor.r, planetsColor.g, planetsColor.b, planetsColor.a);
+    SDL_SetRenderDrawColor(graphicsManager.Renderer, planetsColor.r, planetsColor.g, planetsColor.b, planetsColor.a);
 
     for(auto& p : planets)
     {
-        Body planetBody = p.GetBody();
+        PhysicsEngine::Body planetBody = p.GetBody();
 
-        DrawFilledCircle(planetBody.Position.X, planetBody.Position.Y, p.GetRadius(), 200);
+        graphicsManager.DrawFilledCircle(planetBody.Position.X, planetBody.Position.Y, p.GetRadius(), 200);
     }
 
     constexpr SDL_Color backgroundColor{0, 0, 0, 255};
 
-    SDL_SetRenderDrawColor(renderer, backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
+    SDL_SetRenderDrawColor(graphicsManager.Renderer, backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
 
-    SDL_RenderPresent(renderer);
-}
-
-void DrawCircle(float centerX, float centerY, float r, std::size_t pointNbr)
-{
-    auto angleIncrement = (2.0f * MathUtility::Pi) / static_cast<float>(pointNbr);
-
-    SDL_Point points[pointNbr];
-
-    for (std::size_t i = 0; i < pointNbr; i++)
-    {
-        float angle = static_cast<float>(i) * angleIncrement;
-        float x = centerX + (r * MathUtility::Cos(Radian(angle)));
-        float y = centerY + (r * MathUtility::Sin(Radian(angle)));
-
-        points[i] = {static_cast<int>(x), static_cast<int>(y)};
-    }
-
-    for (int i = 1; i < pointNbr; i++)
-    {
-        SDL_RenderDrawLine(renderer,points[i-1].x, points[i-1].y, points[i].x, points[i].y);
-    }
-
-    SDL_RenderDrawLine(renderer, points[0].x, points[0].y,points[pointNbr-1].x, points[pointNbr-1].y);
-}
-
-void DrawFilledCircle(float centerX, float centerY, float r, std::size_t pointNbr)
-{
-    auto angleIncrement = (2.0f * MathUtility::Pi) / static_cast<float>(pointNbr);
-
-    for (std::size_t i = 0; i < pointNbr; i++)
-    {
-        float angle = static_cast<float>(i) * angleIncrement;
-        float x = centerX + (r * MathUtility::Cos(Radian(angle)));
-        float y = centerY + (r * MathUtility::Sin(Radian(angle)));
-
-        SDL_RenderDrawLineF(renderer, centerX, centerY, x, y);
-    }
+    SDL_RenderPresent(graphicsManager.Renderer);
 }

@@ -1,5 +1,8 @@
-#include "gtest/gtest.h"
 #include "Planet.h"
+
+#include "gtest/gtest.h"
+
+using namespace PhysicsEngine;
 
 struct TupleOfBodyAndTwoFloatFixture : public ::testing::TestWithParam<std::tuple<Body, float, float>>{};
 
@@ -13,10 +16,9 @@ TEST_P(TupleOfBodyAndTwoFloatFixture, Constructor)
 {
     auto [body, radius, speed] = GetParam();
 
-    Planet p(body, radius, speed);
+    Planet p(body, radius);
 
     EXPECT_FLOAT_EQ(p.GetBody().Position.X, body.Position.X);
     EXPECT_FLOAT_EQ(p.GetBody().Position.Y, body.Position.Y);
     EXPECT_FLOAT_EQ(p.GetRadius(), radius);
-    EXPECT_FLOAT_EQ(p.GetSpeed(), speed);
 }

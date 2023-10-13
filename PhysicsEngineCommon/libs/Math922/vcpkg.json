@@ -1,0 +1,9 @@
+{
+  "name": "math922",
+  "version-string": "1.0",
+  "dependencies": [
+    "gtest",
+    "fmt",
+    "benchmark"
+  ]
+}
