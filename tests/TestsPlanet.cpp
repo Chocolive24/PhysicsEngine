@@ -1,4 +1,4 @@
-#include "Planet.h"
+#include "../samples/include/Planet.h"
 
 #include "gtest/gtest.h"
 

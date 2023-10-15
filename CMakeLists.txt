@@ -21,6 +21,7 @@ target_link_libraries(Common PUBLIC SDL2::SDL2)
 
 add_executable(PhysicsEngine main.cpp)
 target_link_libraries(PhysicsEngine PRIVATE Common)
+target_include_directories(PhysicsEngine PUBLIC samples/include/)
 
 # Disable SDL main
 add_definitions(-DSDL_MAIN_HANDLED)
