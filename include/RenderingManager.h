@@ -6,15 +6,13 @@
 #include "SDL.h"
 
 #include <cstddef>
+#include <vector>
 
 class RenderingManager
 {
 private:
-    SDL_Vertex _vertexBuffer[1000]{};
-    int   _vertexBufferUsed = 0;
-
-    int _indexBuffer[1000]{};
-    int _indexBufferUsed = 0;
+    std::vector<SDL_Vertex> _vertices;
+    std::vector<int> _indices;
 
 public:
     static constexpr int WindowWidth = 880;
@@ -28,6 +26,7 @@ public:
     void UnInit() const noexcept;
 
     void AddVertex(Vec2F pos, SDL_Color color, float u = 1, float v = 1);
-    void DrawCircle(float centerX, float centerY, float r, std::size_t pointNbr) const noexcept;
-    void DrawFilledCircle(float centerX, float centerY, float r, std::size_t pointNbr, SDL_Color color) noexcept;
+    void ClearGeometry()  noexcept;
+    //void DrawCircle(float centerX, float centerY, float r, std::size_t pointNbr) const noexcept;
+    void DrawFilledCircle(Vec2F position, float r, std::size_t segments, SDL_Color color) noexcept;
 };

@@ -31,8 +31,9 @@ void RenderingManager::Init() noexcept
         exit(1);
     }
 
-    // Enable VSync
-    SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
+    // Initialize the vectors for geometry
+    _vertices.clear();
+    _indices.clear();
 }
 
 void RenderingManager::UnInit() const noexcept
@@ -56,58 +57,65 @@ void RenderingManager::AddVertex(Vec2F pos, SDL_Color color, float u, float v)
     vertex.tex_coord.x = u;
     vertex.tex_coord.y = v;
 
-    _vertexBuffer[_vertexBufferUsed] = vertex;
-    _vertexBufferUsed++;
+    _vertices.push_back(vertex);
 }
 
-void RenderingManager::DrawCircle(float centerX, float centerY, float r, std::size_t pointNbr) const noexcept
+void RenderingManager::ClearGeometry() noexcept
 {
-    auto angleIncrement = (2.0f * MathUtility::Pi) / static_cast<float>(pointNbr);
-
-    SDL_Point points[pointNbr];
-
-    for (std::size_t i = 0; i < pointNbr; i++)
-    {
-        float angle = static_cast<float>(i) * angleIncrement;
-        float x = centerX + (r * MathUtility::Cos(Radian(angle)));
-        float y = centerY + (r * MathUtility::Sin(Radian(angle)));
-
-        points[i] = {static_cast<int>(x), static_cast<int>(y)};
-    }
-
-    for (int i = 1; i < pointNbr; i++)
-    {
-        SDL_RenderDrawLine(Renderer, points[i - 1].x, points[i - 1].y, points[i].x, points[i].y);
-    }
-
-    SDL_RenderDrawLine(Renderer, points[0].x, points[0].y, points[pointNbr - 1].x, points[pointNbr - 1].y);
+    _vertices.clear();
+    _indices.clear();
 }
 
-void RenderingManager::DrawFilledCircle(float centerX, float centerY, float r, std::size_t pointNbr, SDL_Color color) noexcept
+//void RenderingManager::DrawCircle(float centerX, float centerY, float r, std::size_t pointNbr) const noexcept
+//{
+//    auto angleIncrement = (2.0f * MathUtility::Pi) / static_cast<float>(pointNbr);
+//
+//    SDL_Point points[pointNbr];
+//
+//    for (std::size_t i = 0; i < pointNbr; i++)
+//    {
+//        float angle = static_cast<float>(i) * angleIncrement;
+//        float x = centerX + (r * MathUtility::Cos(Radian(angle)));
+//        float y = centerY + (r * MathUtility::Sin(Radian(angle)));
+//
+//        points[i] = {static_cast<int>(x), static_cast<int>(y)};
+//    }
+//
+//    for (int i = 1; i < pointNbr; i++)
+//    {
+//        SDL_RenderDrawLine(Renderer, points[i - 1].x, points[i - 1].y, points[i].x, points[i].y);
+//    }
+//
+//    SDL_RenderDrawLine(Renderer, points[0].x, points[0].y, points[pointNbr - 1].x, points[pointNbr - 1].y);
+//}
+
+void RenderingManager::DrawFilledCircle(Vec2F position, float r, std::size_t segments, SDL_Color color) noexcept
 {
-    int startIndex = _vertexBufferUsed;
+    //float radius = Metrics::MetersToPixels(0.1f);
 
-    auto angleIncrement = (2.0f * MathUtility::Pi) / static_cast<float>(pointNbr);
+   ClearGeometry();
 
-    for (std::size_t i = 0; i < pointNbr; i++)
+    // Calculate vertices for the circle
+    for (int i = 0; i < segments; i++)
     {
-        float angle = static_cast<float>(i) * angleIncrement;
-        float x = centerX + (r * MathUtility::Cos(Radian(angle)));
-        float y = centerY + (r * MathUtility::Sin(Radian(angle)));
-
+        float angle = 2 * MathUtility::Pi * i / segments;
+        float x = position.X + r * cos(angle);
+        float y = position.Y + r * sin(angle);
         AddVertex(Vec2F(x, y), color, 1, 1);
     }
 
-    // Connect the last vertex with the first vertex to close the circle
-    AddVertex(Vec2F(centerX + r, centerY), color, 1, 1);
-
-    for (int i = 0; i < pointNbr; i++)
+    // Calculate indices to create triangles for filling the circle
+    for (int i = 0; i < segments - 1; i++)
     {
-        _indexBuffer[_indexBufferUsed++] = startIndex + i;
-        _indexBuffer[_indexBufferUsed++] = startIndex + i + 1;
-        _indexBuffer[_indexBufferUsed++] = startIndex + pointNbr;
+        _indices.push_back(0); // Center point
+        _indices.push_back(i);
+        _indices.push_back(i + 1);
     }
 
-    SDL_RenderGeometry(Renderer, nullptr,  _vertexBuffer, _vertexBufferUsed,
-                       _indexBuffer, _indexBufferUsed);
+    _indices.push_back(0); // Center point
+    _indices.push_back(segments - 1);
+    _indices.push_back(0);  // Connect the last vertex to the center
+
+    SDL_RenderGeometry(Renderer, nullptr, _vertices.data(), _vertices.size(),
+                       _indices.data(), _indices.size());
 }

@@ -73,22 +73,21 @@ void PlanetSystem::CalculatePlanetMovements(PhysicsEngine::World& world, float d
 
 void PlanetSystem::RenderScreen(RenderingManager& renderingManager, PhysicsEngine::World& world)
 {
+    SDL_RenderClear(renderingManager.Renderer);
+
     constexpr SDL_Color backgroundColor{0, 0, 0, 255};
     SDL_SetRenderDrawColor(renderingManager.Renderer, backgroundColor.r, backgroundColor.g, backgroundColor.b,
                            backgroundColor.a);
-    SDL_RenderClear(renderingManager.Renderer);
 
     // Draw the sun.
-    SDL_SetRenderDrawColor(renderingManager.Renderer, _sun.Color.r, _sun.Color.g, _sun.Color.b, _sun.Color.a);
     auto sunBodyPos = world.GetBody(_sun.BodyRef).Position();
-    renderingManager.DrawFilledCircle(sunBodyPos.X, sunBodyPos.Y, _sun.Radius, 200, _sun.Color);
+    renderingManager.DrawFilledCircle(sunBodyPos, _sun.Radius, 50, _sun.Color);
 
     // Draw the planets.
     for(auto& p : _planets)
     {
-        SDL_SetRenderDrawColor(renderingManager.Renderer, p.Color.r, p.Color.g, p.Color.b, p.Color.a);
         auto planetBodyPos = world.GetBody(p.BodyRef).Position();
-        renderingManager.DrawFilledCircle(planetBodyPos.X, planetBodyPos.Y, p.Radius, 200, p.Color);
+        renderingManager.DrawFilledCircle(planetBodyPos, p.Radius, 50, p.Color);
     }
 
     SDL_RenderPresent(renderingManager.Renderer);
