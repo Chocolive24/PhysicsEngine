@@ -20,7 +20,7 @@
 
 Ex:
 ```c++
-struct Position 
+struct _position 
 {
     float X;
     float Y;

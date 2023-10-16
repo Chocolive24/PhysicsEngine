@@ -18,7 +18,7 @@ TEST_P(TupleOfBodyAndTwoFloatFixture, Constructor)
 
     Planet p(body, radius);
 
-    EXPECT_FLOAT_EQ(p.GetBody().Position.X, body.Position.X);
-    EXPECT_FLOAT_EQ(p.GetBody().Position.Y, body.Position.Y);
+    EXPECT_FLOAT_EQ(p.GetBody()._position.X, body._position.X);
+    EXPECT_FLOAT_EQ(p.GetBody()._position.Y, body._position.Y);
     EXPECT_FLOAT_EQ(p.GetRadius(), radius);
 }

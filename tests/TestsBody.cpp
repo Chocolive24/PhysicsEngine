@@ -16,9 +16,9 @@ TEST_P(PairOfVec2FFixture, Constructor)
 
     Body b(pos, vel);
 
-    EXPECT_FLOAT_EQ(b.Position.X, pos.X);
-    EXPECT_FLOAT_EQ(b.Position.Y, pos.Y);
+    EXPECT_FLOAT_EQ(b._position.X, pos.X);
+    EXPECT_FLOAT_EQ(b._position.Y, pos.Y);
 
-    EXPECT_FLOAT_EQ(b.Velocity.X, vel.X);
-    EXPECT_FLOAT_EQ(b.Velocity.Y, vel.Y);
+    EXPECT_FLOAT_EQ(b._velocity.X, vel.X);
+    EXPECT_FLOAT_EQ(b._velocity.Y, vel.Y);
 }
