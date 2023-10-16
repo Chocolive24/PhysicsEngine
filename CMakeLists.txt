@@ -13,14 +13,22 @@ target_include_directories(PhysicsEngineCommon PUBLIC PhysicsEngineCommon/includ
 target_include_directories(PhysicsEngineCommon PUBLIC PhysicsEngineCommon/libs/Math922/include/)
 
 file(GLOB_RECURSE SRC_FILES include/*.h src/*.cpp)
-add_library(Common ${SRC_FILES})
+add_library(Common ${SRC_FILES}
+        samples/src/PlanetSystem.cpp)
 set_target_properties(Common PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(Common PUBLIC include/)
 target_link_libraries(Common PUBLIC PhysicsEngineCommon)
 target_link_libraries(Common PUBLIC SDL2::SDL2)
 
+file(GLOB_RECURSE SAMPLES_SRC_FILES samples/include/*.h samples/src/*.cpp)
+add_library(Samples ${SRC_FILES})
+set_target_properties(Samples PROPERTIES LINKER_LANGUAGE CXX)
+target_include_directories(Samples PUBLIC include/)
+target_link_libraries(Samples PUBLIC Common)
+
 add_executable(PhysicsEngine main.cpp)
 target_link_libraries(PhysicsEngine PRIVATE Common)
+target_link_libraries(PhysicsEngine PRIVATE Samples)
 target_include_directories(PhysicsEngine PUBLIC samples/include/)
 
 # Disable SDL main

@@ -20,10 +20,13 @@ namespace PhysicsEngine
     public:
         World() noexcept = default;
 
-        void Init(std::size_t bodyCount) noexcept;
+        void Init(int bodyCount = 100) noexcept;
         BodyRef CreateBody() noexcept;
-        Body& GetBody(BodyRef bodyRef);
+        void DestroyBody(BodyRef bodyRef) noexcept;
+        [[nodiscard]] Body& GetBody(BodyRef bodyRef);
         void Update(float deltaTime) noexcept;
+
+        [[nodiscard]] std::size_t BodyCount() { return _bodies.size(); }
     };
 }
 

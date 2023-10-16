@@ -7,16 +7,12 @@
 
 namespace PhysicsEngine
 {
-    void World::Init(std::size_t bodyCount) noexcept
+    void World::Init(int bodyCount) noexcept
     {
-        for (int i = 0; i < bodyCount; i++)
-        {
-            _bodies.emplace_back();
-            _generationIndices.emplace_back(0);
-        }
+        if (bodyCount < 0) bodyCount = 0;
 
-//        _bodies.resize(bodyCount, Body());
-//        _generationIndices.resize(bodyCount, 0);
+        _bodies.resize(bodyCount, Body());
+        _generationIndices.resize(bodyCount, 0);
     }
 
     BodyRef World::CreateBody() noexcept
@@ -34,23 +30,26 @@ namespace PhysicsEngine
             return BodyRef{index, _generationIndices[index]};
         }
 
-//        // No body with negative mass found.
-//        std::size_t previousSize = _bodies.size();
-//
-//        _bodies.resize(previousSize + _bodyResizeAmount, Body());
-//        _generationIndices.resize(previousSize + _bodyResizeAmount, 0);
+        // No body with negative mass found.
+        std::size_t previousSize = _bodies.size();
 
-        _bodies.emplace_back();
-        _generationIndices.emplace_back(0);
+        _bodies.resize(previousSize + _bodyResizeAmount, Body());
+        _generationIndices.resize(previousSize + _bodyResizeAmount, 0);
 
-        return { _bodies.size() - 1, _generationIndices[_generationIndices.size() - 1] };
+        return { previousSize, _generationIndices[previousSize] };
+    }
+
+    void World::DestroyBody(BodyRef bodyRef) noexcept
+    {
+        _bodies[bodyRef.Index] = Body();
+        _generationIndices[bodyRef.Index]++;
     }
 
     Body& World::GetBody(BodyRef bodyRef)
     {
         if (_generationIndices[bodyRef.Index] != bodyRef.GenerationIdx)
         {
-            std::cout << "THROW EXCEPTION" << "\n";
+            throw std::runtime_error("Null body reference exception");
         }
 
         return _bodies[bodyRef.Index];
@@ -58,7 +57,6 @@ namespace PhysicsEngine
 
     void World::Update(const float deltaTime) noexcept
     {
-        int i = 0;
         for (auto& body : _bodies)
         {
             if (!body.IsValid()) continue;
@@ -72,11 +70,7 @@ namespace PhysicsEngine
             // Change position according to velocity and delta time.
             body.SetPosition(body.Position() + body.Velocity() * deltaTime);
 
-            std::cout << i << " : " << body.Position().X << " " << body.Position().Y << "\n";
-
             body.SetForces(Vec2F::Zero());
-
-            i++;
         }
     }
 }
