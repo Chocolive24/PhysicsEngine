@@ -3,7 +3,7 @@
 //
 
 #include "Random.h"
-#include "../include/PlanetSystem.h"
+#include "PlanetSystem.h"
 
 void PlanetSystem::Init(PhysicsEngine::World& world)
 {
@@ -11,22 +11,22 @@ void PlanetSystem::Init(PhysicsEngine::World& world)
 
     // Create the sun.
     _sun = {world.CreateBody(), 5.f, {255, 0, 0, 255}};
-    auto& sunBody = world.GetBody(_sun.BodyRef);
-    sunBody = PhysicsEngine::Body(rotationCenter, Vec2F::Zero(), 100000.f);
+    auto& body = world.GetBody(_sun.BodyRef);
+    body = PhysicsEngine::Body(rotationCenter, Vec2F::Zero(), 100000.f);
 
     for (auto& planet : _planets)
     {
-        auto theSun = world.GetBody(_sun.BodyRef);
+        auto& sunBody = world.GetBody(_sun.BodyRef);
         CelestialBody p = {world.CreateBody(), Random::Range(3.f, 10.f), {0, 0, 255, 255}};
         auto& pBody = world.GetBody(p.BodyRef);
 
         Vec2F rndPos(Random::Range(300.f, 600.f), Random::Range(100.f, 500.f));
 
         // Distance between the sun and the planet.
-        Vec2F r = theSun.Position() - rndPos;
+        Vec2F r = sunBody.Position() - rndPos;
         float distance = r.Length();
 
-        Vec2F initVel = std::sqrt(G * (theSun.Mass() / distance)) * Vec2F(-r.Y, r.X).Normalized();
+        Vec2F initVel = std::sqrt(G * (sunBody.Mass() / distance)) * Vec2F(-r.Y, r.X).Normalized();
 
         pBody = PhysicsEngine::Body(rndPos, initVel, 100.f);
 
@@ -34,8 +34,8 @@ void PlanetSystem::Init(PhysicsEngine::World& world)
     }
 }
 
-void PlanetSystem::RunGameLoop(RenderingManager& renderingManager, InputManager& inputManager, PhysicsEngine::World& world,
-                                Timer& timer)
+void PlanetSystem::RunGameLoop(RenderingManager& renderingManager, InputManager& inputManager,
+                               PhysicsEngine::World& world, Timer& timer)
 {
     bool quit = false;
 
