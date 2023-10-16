@@ -42,6 +42,24 @@ void RenderingManager::UnInit() const noexcept
     SDL_Quit();
 }
 
+void RenderingManager::AddVertex(Vec2F pos, SDL_Color color, float u, float v)
+{
+    //Vector2F vertexPos = PosToVertex(scaledVec);
+
+    SDL_Vertex vertex;
+    vertex.position.x = pos.X;
+    vertex.position.y = pos.Y;
+    vertex.color.r = color.r;
+    vertex.color.g = color.g;
+    vertex.color.b = color.b;
+    vertex.color.a = color.a;
+    vertex.tex_coord.x = u;
+    vertex.tex_coord.y = v;
+
+    _vertexBuffer[_vertexBufferUsed] = vertex;
+    _vertexBufferUsed++;
+}
+
 void RenderingManager::DrawCircle(float centerX, float centerY, float r, std::size_t pointNbr) const noexcept
 {
     auto angleIncrement = (2.0f * MathUtility::Pi) / static_cast<float>(pointNbr);
@@ -65,8 +83,10 @@ void RenderingManager::DrawCircle(float centerX, float centerY, float r, std::si
     SDL_RenderDrawLine(Renderer, points[0].x, points[0].y, points[pointNbr - 1].x, points[pointNbr - 1].y);
 }
 
-void RenderingManager::DrawFilledCircle(float centerX, float centerY, float r, std::size_t pointNbr) const noexcept
+void RenderingManager::DrawFilledCircle(float centerX, float centerY, float r, std::size_t pointNbr, SDL_Color color) noexcept
 {
+    int startIndex = _vertexBufferUsed;
+
     auto angleIncrement = (2.0f * MathUtility::Pi) / static_cast<float>(pointNbr);
 
     for (std::size_t i = 0; i < pointNbr; i++)
@@ -75,6 +95,19 @@ void RenderingManager::DrawFilledCircle(float centerX, float centerY, float r, s
         float x = centerX + (r * MathUtility::Cos(Radian(angle)));
         float y = centerY + (r * MathUtility::Sin(Radian(angle)));
 
-        SDL_RenderDrawLineF(Renderer, centerX, centerY, x, y);
+        AddVertex(Vec2F(x, y), color, 1, 1);
     }
+
+    // Connect the last vertex with the first vertex to close the circle
+    AddVertex(Vec2F(centerX + r, centerY), color, 1, 1);
+
+    for (int i = 0; i < pointNbr; i++)
+    {
+        _indexBuffer[_indexBufferUsed++] = startIndex + i;
+        _indexBuffer[_indexBufferUsed++] = startIndex + i + 1;
+        _indexBuffer[_indexBufferUsed++] = startIndex + pointNbr;
+    }
+
+    SDL_RenderGeometry(Renderer, nullptr,  _vertexBuffer, _vertexBufferUsed,
+                       _indexBuffer, _indexBufferUsed);
 }

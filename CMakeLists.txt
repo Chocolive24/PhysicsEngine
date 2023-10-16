@@ -23,13 +23,12 @@ target_link_libraries(Common PUBLIC SDL2::SDL2)
 file(GLOB_RECURSE SAMPLES_SRC_FILES samples/include/*.h samples/src/*.cpp)
 add_library(Samples ${SRC_FILES})
 set_target_properties(Samples PROPERTIES LINKER_LANGUAGE CXX)
-target_include_directories(Samples PUBLIC include/)
+target_include_directories(Samples PUBLIC samples/include/)
 target_link_libraries(Samples PUBLIC Common)
 
 add_executable(PhysicsEngine main.cpp)
 target_link_libraries(PhysicsEngine PRIVATE Common)
 target_link_libraries(PhysicsEngine PRIVATE Samples)
-target_include_directories(PhysicsEngine PUBLIC samples/include/)
 
 # Disable SDL main
 add_definitions(-DSDL_MAIN_HANDLED)

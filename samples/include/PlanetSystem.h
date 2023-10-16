@@ -20,7 +20,7 @@ class PlanetSystem
 {
 public:
     static constexpr float G = 100.f;
-    static constexpr std::size_t PlanetToCreate = 20;
+    static constexpr std::size_t PlanetToCreate = 200;
 
 private:
     std::array<CelestialBody, PlanetToCreate> _planets{};

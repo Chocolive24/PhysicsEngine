@@ -19,7 +19,7 @@ int main()
     timer.Init();
 
     PhysicsEngine::World world;
-    world.Init(PlanetSystem::PlanetToCreate + 1);
+    world.Init(1);
 
     PlanetSystem planetSystem;
     planetSystem.Init(world);
