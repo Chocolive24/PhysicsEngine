@@ -18,7 +18,7 @@ private:
     std::array<bool, 5> _mouseButtonsDown{};
     std::array<bool, 5> _mouseButtonsPressed{};
 
-    Vec2F _mousePosition = Vec2F::Zero();
+    Math::Vec2F _mousePosition = Math::Vec2F::Zero();
 
 public:
     SDL_Event event{};
@@ -30,8 +30,8 @@ public:
         return _mouseButtonsDown[mouseButton];
     }
 
-    [[nodiscard]] constexpr Vec2F MousePositionInPixels() const noexcept { return _mousePosition; }
-    [[nodiscard]] constexpr Vec2F MousePositionInMeters() const noexcept
+    [[nodiscard]] constexpr Math::Vec2F MousePositionInPixels() const noexcept { return _mousePosition; }
+    [[nodiscard]] constexpr Math::Vec2F MousePositionInMeters() const noexcept
     {
         return PhysicsEngine::Metrics::PixelsToMeters(_mousePosition);
     }

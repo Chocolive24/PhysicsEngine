@@ -29,11 +29,11 @@ private:
     std::vector<CelestialBody> _planets{};
     CelestialBody _sun{};
 
-    [[nodiscard]] CelestialBody createPlanet(PhysicsEngine::World& world, Vec2F pos, float radius,
+    [[nodiscard]] CelestialBody createPlanet(PhysicsEngine::World& world, Math::Vec2F pos, float radius,
                                              SDL_Color color) noexcept;
 
 public:
-    PlanetSystem() noexcept = default;
+    constexpr PlanetSystem() noexcept = default;
 
     void Init(PhysicsEngine::World& world);
 

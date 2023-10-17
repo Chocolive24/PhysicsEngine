@@ -59,7 +59,7 @@ TEST_P(AngleTestFixtureMixed, DegreeConstructor)
 
     for (int i = 0; i < Size; i++)
     {
-        Degree degree(values[i]);
+        Math::Degree degree(values[i]);
 
         EXPECT_FLOAT_EQ(static_cast<float>(degree), values[i]);
     }
@@ -71,9 +71,9 @@ TEST_P(AngleTestFixtureMixedPair, DegreeOperatorPlus)
 
     for (int i = 0; i < Size; i++)
     {
-        Degree degree(values.first[i]);
-        Degree degree2(values.second[i]);
-        Degree result = degree;
+        Math::Degree degree(values.first[i]);
+        Math::Degree degree2(values.second[i]);
+        Math::Degree result = degree;
 
         result += degree2;
 
@@ -88,9 +88,9 @@ TEST_P(AngleTestFixtureMixedPair, DegreeOperatorMinus)
 
     for (int i = 0; i < Size; i++)
     {
-        Degree degree(values.first[i]);
-        Degree degree2(values.second[i]);
-        Degree result = degree;
+        Math::Degree degree(values.first[i]);
+        Math::Degree degree2(values.second[i]);
+        Math::Degree result = degree;
 
         result -= degree2;
 
@@ -106,9 +106,9 @@ TEST_P(AngleTestFixtureMixedWithScalars, DegreeOperatorMultiply)
 
     for (int i = 0; i < Size; i++)
     {
-        Degree degree(pairs.first[i]);
+        Math::Degree degree(pairs.first[i]);
         float scalar = pairs.second[i];
-        Degree result = degree;
+        Math::Degree result = degree;
 
         result *= scalar;
 
@@ -123,13 +123,14 @@ TEST_P(AngleTestFixtureMixedWithScalars, DegreeOperatorDivide)
 
     for (int i = 0; i < Size; i++)
     {
-        Degree degree(pairs.first[i]);
+        Math::Degree degree(pairs.first[i]);
         float scalar = pairs.second[i];
-        Degree result = degree;
+        Math::Degree result = degree;
 
         if (scalar == 0)
         {
-            EXPECT_THROW(result / scalar, DivisionByZeroException);
+            Math::Degree res;
+            EXPECT_THROW(res = result / scalar, DivisionByZeroException);
             EXPECT_THROW(result /= scalar, DivisionByZeroException);
             continue;
         }
@@ -147,8 +148,8 @@ TEST_P(AngleTestFixtureMixedPair, DegreeOperatorEqualities)
 
     for (int i = 0; i < Size; i++)
     {
-        Degree degree(values.first[i]);
-        Degree degree2(values.second[i]);
+        Math::Degree degree(values.first[i]);
+        Math::Degree degree2(values.second[i]);
 
         EXPECT_EQ(degree == degree2, values.first[i] == values.second[i]);
         EXPECT_EQ(degree != degree2, values.first[i] != values.second[i]);
@@ -169,7 +170,7 @@ TEST_P(AngleTestFixtureMixed, RadianConstructor)
 
     for (int i = 0; i < Size; i++)
     {
-        Radian radian(values[i]);
+        Math::Radian radian(values[i]);
 
         EXPECT_FLOAT_EQ(static_cast<float>(radian), values[i]);
     }
@@ -181,9 +182,9 @@ TEST_P(AngleTestFixtureMixedPair, RadianOperatorPlus)
 
     for (int i = 0; i < Size; i++)
     {
-        Radian radian(values.first[i]);
-        Radian radian2(values.second[i]);
-        Radian result = radian;
+        Math::Radian radian(values.first[i]);
+        Math::Radian radian2(values.second[i]);
+        Math::Radian result = radian;
 
         result += radian2;
 
@@ -198,9 +199,9 @@ TEST_P(AngleTestFixtureMixedPair, RadianOperatorMinus)
 
     for (int i = 0; i < Size; i++)
     {
-        Radian radian(values.first[i]);
-        Radian radian2(values.second[i]);
-        Radian result = radian;
+        Math::Radian radian(values.first[i]);
+        Math::Radian radian2(values.second[i]);
+        Math::Radian result = radian;
 
         result -= radian2;
 
@@ -216,9 +217,9 @@ TEST_P(AngleTestFixtureMixedWithScalars, RadianOperatorMultiply)
 
     for (int i = 0; i < Size; i++)
     {
-        Radian radian(pairs.first[i]);
+        Math::Radian radian(pairs.first[i]);
         float scalar = pairs.second[i];
-        Radian result = radian;
+        Math::Radian result = radian;
 
         result *= scalar;
 
@@ -233,13 +234,14 @@ TEST_P(AngleTestFixtureMixedWithScalars, RadianOperatorDivide)
 
     for (int i = 0; i < Size; i++)
     {
-        Radian radian(pairs.first[i]);
+        Math::Radian radian(pairs.first[i]);
         float scalar = pairs.second[i];
-        Radian result = radian;
+        Math::Radian result = radian;
 
         if (scalar == 0)
         {
-            EXPECT_THROW(result / scalar, DivisionByZeroException);
+            Math::Radian res;
+            EXPECT_THROW(res = result / scalar, DivisionByZeroException);
             EXPECT_THROW(result /= scalar, DivisionByZeroException);
             continue;
         }
@@ -257,8 +259,8 @@ TEST_P(AngleTestFixtureMixedPair, RadianOperatorEqualities)
 
     for (int i = 0; i < Size; i++)
     {
-        Radian radian(values.first[i]);
-        Radian radian2(values.second[i]);
+        Math::Radian radian(values.first[i]);
+        Math::Radian radian2(values.second[i]);
 
         EXPECT_EQ(radian == radian2, values.first[i] == values.second[i]);
         EXPECT_EQ(radian != radian2, values.first[i] != values.second[i]);

@@ -1,53 +1,31 @@
-//
-// Created by remla on 10/10/2023.
-//
+/**
+ * @author Rémy
+ */
+
+#include "NScalar.h"
+#include "Vec2.h"
 
 #include "gtest/gtest.h"
-#include "NScalar.h"
 
-struct EightScalarFTestFixture : public ::testing::TestWithParam<std::pair<EightScalarF, EightScalarF>>
-{
-};
+using namespace Math;
 
 struct FourScalarFTestFixtureMixed : public ::testing::TestWithParam<std::pair<FourScalarF, FourScalarF>>
 {
 };
-
-struct EightScalarITestFixture : public ::testing::TestWithParam<std::pair<EightScalarI, EightScalarI>>
-{
-};
-
 struct FourScalarITestFixtureMixed : public ::testing::TestWithParam<std::pair<FourScalarI, FourScalarI>>
 {
 };
 
 #pragma region InstantiateParametrizedTests
 
-INSTANTIATE_TEST_SUITE_P(NScalar, EightScalarFTestFixture, testing::Values(
-        std::make_pair(
-                EightScalarF(std::array<float, 8>{
-                        1.3f, 3.5f, 5.7f, 7.9f, 9.11f, 11.13f, 14.16f, 16.18f
-                }),
-                EightScalarF(std::array<float, 8>{
-                        10.3f, 32.5f, 54.7f, 8.10f, 1.1f, 10.12f, 111.13f, 12.14f
-                }))
-));
-
 INSTANTIATE_TEST_SUITE_P(NScalar, FourScalarFTestFixtureMixed, testing::Values(
         std::make_pair(
                 FourScalarF(std::array<float, 4>{1.4f, 2.5f, 3.6f, 4.7f}),
                 FourScalarF(std::array<float, 4>{0, 2.5f, 6.9f, 8.11f})
-        )
-));
-
-INSTANTIATE_TEST_SUITE_P(NScalar, EightScalarITestFixture, testing::Values(
+        ),
         std::make_pair(
-                EightScalarI(std::array<int, 8>{
-                        1, 3, 5, 7, 9, 11, 14, 16
-                }),
-                EightScalarI(std::array<int, 8>{
-                        10, 32, 6, 8, 98, 10, 14, 16
-                })
+                FourScalarF(std::array<float, 4>{-1.4f, -2.5f, -3.6f, -4.7f}),
+                FourScalarF(std::array<float, 4>{6.f, -2.5f, -6.9f, -8.11f})
         )
 ));
 
@@ -55,194 +33,48 @@ INSTANTIATE_TEST_SUITE_P(NScalar, FourScalarITestFixtureMixed, testing::Values(
         std::make_pair(
                 FourScalarI(std::array<int, 4>{1, 2, 7, 8}),
                 FourScalarI(std::array<int, 4>{10, 2, 0, 4})
+        ),
+        std::make_pair(
+                FourScalarI(std::array<int, 4>{-1, -2, -7, -8}),
+                FourScalarI(std::array<int, 4>{-10, -2, 8, -4})
         )
 ));
 
+#pragma endregion
 
-TEST_P(EightScalarFTestFixture, OperatorPlus)
+TEST(FourScalarITest, Creation)
 {
-    auto pair = GetParam();
-    auto nV1 = pair.first;
-    auto nV2 = pair.second;
+    std::array<int, 4> values = {1, 0, 2, 3};
+    Math::FourScalarI nS(values);
 
-    auto result = nV1 + nV2;
-    auto result2 = nV1;
-    result2 += nV2;
-
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < 4; i++)
     {
-        // +
-        EXPECT_EQ(result[i], nV1[i] + nV2[i]);
-        // +=
-        EXPECT_EQ(result2[i], nV1[i] + nV2[i]);
-        EXPECT_EQ(result2[i], nV1[i] + nV2[i]);
+        EXPECT_EQ(nS[i], values[i]);
+    }
+
+    Math::FourScalarI nS2(2);
+    for (int i = 0; i < 4; i++)
+    {
+        EXPECT_EQ(nS2[i], 2);
     }
 }
 
-TEST_P(EightScalarFTestFixture, OperatorMinus)
+TEST(FourScalarFTest, Creation)
 {
-    auto pair = GetParam();
-    auto nV1 = pair.first;
-    auto nV2 = pair.second;
+    std::array<float, 4> values = {1.5f, 0.0f, 2.8f, 33.4f};
+    Math::FourScalarF nS(values);
 
-    auto result = nV1 - nV2;
-    auto result2 = nV1;
-    result2 -= nV2;
-    auto result3 = -nV1;
-
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < 4; i++)
     {
-        // -
-        EXPECT_EQ(result[i], nV1[i] - nV2[i]);
-        // -=
-        EXPECT_EQ(result2[i], nV1[i] - nV2[i]);
-        // - unary
-        EXPECT_EQ(result3[i], -nV1[i]);
+        EXPECT_EQ(nS[i], values[i]);
+    }
+
+    Math::FourScalarF nS2(54.4f);
+    for (int i = 0; i < 4; i++)
+    {
+        EXPECT_EQ(nS2[i], 54.4f);
     }
 }
-
-TEST_P(EightScalarFTestFixture, OperatorMultiply)
-{
-    auto pair = GetParam();
-    auto nV1 = pair.first;
-    auto nV2 = pair.second;
-
-    auto result = nV1 * nV2;
-    auto result2 = nV1;
-    result2 *= nV2;
-
-    for (int i = 0; i < 8; i++)
-    {
-        // *
-        EXPECT_EQ(result[i], nV1[i] * nV2[i]);
-        // *=
-        EXPECT_EQ(result2[i], nV1[i] * nV2[i]);
-    }
-}
-
-TEST_P(EightScalarFTestFixture, OperatorDivide)
-{
-    auto pair = GetParam();
-    auto nV1 = pair.first;
-    auto nV2 = pair.second;
-    constexpr auto epsilon = 0.0001f;
-
-    for (int i = 0; i < 8; i++)
-    {
-        if (nV2[i] == 0 )
-        {
-            EXPECT_THROW(nV1 / nV2, DivisionByZeroException);
-            EXPECT_THROW(nV1 /= nV2, DivisionByZeroException);
-            return;
-        }
-    }
-
-    auto result = nV1 / nV2;
-    auto result2 = nV1;
-    result2 /= nV2;
-
-    for (int i = 0; i < 8; i++)
-    {
-        // /
-        EXPECT_NEAR(result[i], nV1[i] / nV2[i], epsilon);
-        // /=
-        EXPECT_NEAR(result2[i], nV1[i] / nV2[i], epsilon);
-
-    }
-}
-
-TEST_P(EightScalarITestFixture, OperatorPlus)
-{
-    auto pair = GetParam();
-    auto nV1 = pair.first;
-    auto nV2 = pair.second;
-
-    auto result = nV1 + nV2;
-    auto result2 = nV1;
-    result2 += nV2;
-
-    for (int i = 0; i < 8; i++)
-    {
-        // +
-        EXPECT_EQ(result[i], nV1[i] + nV2[i]);
-        // +=
-        EXPECT_EQ(result2[i], nV1[i] + nV2[i]);
-        EXPECT_EQ(result2[i], nV1[i] + nV2[i]);
-    }
-}
-
-TEST_P(EightScalarITestFixture, OperatorMinus)
-{
-    auto pair = GetParam();
-    auto nV1 = pair.first;
-    auto nV2 = pair.second;
-
-    auto result = nV1 - nV2;
-    auto result2 = nV1;
-    result2 -= nV2;
-    auto result3 = -nV1;
-
-    for (int i = 0; i < 8; i++)
-    {
-        // -
-        EXPECT_EQ(result[i], nV1[i] - nV2[i]);
-        // -=
-        EXPECT_EQ(result2[i], nV1[i] - nV2[i]);
-        // - unary
-        EXPECT_EQ(result3[i], -nV1[i]);
-    }
-}
-
-TEST_P(EightScalarITestFixture, OperatorMultiply)
-{
-    auto pair = GetParam();
-    auto nV1 = pair.first;
-    auto nV2 = pair.second;
-
-    auto result = nV1 * nV2;
-    auto result2 = nV1;
-    result2 *= nV2;
-
-    for (int i = 0; i < 8; i++)
-    {
-        // *
-        EXPECT_EQ(result[i], nV1[i] * nV2[i]);
-        // *=
-        EXPECT_EQ(result2[i], nV1[i] * nV2[i]);
-    }
-}
-
-TEST_P(EightScalarITestFixture, OperatorDivide)
-{
-    auto pair = GetParam();
-    auto nV1 = pair.first;
-    auto nV2 = pair.second;
-    constexpr auto epsilon = 0.0001f;
-
-    for (int i = 0; i < 8; i++)
-    {
-        if (nV2[i] == 0 )
-        {
-            EXPECT_THROW(nV1 / nV2, DivisionByZeroException);
-            EXPECT_THROW(nV1 /= nV2, DivisionByZeroException);
-            return;
-        }
-    }
-
-    auto result = nV1 / nV2;
-    auto result2 = nV1;
-    result2 /= nV2;
-
-    for (int i = 0; i < 8; i++)
-    {
-        // /
-        EXPECT_NEAR(result[i], nV1[i] / nV2[i], epsilon);
-        // /=
-        EXPECT_NEAR(result2[i], nV1[i] / nV2[i], epsilon);
-
-    }
-}
-
 
 
 TEST_P(FourScalarFTestFixtureMixed, OperatorPlus)
@@ -315,9 +147,10 @@ TEST_P(FourScalarFTestFixtureMixed, OperatorDivide)
 
     for (int i = 0; i < 4; i++)
     {
-        if (nV2[i] == 0 )
+        if (nV2[i] == 0)
         {
-            EXPECT_THROW(nV1 / nV2, DivisionByZeroException);
+            FourScalarF res;
+            EXPECT_THROW(res = nV1 / nV2, DivisionByZeroException);
             EXPECT_THROW(nV1 /= nV2, DivisionByZeroException);
             return;
         }
@@ -409,7 +242,8 @@ TEST_P(FourScalarITestFixtureMixed, OperatorDivide)
     {
         if (nV2[i] == 0 )
         {
-            EXPECT_THROW(nV1 / nV2, DivisionByZeroException);
+            FourScalarI res;
+            EXPECT_THROW(res = nV1 / nV2, DivisionByZeroException);
             EXPECT_THROW(nV1 /= nV2, DivisionByZeroException);
             return;
         }
@@ -425,6 +259,5 @@ TEST_P(FourScalarITestFixtureMixed, OperatorDivide)
         EXPECT_NEAR(result[i], nV1[i] / nV2[i], epsilon);
         // /=
         EXPECT_NEAR(result2[i], nV1[i] / nV2[i], epsilon);
-
     }
 }

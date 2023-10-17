@@ -1,13 +1,17 @@
-#include "gtest/gtest.h"
-#include "Vec2.h"
-#include "Random.h"
-
 /**
  * @headerfile Test the Vec2.h classes and functions
  * @author Alexis
  */
 
-constexpr int Size = 30;
+#include "Vec2.h"
+#include "Random.h"
+
+#include "gtest/gtest.h"
+
+
+using namespace Math;
+
+constexpr int ValuesSize = 30;
 
 enum numberType
 {
@@ -17,19 +21,19 @@ enum numberType
 template <typename T>
 T* GenerateValues(numberType type, bool reverseOrder = false)
 {
-	auto* list = new T[Size];
+	auto* list = new T[ValuesSize];
 
-	for (int i = 1; i < Size + 1; i++)
+	for (int i = 1; i < ValuesSize + 1; i++)
 	{
 		T number = 0;
-		int j = reverseOrder ? Size - i + 1 : i;
+		int j = reverseOrder ? ValuesSize - i + 1 : i;
 
 		switch (type)
 		{
 			case Positive: number = j; break;
 			case Negative: number = -j; break;
 			case Mixed: number = j % 2 == 0 ? j : -j; break;
-			case Time: number = static_cast<float>(j) / static_cast<float>(Size); break;
+			case Time: number = static_cast<float>(j) / static_cast<float>(ValuesSize); break;
 		}
 
 		list[i - 1] = number;
@@ -41,13 +45,13 @@ T* GenerateValues(numberType type, bool reverseOrder = false)
 template <typename T>
 Vec2<T>* GenerateVectors(numberType type, bool reverseOrder = false)
 {
-	auto* list = new Vec2<T>[Size];
+	auto* list = new Vec2<T>[ValuesSize];
 	auto* values = GenerateValues<T>(type);
 	auto* values2 = GenerateValues<T>(type, true);
 
-	for (int i = 0; i < Size; i++)
+	for (int i = 0; i < ValuesSize; i++)
 	{
-		const auto index = reverseOrder ? Size - i - 1 : i;
+		const auto index = reverseOrder ? ValuesSize - i - 1 : i;
 
 		list[i] = Vec2<T>(values[index], values2[index]);
 	}
@@ -111,7 +115,7 @@ TEST_P(IntTestFixtureMixed, Constructor)
 {
 	auto* values = GetParam();
 
-	for (int i = 0; i < Size; i++)
+	for (int i = 0; i < ValuesSize; i++)
 	{
 		Vec2I vec2i(values[i], values[i]);
 
@@ -126,7 +130,7 @@ TEST_P(Vec2ITestFixtureMixedPair, OperatorPlus)
 	auto* values = pair.first;
 	auto* additives = pair.second;
 
-	for (int i = 0; i < Size; i++)
+	for (int i = 0; i < ValuesSize; i++)
 	{
 		Vec2I value = values[i];
 		Vec2I additive = additives[i];
@@ -149,7 +153,7 @@ TEST_P(Vec2ITestFixtureMixedPair, OperatorMinus)
 	auto* values = pair.first;
 	auto* additives = pair.second;
 
-	for (int i = 0; i < Size; i++)
+	for (int i = 0; i < ValuesSize; i++)
 	{
 		auto value = values[i];
 		auto additive = additives[i];
@@ -176,7 +180,7 @@ TEST_P(Vec2ITestFixtureMixedPairWithScalar, OperatorMultiply)
 	auto* multipliers = pair.first.second;
 	auto* scalars = pair.second;
 
-	for (int i = 0; i < Size; i++)
+	for (int i = 0; i < ValuesSize; i++)
 	{
 		auto value = values[i];
 		auto multiplier = multipliers[i];
@@ -212,7 +216,7 @@ TEST_P(Vec2ITestFixtureMixedPairWithScalar, OperatorDivide)
 	const auto* dividers = pairs.first.second;
 	const auto* scalars = pairs.second;
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		const auto value = values[i];
 		const auto divisor = dividers[i];
@@ -222,14 +226,16 @@ TEST_P(Vec2ITestFixtureMixedPairWithScalar, OperatorDivide)
 
 		if (divisor.X == 0 || divisor.Y == 0)
 		{
-			EXPECT_THROW(result / divisor, DivisionByZeroException);
+			Vec2I res;
+			EXPECT_THROW(res = result / divisor, DivisionByZeroException);
 			EXPECT_THROW(result /= divisor, DivisionByZeroException);
 			continue;
 		}
 
 		if (scalar == 0)
 		{
-			EXPECT_THROW(resultScalar / scalar, DivisionByZeroException);
+			Vec2I res;
+			EXPECT_THROW(res = resultScalar / scalar, DivisionByZeroException);
 			EXPECT_THROW(resultScalar /= scalar, DivisionByZeroException);
 			continue;
 		}
@@ -258,7 +264,7 @@ TEST_P(Vec2ITestFixtureMixedPair, OperatorEqual)
 	auto* values = pair.first;
 	auto* values2 = pair.second;
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		EXPECT_EQ(values[i].X == values2[i].X && values[i].Y == values2[i].Y, values[i] == values2[i]);
 		EXPECT_EQ(values[i].X != values2[i].X || values[i].Y != values2[i].Y, values[i] != values2[i]);
@@ -269,7 +275,7 @@ TEST_P(Vec2ITestFixtureMixedVec, OperatorIndex)
 {
 	auto* values = GetParam();
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		Vec2I value = values[i];
 
@@ -277,7 +283,8 @@ TEST_P(Vec2ITestFixtureMixedVec, OperatorIndex)
 		EXPECT_EQ(value[1], values[i].Y);
 	}
 
-	EXPECT_THROW(values[0][2], OutOfRangeException);
+	int res;
+	EXPECT_THROW(res = values[0][2], OutOfRangeException);
 }
 
 TEST_P(Vec2ITestFixtureMixedPair, Dot)
@@ -286,7 +293,7 @@ TEST_P(Vec2ITestFixtureMixedPair, Dot)
 	auto* values = pair.first;
 	auto* values2 = pair.second;
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		EXPECT_EQ(values[i].X * values2[i].X + values[i].Y * values2[i].Y, values[i].Dot(values2[i]));
 	}
@@ -298,7 +305,7 @@ TEST_P(Vec2ITestFixtureMixedPair, Length)
 	auto* values = pair.first;
 	auto* values2 = pair.second;
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		auto length = std::sqrt(values[i].X * values[i].X + values[i].Y * values[i].Y);
 		EXPECT_EQ(static_cast<int>(length), values[i].Length());
@@ -309,7 +316,7 @@ TEST_P(Vec2ITestFixtureMixedVec, Normalized)
 {
 	auto* values = GetParam();
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		auto length = static_cast<int>(std::sqrt(values[i].X * values[i].X + values[i].Y * values[i].Y));
 
@@ -339,7 +346,7 @@ TEST_P(Vec2ITestFixtureMixedPair, IsPerpendicular)
 	auto* values = pair.first;
 	auto* values2 = pair.second;
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		EXPECT_EQ(values[i].Dot(values2[i]) == 0, values[i].IsPerpendicular(values2[i]));
 	}
@@ -351,7 +358,7 @@ TEST_P(Vec2ITestFixtureMixedPair, IsParallel)
 	auto* values = pair.first;
 	auto* values2 = pair.second;
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		const auto result = values[i].X * values2[i].Y - values[i].Y * values2[i].X;
 		EXPECT_EQ(result == 0, values[i].IsParallel(values2[i]));
@@ -364,7 +371,7 @@ TEST_P(Vec2ITestFixtureMixedPair, Project)
 	auto* values = pair.first;
 	auto* values2 = pair.second;
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		Vec2I vecUnit;
 
@@ -395,7 +402,7 @@ TEST_P(Vec2ITestFixtureMixedPair, Reflect)
 	auto* values = pair.first;
 	auto* values2 = pair.second;
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		Vec2I currentVec = values[i];
 		Vec2I normalizedVec;
@@ -427,7 +434,7 @@ TEST_P(Vec2ITestFixtureMixedPair, Angle)
 	auto* values = pair.first;
 	auto* values2 = pair.second;
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		auto vecAf = Vec2I(values[i].X, values[i].Y);
 		auto vecBf = Vec2I(values2[i].X, values2[i].Y);
@@ -445,7 +452,7 @@ TEST_P(Vec2ITestFixtureMixedPairWithTime, Lerp)
 	auto* values2 = pair.first.second;
 	auto* times = pair.second;
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		auto vecAf = Vec2I(values[i].X, values[i].Y);
 		auto vecBf = Vec2I(values2[i].X, values2[i].Y);
@@ -463,7 +470,7 @@ TEST_P(Vec2ITestFixtureMixedPairWithTime, Slerp)
 	auto* values2 = pair.first.second;
 	auto* times = pair.second;
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		auto vecAf = Vec2I(values[i].X, values[i].Y);
 		auto vecBf = Vec2I(values2[i].X, values2[i].Y);
@@ -480,9 +487,9 @@ TEST_P(Vec2ITestFixtureMixedPairWithTime, Slerp)
 			continue;
 		}
 
-		float sinAngle = MathUtility::Sin(angleBetween);
-		float sinAngleT = MathUtility::Sin(times[i] * angleBetween);
-		float sinAngle1T = MathUtility::Sin((1 - times[i]) * angleBetween);
+		float sinAngle = Utility::Sin(angleBetween);
+		float sinAngleT = Utility::Sin(times[i] * angleBetween);
+		float sinAngle1T = Utility::Sin((1 - times[i]) * angleBetween);
 
 		if (sinAngle == 0)
 		{
@@ -506,7 +513,7 @@ TEST_P(Vec2ITestFixtureMixedPair, Distance)
 	auto* values = pair.first;
 	auto* values2 = pair.second;
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		auto distance = static_cast<int>(std::sqrt(std::pow(values[i].X - values2[i].X, 2) + std::pow(values[i].Y - values2[i].Y, 2)));
 
@@ -520,13 +527,13 @@ TEST_P(Vec2ITestFixtureVecAndScalar, Rotate)
 	auto* values = pair.first;
 	auto* scalars = pair.second;
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		auto vecAf = Vec2I(values[i].X, values[i].Y);
 		auto angle = Radian(scalars[i]);
 
-		float cos = MathUtility::Cos(angle);
-		float sin = MathUtility::Sin(angle);
+		float cos = Utility::Cos(angle);
+		float sin = Utility::Sin(angle);
 
 		int x = values[i].X * cos - values[i].Y * sin;
 		int y = values[i].X * sin + values[i].Y * cos;
@@ -548,7 +555,7 @@ TEST_P(FloatTestFixtureMixed, Constructor)
 {
 	auto* values = GetParam();
 
-	for (int i = 0; i < Size; i++)
+	for (int i = 0; i < ValuesSize; i++)
 	{
 		Vec2F vec2f(values[i], values[i]);
 
@@ -563,7 +570,7 @@ TEST_P(Vec2FTestFixtureMixedPair, OperatorPlus)
 	auto* values = pair.first;
 	auto* additives = pair.second;
 
-	for (int i = 0; i < Size; i++)
+	for (int i = 0; i < ValuesSize; i++)
 	{
 		Vec2F value = values[i];
 		Vec2F additive = additives[i];
@@ -586,7 +593,7 @@ TEST_P(Vec2FTestFixtureMixedPair, OperatorMinus)
 	auto* values = pair.first;
 	auto* additives = pair.second;
 
-	for (int i = 0; i < Size; i++)
+	for (int i = 0; i < ValuesSize; i++)
 	{
 		Vec2F value = values[i];
 		Vec2F additive = additives[i];
@@ -613,7 +620,7 @@ TEST_P(Vec2FTestFixtureMixedPairWithScalar, OperatorMultiply)
 	auto* multipliers = pair.first.second;
 	auto* scalars = pair.second;
 
-	for (int i = 0; i < Size; i++)
+	for (int i = 0; i < ValuesSize; i++)
 	{
 		Vec2F value = values[i];
 		Vec2F multiplier = multipliers[i];
@@ -649,7 +656,7 @@ TEST_P(Vec2FTestFixtureMixedPairWithScalar, OperatorDivide)
 	auto* dividers = pair.first.second;
 	auto* scalars = pair.second;
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		Vec2F value = values[i];
 		Vec2F divisor = dividers[i];
@@ -659,14 +666,16 @@ TEST_P(Vec2FTestFixtureMixedPairWithScalar, OperatorDivide)
 
 		if (divisor.X == 0 || divisor.Y == 0)
 		{
-			EXPECT_THROW(result / divisor, DivisionByZeroException);
+			Vec2F res;
+			EXPECT_THROW(res = result / divisor, DivisionByZeroException);
 			EXPECT_THROW(result /= divisor, DivisionByZeroException);
 			continue;
 		}
 
 		if (scalar == 0)
 		{
-			EXPECT_THROW(resultScalar / scalar, DivisionByZeroException);
+			Vec2F res;
+			EXPECT_THROW(res = resultScalar / scalar, DivisionByZeroException);
 			EXPECT_THROW(resultScalar /= scalar, DivisionByZeroException);
 			continue;
 		}
@@ -695,7 +704,7 @@ TEST_P(Vec2FTestFixtureMixedPair, OperatorEqual)
 	auto* values = pair.first;
 	auto* values2 = pair.second;
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		EXPECT_EQ(values[i].X == values2[i].X && values[i].Y == values2[i].Y, values[i] == values2[i]);
 		EXPECT_EQ(values[i].X != values2[i].X || values[i].Y != values2[i].Y, values[i] != values2[i]);
@@ -706,7 +715,7 @@ TEST_P(Vec2FTestFixtureMixedVec, OperatorIndex)
 {
 	auto* values = GetParam();
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		Vec2F value = values[i];
 
@@ -714,7 +723,8 @@ TEST_P(Vec2FTestFixtureMixedVec, OperatorIndex)
 		EXPECT_FLOAT_EQ(value[1], values[i].Y);
 	}
 
-	EXPECT_THROW(values[0][2], OutOfRangeException);
+	float res;
+	EXPECT_THROW(res = values[0][2], OutOfRangeException);
 }
 
 TEST_P(Vec2FTestFixtureMixedPair, Dot)
@@ -723,7 +733,7 @@ TEST_P(Vec2FTestFixtureMixedPair, Dot)
 	auto* values = pair.first;
 	auto* values2 = pair.second;
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		EXPECT_FLOAT_EQ(values[i].X * values2[i].X + values[i].Y * values2[i].Y, values[i].Dot(values2[i]));
 	}
@@ -735,7 +745,7 @@ TEST_P(Vec2FTestFixtureMixedPair, Length)
 	auto* values = pair.first;
 	auto* values2 = pair.second;
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		auto length = std::sqrt(values[i].X * values[i].X + values[i].Y * values[i].Y);
 		EXPECT_FLOAT_EQ(length, values[i].Length());
@@ -746,7 +756,7 @@ TEST_P(Vec2FTestFixtureMixedVec, Normalized)
 {
 	auto* values = GetParam();
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		auto length = std::sqrt(values[i].X * values[i].X + values[i].Y * values[i].Y);
 
@@ -777,7 +787,7 @@ TEST_P(Vec2FTestFixtureMixedPair, IsPerpendicular)
 	auto* values2 = pair.second;
 	const auto epsilon = 0.0001f;
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		auto dot = values[i].Dot(values2[i]);
 
@@ -792,7 +802,7 @@ TEST_P(Vec2FTestFixtureMixedPair, IsParallel)
 	auto* values2 = pair.second;
 	const auto epsilon = 0.0001f;
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		const auto result = values[i].X * values2[i].Y - values[i].Y * values2[i].X;
 
@@ -807,7 +817,7 @@ TEST_P(Vec2FTestFixtureMixedPair, Project)
 	auto* values2 = pair.second;
 	const auto epsilon = 0.0001f;
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		Vec2F vecUnit;
 
@@ -840,7 +850,7 @@ TEST_P(Vec2FTestFixtureMixedPair, Reflect)
 	auto* values2 = pair.second;
 	const auto epsilon = 0.0001f;
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		Vec2F currentVec = values[i];
 		Vec2F normalizedVec;
@@ -874,7 +884,7 @@ TEST_P(Vec2FTestFixtureMixedPair, Angle)
 	auto* values2 = pair.second;
 	const auto epsilon = 0.0001f;
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		auto vecAf = Vec2F(values[i].X, values[i].Y);
 		auto vecBf = Vec2F(values2[i].X, values2[i].Y);
@@ -908,7 +918,7 @@ TEST_P(Vec2FTestFixtureMixedPairWithTime, Lerp)
 	auto* times = pair.second;
 	const auto epsilon = 0.0001f;
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		auto vecAf = Vec2F(values[i].X, values[i].Y);
 		auto vecBf = Vec2F(values2[i].X, values2[i].Y);
@@ -928,7 +938,7 @@ TEST_P(Vec2FTestFixtureMixedPairWithTime, Slerp)
 	auto* times = pair.second;
 	const auto epsilon = 0.0001f;
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		auto vecAf = Vec2F(values[i].X, values[i].Y);
 		auto vecBf = Vec2F(values2[i].X, values2[i].Y);
@@ -955,9 +965,9 @@ TEST_P(Vec2FTestFixtureMixedPairWithTime, Slerp)
 			FAIL();
 		}
 
-		float sinAngle = MathUtility::Sin(angleBetween);
-		float sinAngleT = MathUtility::Sin(times[i] * angleBetween);
-		float sinAngle1T = MathUtility::Sin((1 - times[i]) * angleBetween);
+		float sinAngle = Utility::Sin(angleBetween);
+		float sinAngleT = Utility::Sin(times[i] * angleBetween);
+		float sinAngle1T = Utility::Sin((1 - times[i]) * angleBetween);
 
 		if (sinAngle == 0)
 		{
@@ -983,7 +993,7 @@ TEST_P(Vec2FTestFixtureMixedPair, Distance)
 	auto* values2 = pair.second;
 	const auto epsilon = 0.0001f;
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		auto distance = std::sqrt(std::pow(values[i].X - values2[i].X, 2) + std::pow(values[i].Y - values2[i].Y, 2));
 
@@ -998,14 +1008,14 @@ TEST_P(Vec2FTestFixtureVecAndScalar, Rotate)
 	auto* scalars = pair.second;
 	const auto epsilon = 0.001f;
 
-	for (size_t i = 0; i < Size; i++)
+	for (size_t i = 0; i < ValuesSize; i++)
 	{
 		auto vecAf = values[i];
 		auto result = values[i];
 		auto angle = Radian(Degree(scalars[i]));
 
-		const float cos = MathUtility::Cos(angle);
-		const float sin = MathUtility::Sin(angle);
+		const float cos = Utility::Cos(angle);
+		const float sin = Utility::Sin(angle);
 
 		auto x = vecAf.X * cos - vecAf.Y * sin;
 		auto y = vecAf.X * sin + vecAf.Y * cos;

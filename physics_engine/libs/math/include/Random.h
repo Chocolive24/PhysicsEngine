@@ -2,18 +2,20 @@
 
 /**
 * @headerfile Random number generator functions and classes
-* @author Alexis Haldy
+* @author Alexis
 */
+
+#include "Definition.h"
 
 #include <random>
 
 /**
  * @brief A namespace for random number generator functions and classes
  */
-namespace Random
+namespace Math::Random
 {
     template <class T>
-    [[nodiscard]] T Range(T min, T max) noexcept
+    [[nodiscard]] NOALIAS T Range(T min, T max) noexcept
     {
         if (min > max)
         {
@@ -30,7 +32,7 @@ namespace Random
     }
 
     template <>
-    [[nodiscard]] int Range(int min, int max) noexcept
+    [[nodiscard]] NOALIAS int Range(int min, int max) noexcept
     {
         if (min > max)
         {
@@ -47,7 +49,7 @@ namespace Random
     }
 
     template <>
-    [[nodiscard]] unsigned int Range(unsigned int min, unsigned int max) noexcept
+    [[nodiscard]] NOALIAS unsigned int Range(unsigned int min, unsigned int max) noexcept
     {
         if (min > max)
         {
@@ -64,7 +66,7 @@ namespace Random
     }
 
     template <>
-    [[nodiscard]] long Range(long min, long max) noexcept
+    [[nodiscard]] NOALIAS long Range(long min, long max) noexcept
     {
         if (min > max)
         {

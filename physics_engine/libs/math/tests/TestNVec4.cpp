@@ -1,11 +1,14 @@
-//
-// Created by Olivier on 08.10.2023.
-//
+/**
+ * @author Olivier
+ */
+
+#include "NVec4.h"
+
+#include "gtest/gtest.h"
 
 #include <array>
 
-#include "gtest/gtest.h"
-#include "NVec4.h"
+using namespace Math;
 
 #pragma region Vec4 FixtureAndTestInstantations
 
@@ -63,10 +66,10 @@ INSTANTIATE_TEST_SUITE_P(FourVec4I, ArrayOfFourVec4IntFixture, testing::Values(
 
 INSTANTIATE_TEST_SUITE_P(FourVec4F, OneFourVec4FloatFixture, testing::Values(
         FourVec4F(std::array<Vec4F, 4>{
-                Vec4F(0.f, 0.f, 0.f, 0.f),
-                Vec4F(0.f, 0.f, 0.f, 0.f),
-                Vec4F(0.f, 0.f, 0.f, 0.f),
-                Vec4F(0.f, 0.f, 0.f, 0.f)}),
+                Vec4F(0.f, 1.f, 0.f, 0.f),
+                Vec4F(0.f, 0.f, 5.f, 0.f),
+                Vec4F(85.f, 0.f, 0.f, 0.f),
+                Vec4F(0.f, 0.f, 0.f, 10.f)}),
         FourVec4F(std::array<Vec4F, 4>{
                 Vec4F(1.f, 2.f, 3.f, 4.f),
                 Vec4F(5.f, 6.f, 7.f, 8.f),
@@ -81,10 +84,10 @@ INSTANTIATE_TEST_SUITE_P(FourVec4F, OneFourVec4FloatFixture, testing::Values(
 
 INSTANTIATE_TEST_SUITE_P(FourVec4I, OneFourVec4IntFixture, testing::Values(
         FourVec4I(std::array<Vec4I, 4>{
-                Vec4I(0, 0, 0, 0),
-                Vec4I(0, 0, 0, 0),
-                Vec4I(0, 0, 0, 0),
-                Vec4I(0, 0, 0, 0)}),
+                Vec4I(0, 0, 2, 0),
+                Vec4I(0, 5, 0, 0),
+                Vec4I(0, 0, 0, 9),
+                Vec4I(10, 0, 0, 0)}),
         FourVec4I(std::array<Vec4I, 4>{
                 Vec4I(1, 2, 3, 4),
                 Vec4I(5, 6, 7, 8),
@@ -155,189 +158,6 @@ INSTANTIATE_TEST_SUITE_P(FourVec4I, PairOfFourVec4AndScalarIntFixture, testing::
 
 #pragma endregion FourVec4
 
-#pragma region EightVec4 FixturesAndTestInstantations
-
-struct ArrayOfEightVec4FloatFixture : public ::testing::TestWithParam<std::array<Vec4F, 8>> {};
-
-struct ArrayOfEightVec4IntFixture : public ::testing::TestWithParam<std::array<Vec4I, 8>> {};
-
-struct OneEightVec4FloatFixture : public ::testing::TestWithParam<EightVec4F>{};
-
-struct OneEightVec4IntFixture : public ::testing::TestWithParam<EightVec4I>{};
-
-struct PairOfEightVec4FloatFixture : public ::testing::TestWithParam<std::pair<EightVec4F, EightVec4F>>{};
-
-struct PairOfEightVec4IntFixture : public ::testing::TestWithParam<std::pair<EightVec4I, EightVec4I>>{};
-
-struct PairOfEightVec4AndScalarFloatFixture : public ::testing::TestWithParam<
-        std::pair<EightVec4F, std::array<float, 8>>>{};
-
-struct PairOfEightVec4AndScalarIntFixture : public ::testing::TestWithParam<
-        std::pair<EightVec4I, std::array<int, 8>>>{};
-
-INSTANTIATE_TEST_SUITE_P(EightVec4F, ArrayOfEightVec4FloatFixture, testing::Values(
-        std::array<Vec4F, 8>{Vec4F(1.f, 2.f, 3.f, 4.f), Vec4F(5.f, 6.f, 7.f, 8.f),
-                             Vec4F(9.f, 10.f, 11.f, 12.f), Vec4F(13.f, 14.f, 15.f, 16.f),
-                             Vec4F(17.f, 18.f, 19.f, 20.f), Vec4F(21.f, 22.f, 23.f, 24.f),
-                             Vec4F(25.f, 26.f, 27.f, 28.f), Vec4F(29.f, 30.f, 31.f, 32.f)},
-        std::array<Vec4F, 8>{Vec4F(33.33f, 44.44f, 55.55f, 66.66f),
-                             Vec4F(77.77f, 88.88f, 99.99f, 100.0f),
-                             Vec4F(111.11f, 122.22f, 133.33f, 144.44f),
-                             Vec4F(155.55f, 166.66f, 177.77f, 188.88f),
-                             Vec4F(199.99f, 210.0f, 221.11f, 232.22f),
-                             Vec4F(243.33f, 254.44f, 265.55f, 276.66f),
-                             Vec4F(287.77f, 298.88f, 309.99f, 320.0f),
-                             Vec4F(331.11f, 342.22f, 353.33f, 364.44f)}
-));
-
-INSTANTIATE_TEST_SUITE_P(EightVec4I, ArrayOfEightVec4IntFixture, testing::Values(
-        std::array<Vec4I, 8>{Vec4I(1, 2, 3, 4), Vec4I(5, 6, 7, 8),
-                             Vec4I(9, 10, 11, 12), Vec4I(13, 14, 15, 16),
-                             Vec4I(17, 18, 19, 20), Vec4I(21, 22, 23, 24),
-                             Vec4I(25, 26, 27, 28), Vec4I(29, 30, 31, 32)},
-        std::array<Vec4I, 8>{Vec4I(-111, -222, -333, -444),
-                             Vec4I(-555, -666, -777, -888),
-                             Vec4I(-999, -1010, -1111, -1212),
-                             Vec4I(-1313, -1414, -1515, -1616),
-                             Vec4I(-1717, -1818, -1919, -2020),
-                             Vec4I(-2121, -2222, -2323, -2424),
-                             Vec4I(-2525, -2626, -2727, -2828),
-                             Vec4I(-2929, -3030, -3131, -3232)}
-));
-
-INSTANTIATE_TEST_SUITE_P(EightVec4F, OneEightVec4FloatFixture, testing::Values(
-        EightVec4F(std::array<Vec4F, 8>{
-                Vec4F(1.f, 2.f, 3.f, 4.f),
-                Vec4F(5.f, 6.f, 7.f, 8.f),
-                Vec4F(9.f, 10.f, 11.f, 12.f),
-                Vec4F(13.f, 14.f, 15.f, 16.f),
-                Vec4F(1.f, 2.f, 3.f, 4.f),
-                Vec4F(5.f, 6.f, 7.f, 8.f),
-                Vec4F(9.f, 10.f, 11.f, 12.f),
-                Vec4F(13.f, 14.f, 15.f, 16.f)}),
-        EightVec4F(std::array<Vec4F, 8>{
-                Vec4F(-10.f, -11.f, -12.f, -13.f),
-                Vec4F(-14.f, -15.f, -16.f, -17.f),
-                Vec4F(-18.f, -19.f, -20.f, -21.f),
-                Vec4F(-22.f, -23.f, -24.f, -25.f),
-                Vec4F(-10.f, -11.f, -12.f, -13.f),
-                Vec4F(-14.f, -15.f, -16.f, -17.f),
-                Vec4F(-18.f, -19.f, -20.f, -21.f),
-                Vec4F(-22.f, -23.f, -24.f, -25.f)})
-));
-
-INSTANTIATE_TEST_SUITE_P(EightVec4I, OneEightVec4IntFixture, testing::Values(
-        EightVec4I(std::array<Vec4I, 8>{
-                Vec4I(1, 2, 3, 4),
-                Vec4I(5, 6, 7, 8),
-                Vec4I(9, 10, 11, 12),
-                Vec4I(13, 14, 15, 16),
-                Vec4I(1, 2, 3, 4),
-                Vec4I(5, 6, 7, 8),
-                Vec4I(9, 10, 11, 12),
-                Vec4I(13, 14, 15, 16)}),
-        EightVec4I(std::array<Vec4I, 8>{
-                Vec4I(-10, -11, -12, -13),
-                Vec4I(-14, -15, -16, -17),
-                Vec4I(-18, -19, -20, -21),
-                Vec4I(-22, -23, -24, -25),
-                Vec4I(-10, -11, -12, -13),
-                Vec4I(-14, -15, -16, -17),
-                Vec4I(-18, -19, -20, -21),
-                Vec4I(-22, -23, -24, -25)})
-));
-
-INSTANTIATE_TEST_SUITE_P(EightVec4F, PairOfEightVec4FloatFixture, testing::Values(
-        std::pair{EightVec4F(std::array<Vec4F, 8>{
-                Vec4F(1.f, 2.f, 3.f, 4.f),
-                Vec4F(5.f, 6.f, 7.f, 8.f),
-                Vec4F(9.f, 10.f, 11.f, 12.f),
-                Vec4F(13.f, 14.f, 15.f, 16.f),
-                Vec4F(1.f, 2.f, 3.f, 4.f),
-                Vec4F(5.f, 6.f, 7.f, 8.f),
-                Vec4F(9.f, 10.f, 11.f, 12.f),
-                Vec4F(13.f, 14.f, 15.f, 16.f)}),
-                  EightVec4F(std::array<Vec4F, 8>{
-                          Vec4F(10.f, 11.f, 12.f, 13.f),
-                          Vec4F(14.f, 15.f, 16.f, 17.f),
-                          Vec4F(18.f, 19.f, 20.f, 21.f),
-                          Vec4F(22.f, 23.f, 24.f, 25.f),
-                          Vec4F(10.f, 11.f, 12.f, 13.f),
-                          Vec4F(14.f, 15.f, 16.f, 17.f),
-                          Vec4F(18.f, 19.f, 20.f, 21.f),
-                          Vec4F(22.f, 23.f, 24.f, 25.f)})}
-));
-
-INSTANTIATE_TEST_SUITE_P(EightVec4I, PairOfEightVec4IntFixture, testing::Values(
-        std::pair{EightVec4I(std::array<Vec4I, 8>{
-                Vec4I(1, 2, 3, 4),
-                Vec4I(5, 6, 7, 8),
-                Vec4I(9, 10, 11, 12),
-                Vec4I(13, 14, 15, 16),
-                Vec4I(1, 2, 3, 4),
-                Vec4I(5, 6, 7, 8),
-                Vec4I(9, 10, 11, 12),
-                Vec4I(13, 14, 15, 16)}),
-                  EightVec4I(std::array<Vec4I, 8>{
-                          Vec4I(10, 11, 12, 13),
-                          Vec4I(14, 15, 16, 17),
-                          Vec4I(18, 19, 20, 21),
-                          Vec4I(22, 23, 24, 25),
-                          Vec4I(10, 11, 12, 13),
-                          Vec4I(14, 15, 16, 17),
-                          Vec4I(18, 19, 20, 21),
-                          Vec4I(22, 23, 24, 25)})}
-));
-
-INSTANTIATE_TEST_SUITE_P(EightVec4F, PairOfEightVec4AndScalarFloatFixture, testing::Values(
-        std::pair{EightVec4F(std::array<Vec4F, 8>{
-                Vec4F(1.f, 2.f, 3.f, 4.f),
-                Vec4F(5.f, 6.f, 7.f, 8.f),
-                Vec4F(9.f, 10.f, 11.f, 12.f),
-                Vec4F(13.f, 14.f, 15.f, 16.f),
-                Vec4F(17.f, 18.f, 19.f, 20.f),
-                Vec4F(21.f, 22.f, 23.f, 24.f),
-                Vec4F(25.f, 26.f, 27.f, 28.f),
-                Vec4F(29.f, 30.f, 31.f, 32.f)}),
-                   std::array<float, 8>{1.1111f, 5.0000001f, 10.45612f, -500.f, 2.0f, -5.5f, 7.89f, -10.0f}},
-        std::pair{EightVec4F(std::array<Vec4F, 8>{
-                Vec4F(1.f, 2.f, 3.f, 4.f),
-                Vec4F(5.f, 6.f, 7.f, 8.f),
-                Vec4F(9.f, 10.f, 11.f, 12.f),
-                Vec4F(13.f, 14.f, 15.f, 16.f),
-                Vec4F(17.f, 18.f, 19.f, 20.f),
-                Vec4F(21.f, 22.f, 23.f, 24.f),
-                Vec4F(25.f, 26.f, 27.f, 28.f),
-                Vec4F(29.f, 30.f, 31.f, 32.f)}),
-                   std::array<float, 8>{0.f, 10.f, 90.000000f, -40.000f, 1.0f, 7.5f, -3.45f, 12.5f}}
-));
-
-INSTANTIATE_TEST_SUITE_P(EightVec4I, PairOfEightVec4AndScalarIntFixture, testing::Values(
-        std::pair{EightVec4I(std::array<Vec4I, 8>{
-                Vec4I(1, 2, 3, 4),
-                Vec4I(5, 6, 7, 8),
-                Vec4I(9, 10, 11, 12),
-                Vec4I(13, 14, 15, 16),
-                Vec4I(17, 18, 19, 20),
-                Vec4I(21, 22, 23, 24),
-                Vec4I(25, 26, 27, 28),
-                Vec4I(29, 30, 31, 32)}),
-                   std::array<int, 8>{1, 5, 10, -500, 2, -3, 6, 7}},
-        std::pair{EightVec4I(std::array<Vec4I, 8>{
-                Vec4I(1, 2, 3, 4),
-                Vec4I(5, 6, 7, 8),
-                Vec4I(9, 10, 11, 12),
-                Vec4I(13, 14, 15, 16),
-                Vec4I(17, 18, 19, 20),
-                Vec4I(21, 22, 23, 24),
-                Vec4I(25, 26, 27, 28),
-                Vec4I(29, 30, 31, 32)}),
-                   std::array<int, 8>{0, 10, 90, -40, 1, 7, -3, 12}}
-));
-
-
-#pragma endregion EightVec4 FixturesAndTestInstantations
-
 #pragma region FourVec4 Tests
 
 TEST_P(ArrayOfFourVec4FloatFixture, Constructor)
@@ -346,7 +166,7 @@ TEST_P(ArrayOfFourVec4FloatFixture, Constructor)
 
     FourVec4F fourV(vecs);
 
-    for(int i = 0; i < FourVec4F::Size(); i++)
+    for(int i = 0; i < 4; i++)
     {
         EXPECT_FLOAT_EQ(fourV.X()[i], vecs[i].X);
         EXPECT_FLOAT_EQ(fourV.Y()[i], vecs[i].Y);
@@ -361,7 +181,7 @@ TEST_P(ArrayOfFourVec4IntFixture, Constructor)
 
     FourVec4I fourV(vecs);
 
-    for(int i = 0; i < FourVec4I::Size(); i++)
+    for(int i = 0; i < 4; i++)
     {
         EXPECT_EQ(fourV.X()[i], vecs[i].X);
         EXPECT_EQ(fourV.Y()[i], vecs[i].Y);
@@ -376,7 +196,7 @@ TEST_P(OneVec4FloatFixture, ConstructorFourVec)
 
     FourVec4F fourV(v);
 
-    for (int i = 0; i < FourVec4F::Size(); i++)
+    for (int i = 0; i < 4; i++)
     {
         EXPECT_FLOAT_EQ(fourV.X()[i], v.X);
         EXPECT_FLOAT_EQ(fourV.Y()[i], v.Y);
@@ -391,7 +211,7 @@ TEST_P(OneVec4IntFixture, ConstructorFourVec)
 
     FourVec4I fourV(v);
 
-    for (int i = 0; i < FourVec4I::Size(); i++)
+    for (int i = 0; i < 4; i++)
     {
         EXPECT_EQ(fourV.X()[i], v.X);
         EXPECT_EQ(fourV.Y()[i], v.Y);
@@ -408,7 +228,7 @@ TEST_P(PairOfFourVec4FloatFixture, Add)
     auto nVPlusEqual = nV1;
     nVPlusEqual += nV2;
 
-    for(int i = 0; i < FourVec4F::Size(); i++)
+    for(int i = 0; i < 4; i++)
     {
         EXPECT_FLOAT_EQ(nVecResult.X()[i], nV1.X()[i] + nV2.X()[i]);
         EXPECT_FLOAT_EQ(nVecResult.Y()[i], nV1.Y()[i] + nV2.Y()[i]);
@@ -430,7 +250,7 @@ TEST_P(PairOfFourVec4IntFixture, Add)
     auto nVPlusEqual = nV1;
     nVPlusEqual += nV2;
 
-    for(int i = 0; i < FourVec4I::Size(); i++)
+    for(int i = 0; i < 4; i++)
     {
         EXPECT_EQ(nVecResult.X()[i], nV1.X()[i] + nV2.X()[i]);
         EXPECT_EQ(nVecResult.Y()[i], nV1.Y()[i] + nV2.Y()[i]);
@@ -452,7 +272,7 @@ TEST_P(PairOfFourVec4FloatFixture, Sub)
     auto nVPlusEqual = nV1;
     nVPlusEqual -= nV2;
 
-    for(int i = 0; i < FourVec4F::Size(); i++)
+    for(int i = 0; i < 4; i++)
     {
         EXPECT_FLOAT_EQ(nVecResult.X()[i], nV1.X()[i] - nV2.X()[i]);
         EXPECT_FLOAT_EQ(nVecResult.Y()[i], nV1.Y()[i] - nV2.Y()[i]);
@@ -474,7 +294,7 @@ TEST_P(PairOfFourVec4IntFixture, Sub)
     auto nVPlusEqual = nV1;
     nVPlusEqual -= nV2;
 
-    for(int i = 0; i < FourVec4I::Size(); i++)
+    for(int i = 0; i < 4; i++)
     {
         EXPECT_EQ(nVecResult.X()[i], nV1.X()[i] - nV2.X()[i]);
         EXPECT_EQ(nVecResult.Y()[i], nV1.Y()[i] - nV2.Y()[i]);
@@ -494,7 +314,7 @@ TEST_P(OneFourVec4FloatFixture, MinusOperator)
 
     auto nResult = -nV;
 
-    for (int i = 0; i < FourVec4F::Size(); i++)
+    for (int i = 0; i < 4; i++)
     {
         EXPECT_FLOAT_EQ(nResult.X()[i], -nV.X()[i]);
         EXPECT_FLOAT_EQ(nResult.Y()[i], -nV.Y()[i]);
@@ -509,7 +329,7 @@ TEST_P(OneFourVec4IntFixture, MinusOperator)
 
     auto nResult = -nV;
 
-    for (int i = 0; i < FourVec4I::Size(); i++)
+    for (int i = 0; i < 4; i++)
     {
         EXPECT_EQ(nResult.X()[i], -nV.X()[i]);
         EXPECT_EQ(nResult.Y()[i], -nV.Y()[i]);
@@ -526,7 +346,7 @@ TEST_P(PairOfFourVec4FloatFixture, Multiply)
     auto nVPlusEqual = nV1;
     nVPlusEqual *= nV2;
 
-    for(int i = 0; i < FourVec4F::Size(); i++)
+    for(int i = 0; i < 4; i++)
     {
         EXPECT_FLOAT_EQ(nVecResult.X()[i], nV1.X()[i] * nV2.X()[i]);
         EXPECT_FLOAT_EQ(nVecResult.Y()[i], nV1.Y()[i] * nV2.Y()[i]);
@@ -548,7 +368,7 @@ TEST_P(PairOfFourVec4IntFixture, Multiply)
     auto nVPlusEqual = nV1;
     nVPlusEqual *= nV2;
 
-    for(int i = 0; i < FourVec4I::Size(); i++)
+    for(int i = 0; i < 4; i++)
     {
         EXPECT_EQ(nVecResult.X()[i], nV1.X()[i] * nV2.X()[i]);
         EXPECT_EQ(nVecResult.Y()[i], nV1.Y()[i] * nV2.Y()[i]);
@@ -566,11 +386,12 @@ TEST_P(PairOfFourVec4FloatFixture, Division)
 {
     auto [nV1, nV2] = GetParam();
 
-    for (int i = 0; i < FourVec4F::Size(); i++)
+    for (int i = 0; i < 4; i++)
     {
         if (nV2.X()[i] == 0 || nV2.Y()[i] == 0 || nV2.Z()[i] == 0 || nV2.W()[i] == 0)
         {
-            EXPECT_THROW(nV1 / nV2, DivisionByZeroException);
+			FourVec4F result;
+            EXPECT_THROW(result = nV1 / nV2, DivisionByZeroException);
             EXPECT_THROW(nV1 /= nV2, DivisionByZeroException);
             return;
         }
@@ -580,7 +401,7 @@ TEST_P(PairOfFourVec4FloatFixture, Division)
     auto nVPlusEqual = nV1;
     nVPlusEqual /= nV2;
 
-    for(int i = 0; i < FourVec4I::Size(); i++)
+    for(int i = 0; i < 4; i++)
     {
         EXPECT_FLOAT_EQ(nVecResult.X()[i], nV1.X()[i] / nV2.X()[i]);
         EXPECT_FLOAT_EQ(nVecResult.Y()[i], nV1.Y()[i] / nV2.Y()[i]);
@@ -598,11 +419,12 @@ TEST_P(PairOfFourVec4IntFixture, Division)
 {
     auto [nV1, nV2] = GetParam();
 
-    for (int i = 0; i < FourVec4F::Size(); i++)
+    for (int i = 0; i < 4; i++)
     {
         if (nV2.X()[i] == 0 || nV2.Y()[i] == 0 || nV2.Z()[i] == 0 || nV2.W()[i] == 0)
         {
-            EXPECT_THROW(nV1 / nV2, DivisionByZeroException);
+			FourVec4I result;
+            EXPECT_THROW(result = nV1 / nV2, DivisionByZeroException);
             EXPECT_THROW(nV1 /= nV2, DivisionByZeroException);
             return;
         }
@@ -612,7 +434,7 @@ TEST_P(PairOfFourVec4IntFixture, Division)
     auto nVPlusEqual = nV1;
     nVPlusEqual /= nV2;
 
-    for(int i = 0; i < FourVec4I::Size(); i++)
+    for(int i = 0; i < 4; i++)
     {
         EXPECT_EQ(nVecResult.X()[i], nV1.X()[i] / nV2.X()[i]);
         EXPECT_EQ(nVecResult.Y()[i], nV1.Y()[i] / nV2.Y()[i]);
@@ -634,7 +456,7 @@ TEST_P(PairOfFourVec4AndScalarFloatFixture, Multiply)
     auto nVPlusEqual = nV1;
     nVPlusEqual *= nV2;
 
-    for(int i = 0; i < FourVec4F::Size(); i++)
+    for(int i = 0; i < 4; i++)
     {
         EXPECT_FLOAT_EQ(nVecResult.X()[i], nV1.X()[i] * nV2[i]);
         EXPECT_FLOAT_EQ(nVecResult.Y()[i], nV1.Y()[i] * nV2[i]);
@@ -656,7 +478,7 @@ TEST_P(PairOfFourVec4AndScalarIntFixture, Multiply)
     auto nVPlusEqual = nV1;
     nVPlusEqual *= nV2;
 
-    for(int i = 0; i < FourVec4I::Size(); i++)
+    for(int i = 0; i < 4; i++)
     {
         EXPECT_EQ(nVecResult.X()[i], nV1.X()[i] * nV2[i]);
         EXPECT_EQ(nVecResult.Y()[i], nV1.Y()[i] * nV2[i]);
@@ -674,11 +496,12 @@ TEST_P(PairOfFourVec4AndScalarFloatFixture, Division)
 {
     auto [nV1, nV2] = GetParam();
 
-    for (int i = 0; i < FourVec4F::Size(); i++)
+    for (int i = 0; i < 4; i++)
     {
         if (nV2[i] == 0 || nV2[i] == 0 || nV2[i] == 0 || nV2[i] == 0)
         {
-            EXPECT_THROW(nV1 / nV2, DivisionByZeroException);
+			FourVec4F result;
+            EXPECT_THROW(result = nV1 / nV2, DivisionByZeroException);
             EXPECT_THROW(nV1 /= nV2, DivisionByZeroException);
             return;
         }
@@ -688,7 +511,7 @@ TEST_P(PairOfFourVec4AndScalarFloatFixture, Division)
     auto nVPlusEqual = nV1;
     nVPlusEqual /= nV2;
 
-    for(int i = 0; i < FourVec4F::Size(); i++)
+    for(int i = 0; i < 4; i++)
     {
         EXPECT_FLOAT_EQ(nVecResult.X()[i], nV1.X()[i] / nV2[i]);
         EXPECT_FLOAT_EQ(nVecResult.Y()[i], nV1.Y()[i] / nV2[i]);
@@ -706,11 +529,12 @@ TEST_P(PairOfFourVec4AndScalarIntFixture, Division)
 {
     auto [nV1, nV2] = GetParam();
 
-    for (int i = 0; i < FourVec4F::Size(); i++)
+    for (int i = 0; i < 4; i++)
     {
         if (nV2[i] == 0 || nV2[i] == 0 || nV2[i] == 0 || nV2[i] == 0)
         {
-            EXPECT_THROW(nV1 / nV2, DivisionByZeroException);
+			FourVec4I result;
+            EXPECT_THROW(result = nV1 / nV2, DivisionByZeroException);
             EXPECT_THROW(nV1 /= nV2, DivisionByZeroException);
             return;
         }
@@ -720,7 +544,7 @@ TEST_P(PairOfFourVec4AndScalarIntFixture, Division)
     auto nVPlusEqual = nV1;
     nVPlusEqual /= nV2;
 
-    for(int i = 0; i < FourVec4I::Size(); i++)
+    for(int i = 0; i < 4; i++)
     {
         EXPECT_EQ(nVecResult.X()[i], nV1.X()[i] / nV2[i]);
         EXPECT_EQ(nVecResult.Y()[i], nV1.Y()[i] / nV2[i]);
@@ -740,7 +564,7 @@ TEST_P(PairOfFourVec4FloatFixture, Dot)
 
     auto dots = FourVec4F::Dot(nV1, nV2);
 
-    for(int i = 0; i < FourVec4I::Size(); i++)
+    for(int i = 0; i < 4; i++)
     {
         EXPECT_FLOAT_EQ(dots[i], nV1.X()[i] * nV2.X()[i] + nV1.Y()[i] * nV2.Y()[i] +
                            nV1.Z()[i] * nV2.Z()[i] + nV1.W()[i] * nV2.W()[i]);
@@ -753,7 +577,7 @@ TEST_P(PairOfFourVec4IntFixture, Dot)
 
     auto dots = FourVec4I::Dot(nV1, nV2);
 
-    for(int i = 0; i < FourVec4I::Size(); i++)
+    for(int i = 0; i < 4; i++)
     {
         EXPECT_EQ(dots[i], nV1.X()[i] * nV2.X()[i] + nV1.Y()[i] * nV2.Y()[i] +
                            nV1.Z()[i] * nV2.Z()[i] + nV1.W()[i] * nV2.W()[i]);
@@ -766,7 +590,7 @@ TEST_P (OneFourVec4FloatFixture, SquareMagnitude)
 
     auto sM = nV.SquareMagnitude();
 
-    for(int i = 0; i < FourVec4F::Size(); i++)
+    for(int i = 0; i < 4; i++)
     {
         EXPECT_FLOAT_EQ(sM[i], nV.X()[i] * nV.X()[i] + nV.Y()[i] * nV.Y()[i] +
                                nV.Z()[i] * nV.Z()[i] + nV.W()[i] * nV.W()[i]);
@@ -779,7 +603,7 @@ TEST_P (OneFourVec4IntFixture, SquareMagnitude)
 
     auto sM = nV.SquareMagnitude();
 
-    for(int i = 0; i < FourVec4I::Size(); i++)
+    for(int i = 0; i < 4; i++)
     {
         EXPECT_EQ(sM[i], nV.X()[i] * nV.X()[i] + nV.Y()[i] * nV.Y()[i] +
                                nV.Z()[i] * nV.Z()[i] + nV.W()[i] * nV.W()[i]);
@@ -794,7 +618,7 @@ TEST_P (OneFourVec4FloatFixture, Magnitude)
 
     auto m = nV.Magnitude();
 
-    for(int i = 0; i < FourVec4F::Size(); i++)
+    for(int i = 0; i < 4; i++)
     {
         EXPECT_FLOAT_EQ(m[i], std::sqrt(sM[i]));
     }
@@ -808,7 +632,7 @@ TEST_P (OneFourVec4IntFixture, Magnitude)
 
     auto m = nV.Magnitude();
 
-    for(int i = 0; i < FourVec4F::Size(); i++)
+    for(int i = 0; i < 4; i++)
     {
         EXPECT_EQ(m[i], static_cast<int>(std::sqrt(sM[i])));
     }
@@ -822,7 +646,7 @@ TEST_P(OneFourVec4FloatFixture, Normalized)
 
     std::array<float, 4> normalized{};
 
-    for (int i = 0; i < FourVec4F::Size(); i++)
+    for (int i = 0; i < 4; i++)
     {
         if (magnitude[i] == 0)
         {
@@ -837,12 +661,12 @@ TEST_P(OneFourVec4FloatFixture, Normalized)
 
     constexpr auto epsilon = 0.001f;
 
-    for (int i = 0; i < FourVec4F::Size(); i++)
+    for (int i = 0; i < 4; i++)
     {
         reciprocalSqrt[i] = 1 / std::sqrt(array1N[i]);
     }
 
-    for (int i = 0; i < FourVec4F::Size(); i++)
+    for (int i = 0; i < 4; i++)
     {
         EXPECT_NEAR(normalized[i], reciprocalSqrt[i], epsilon);
     }
@@ -856,7 +680,7 @@ TEST_P(OneFourVec4IntFixture, Normalized)
 
     std::array<int, 4> normalized{};
 
-    for (int i = 0; i < FourVec4F::Size(); i++)
+    for (int i = 0; i < 4; i++)
     {
         if (magnitude[i] == 0)
         {
@@ -869,563 +693,15 @@ TEST_P(OneFourVec4IntFixture, Normalized)
     const auto array1N = nV.SquareMagnitude();
     std::array<int, 4> reciprocalSqrt = std::array<int, 4>();
 
-    for (int i = 0; i < FourVec4F::Size(); i++)
+    for (int i = 0; i < 4; i++)
     {
         reciprocalSqrt[i] = static_cast<int>(1 / std::sqrt(array1N[i]));
     }
 
-    for (int i = 0; i < FourVec4F::Size(); i++)
+    for (int i = 0; i < 4; i++)
     {
         EXPECT_EQ(normalized[i], static_cast<int>(reciprocalSqrt[i]));
     }
 }
 
 #pragma endregion FourVec4 Tests
-
-#pragma region EightVec4 Tests
-
-TEST_P(ArrayOfEightVec4FloatFixture, Constructor)
-{
-    auto vecs = GetParam();
-
-    EightVec4F fourV(vecs);
-
-    for(int i = 0; i < EightVec4F::Size(); i++)
-    {
-        EXPECT_FLOAT_EQ(fourV.X()[i], vecs[i].X);
-        EXPECT_FLOAT_EQ(fourV.Y()[i], vecs[i].Y);
-        EXPECT_FLOAT_EQ(fourV.Z()[i], vecs[i].Z);
-        EXPECT_FLOAT_EQ(fourV.W()[i], vecs[i].W);
-    }
-}
-
-TEST_P(ArrayOfEightVec4IntFixture, Constructor)
-{
-    auto vecs = GetParam();
-
-    EightVec4I fourV(vecs);
-
-    for(int i = 0; i < EightVec4I::Size(); i++)
-    {
-        EXPECT_EQ(fourV.X()[i], vecs[i].X);
-        EXPECT_EQ(fourV.Y()[i], vecs[i].Y);
-        EXPECT_EQ(fourV.Z()[i], vecs[i].Z);
-        EXPECT_EQ(fourV.W()[i], vecs[i].W);
-    }
-}
-
-TEST_P(OneVec4FloatFixture, ConstructorEightVec)
-{
-    auto v = GetParam();
-
-    EightVec4F fourV(v);
-
-    for (int i = 0; i < EightVec4F::Size(); i++)
-    {
-        EXPECT_FLOAT_EQ(fourV.X()[i], v.X);
-        EXPECT_FLOAT_EQ(fourV.Y()[i], v.Y);
-        EXPECT_FLOAT_EQ(fourV.Z()[i], v.Z);
-        EXPECT_FLOAT_EQ(fourV.W()[i], v.W);
-    }
-}
-
-TEST_P(OneVec4IntFixture, ConstructorEightVec)
-{
-    auto v = GetParam();
-
-    EightVec4I fourV(v);
-
-    for (int i = 0; i < EightVec4I::Size(); i++)
-    {
-        EXPECT_EQ(fourV.X()[i], v.X);
-        EXPECT_EQ(fourV.Y()[i], v.Y);
-        EXPECT_EQ(fourV.Z()[i], v.Z);
-        EXPECT_EQ(fourV.W()[i], v.W);
-    }
-}
-
-TEST_P(PairOfEightVec4FloatFixture, Add)
-{
-    auto [nV1, nV2] = GetParam();
-
-    auto nVecResult = nV1 + nV2;
-    auto nVPlusEqual = nV1;
-    nVPlusEqual += nV2;
-
-    for(int i = 0; i < EightVec4F::Size(); i++)
-    {
-        EXPECT_FLOAT_EQ(nVecResult.X()[i], nV1.X()[i] + nV2.X()[i]);
-        EXPECT_FLOAT_EQ(nVecResult.Y()[i], nV1.Y()[i] + nV2.Y()[i]);
-        EXPECT_FLOAT_EQ(nVecResult.Z()[i], nV1.Z()[i] + nV2.Z()[i]);
-        EXPECT_FLOAT_EQ(nVecResult.W()[i], nV1.W()[i] + nV2.W()[i]);
-
-        EXPECT_FLOAT_EQ(nVPlusEqual.X()[i], nV1.X()[i] + nV2.X()[i]);
-        EXPECT_FLOAT_EQ(nVPlusEqual.Y()[i], nV1.Y()[i] + nV2.Y()[i]);
-        EXPECT_FLOAT_EQ(nVPlusEqual.Z()[i], nV1.Z()[i] + nV2.Z()[i]);
-        EXPECT_FLOAT_EQ(nVPlusEqual.W()[i], nV1.W()[i] + nV2.W()[i]);
-    }
-}
-
-TEST_P(PairOfEightVec4IntFixture, Add)
-{
-    auto [nV1, nV2] = GetParam();
-
-    auto nVecResult = nV1 + nV2;
-    auto nVPlusEqual = nV1;
-    nVPlusEqual += nV2;
-
-    for(int i = 0; i < EightVec4I::Size(); i++)
-    {
-        EXPECT_EQ(nVecResult.X()[i], nV1.X()[i] + nV2.X()[i]);
-        EXPECT_EQ(nVecResult.Y()[i], nV1.Y()[i] + nV2.Y()[i]);
-        EXPECT_EQ(nVecResult.Z()[i], nV1.Z()[i] + nV2.Z()[i]);
-        EXPECT_EQ(nVecResult.W()[i], nV1.W()[i] + nV2.W()[i]);
-
-        EXPECT_EQ(nVPlusEqual.X()[i], nV1.X()[i] + nV2.X()[i]);
-        EXPECT_EQ(nVPlusEqual.Y()[i], nV1.Y()[i] + nV2.Y()[i]);
-        EXPECT_EQ(nVPlusEqual.Z()[i], nV1.Z()[i] + nV2.Z()[i]);
-        EXPECT_EQ(nVPlusEqual.W()[i], nV1.W()[i] + nV2.W()[i]);
-    }
-}
-
-TEST_P(PairOfEightVec4FloatFixture, Sub)
-{
-    auto [nV1, nV2] = GetParam();
-
-    auto nVecResult = nV1 - nV2;
-    auto nVPlusEqual = nV1;
-    nVPlusEqual -= nV2;
-
-    for(int i = 0; i < EightVec4F::Size(); i++)
-    {
-        EXPECT_FLOAT_EQ(nVecResult.X()[i], nV1.X()[i] - nV2.X()[i]);
-        EXPECT_FLOAT_EQ(nVecResult.Y()[i], nV1.Y()[i] - nV2.Y()[i]);
-        EXPECT_FLOAT_EQ(nVecResult.Z()[i], nV1.Z()[i] - nV2.Z()[i]);
-        EXPECT_FLOAT_EQ(nVecResult.W()[i], nV1.W()[i] - nV2.W()[i]);
-
-        EXPECT_FLOAT_EQ(nVPlusEqual.X()[i], nV1.X()[i] - nV2.X()[i]);
-        EXPECT_FLOAT_EQ(nVPlusEqual.Y()[i], nV1.Y()[i] - nV2.Y()[i]);
-        EXPECT_FLOAT_EQ(nVPlusEqual.Z()[i], nV1.Z()[i] - nV2.Z()[i]);
-        EXPECT_FLOAT_EQ(nVPlusEqual.W()[i], nV1.W()[i] - nV2.W()[i]);
-    }
-}
-
-TEST_P(PairOfEightVec4IntFixture, Sub)
-{
-    auto [nV1, nV2] = GetParam();
-
-    auto nVecResult = nV1 - nV2;
-    auto nVPlusEqual = nV1;
-    nVPlusEqual -= nV2;
-
-    for(int i = 0; i < EightVec4I::Size(); i++)
-    {
-        EXPECT_EQ(nVecResult.X()[i], nV1.X()[i] - nV2.X()[i]);
-        EXPECT_EQ(nVecResult.Y()[i], nV1.Y()[i] - nV2.Y()[i]);
-        EXPECT_EQ(nVecResult.Z()[i], nV1.Z()[i] - nV2.Z()[i]);
-        EXPECT_EQ(nVecResult.W()[i], nV1.W()[i] - nV2.W()[i]);
-
-        EXPECT_EQ(nVPlusEqual.X()[i], nV1.X()[i] - nV2.X()[i]);
-        EXPECT_EQ(nVPlusEqual.Y()[i], nV1.Y()[i] - nV2.Y()[i]);
-        EXPECT_EQ(nVPlusEqual.Z()[i], nV1.Z()[i] - nV2.Z()[i]);
-        EXPECT_EQ(nVPlusEqual.W()[i], nV1.W()[i] - nV2.W()[i]);
-    }
-}
-
-TEST_P(OneEightVec4FloatFixture, MinusOperator)
-{
-    auto nV = GetParam();
-
-    auto nResult = -nV;
-
-    for (int i = 0; i < EightVec4F::Size(); i++)
-    {
-        EXPECT_FLOAT_EQ(nResult.X()[i], -nV.X()[i]);
-        EXPECT_FLOAT_EQ(nResult.Y()[i], -nV.Y()[i]);
-        EXPECT_FLOAT_EQ(nResult.Z()[i], -nV.Z()[i]);
-        EXPECT_FLOAT_EQ(nResult.W()[i], -nV.W()[i]);
-    }
-}
-
-TEST_P(OneEightVec4IntFixture, MinusOperator)
-{
-    auto nV = GetParam();
-
-    auto nResult = -nV;
-
-    for (int i = 0; i < EightVec4I::Size(); i++)
-    {
-        EXPECT_EQ(nResult.X()[i], -nV.X()[i]);
-        EXPECT_EQ(nResult.Y()[i], -nV.Y()[i]);
-        EXPECT_EQ(nResult.Z()[i], -nV.Z()[i]);
-        EXPECT_EQ(nResult.W()[i], -nV.W()[i]);
-    }
-}
-
-TEST_P(PairOfEightVec4FloatFixture, Multiply)
-{
-    auto [nV1, nV2] = GetParam();
-
-    auto nVecResult = nV1 * nV2;
-    auto nVPlusEqual = nV1;
-    nVPlusEqual *= nV2;
-
-    for(int i = 0; i < EightVec4F::Size(); i++)
-    {
-        EXPECT_FLOAT_EQ(nVecResult.X()[i], nV1.X()[i] * nV2.X()[i]);
-        EXPECT_FLOAT_EQ(nVecResult.Y()[i], nV1.Y()[i] * nV2.Y()[i]);
-        EXPECT_FLOAT_EQ(nVecResult.Z()[i], nV1.Z()[i] * nV2.Z()[i]);
-        EXPECT_FLOAT_EQ(nVecResult.W()[i], nV1.W()[i] * nV2.W()[i]);
-
-        EXPECT_FLOAT_EQ(nVPlusEqual.X()[i], nV1.X()[i] * nV2.X()[i]);
-        EXPECT_FLOAT_EQ(nVPlusEqual.Y()[i], nV1.Y()[i] * nV2.Y()[i]);
-        EXPECT_FLOAT_EQ(nVPlusEqual.Z()[i], nV1.Z()[i] * nV2.Z()[i]);
-        EXPECT_FLOAT_EQ(nVPlusEqual.W()[i], nV1.W()[i] * nV2.W()[i]);
-    }
-}
-
-TEST_P(PairOfEightVec4IntFixture, Multiply)
-{
-    auto [nV1, nV2] = GetParam();
-
-    auto nVecResult = nV1 * nV2;
-    auto nVPlusEqual = nV1;
-    nVPlusEqual *= nV2;
-
-    for(int i = 0; i < EightVec4I::Size(); i++)
-    {
-        EXPECT_EQ(nVecResult.X()[i], nV1.X()[i] * nV2.X()[i]);
-        EXPECT_EQ(nVecResult.Y()[i], nV1.Y()[i] * nV2.Y()[i]);
-        EXPECT_EQ(nVecResult.Z()[i], nV1.Z()[i] * nV2.Z()[i]);
-        EXPECT_EQ(nVecResult.W()[i], nV1.W()[i] * nV2.W()[i]);
-
-        EXPECT_EQ(nVPlusEqual.X()[i], nV1.X()[i] * nV2.X()[i]);
-        EXPECT_EQ(nVPlusEqual.Y()[i], nV1.Y()[i] * nV2.Y()[i]);
-        EXPECT_EQ(nVPlusEqual.Z()[i], nV1.Z()[i] * nV2.Z()[i]);
-        EXPECT_EQ(nVPlusEqual.W()[i], nV1.W()[i] * nV2.W()[i]);
-    }
-}
-
-TEST_P(PairOfEightVec4FloatFixture, Division)
-{
-    auto [nV1, nV2] = GetParam();
-
-    for (int i = 0; i < EightVec4F::Size(); i++)
-    {
-        if (nV2.X()[i] == 0 || nV2.Y()[i] == 0 || nV2.Z()[i] == 0 || nV2.W()[i] == 0)
-        {
-            EXPECT_THROW(nV1 / nV2, DivisionByZeroException);
-            EXPECT_THROW(nV1 /= nV2, DivisionByZeroException);
-            return;
-        }
-    }
-
-    auto nVecResult = nV1 / nV2;
-    auto nVPlusEqual = nV1;
-    nVPlusEqual /= nV2;
-
-    for(int i = 0; i < EightVec4I::Size(); i++)
-    {
-        EXPECT_FLOAT_EQ(nVecResult.X()[i], nV1.X()[i] / nV2.X()[i]);
-        EXPECT_FLOAT_EQ(nVecResult.Y()[i], nV1.Y()[i] / nV2.Y()[i]);
-        EXPECT_FLOAT_EQ(nVecResult.Z()[i], nV1.Z()[i] / nV2.Z()[i]);
-        EXPECT_FLOAT_EQ(nVecResult.W()[i], nV1.W()[i] / nV2.W()[i]);
-
-        EXPECT_FLOAT_EQ(nVPlusEqual.X()[i], nV1.X()[i] / nV2.X()[i]);
-        EXPECT_FLOAT_EQ(nVPlusEqual.Y()[i], nV1.Y()[i] / nV2.Y()[i]);
-        EXPECT_FLOAT_EQ(nVPlusEqual.Z()[i], nV1.Z()[i] / nV2.Z()[i]);
-        EXPECT_FLOAT_EQ(nVPlusEqual.W()[i], nV1.W()[i] / nV2.W()[i]);
-    }
-}
-
-TEST_P(PairOfEightVec4IntFixture, Division)
-{
-    auto [nV1, nV2] = GetParam();
-
-    for (int i = 0; i < EightVec4F::Size(); i++)
-    {
-        if (nV2.X()[i] == 0 || nV2.Y()[i] == 0 || nV2.Z()[i] == 0 || nV2.W()[i] == 0)
-        {
-            EXPECT_THROW(nV1 / nV2, DivisionByZeroException);
-            EXPECT_THROW(nV1 /= nV2, DivisionByZeroException);
-            return;
-        }
-    }
-
-    auto nVecResult = nV1 / nV2;
-    auto nVPlusEqual = nV1;
-    nVPlusEqual /= nV2;
-
-    for(int i = 0; i < EightVec4I::Size(); i++)
-    {
-        EXPECT_EQ(nVecResult.X()[i], nV1.X()[i] / nV2.X()[i]);
-        EXPECT_EQ(nVecResult.Y()[i], nV1.Y()[i] / nV2.Y()[i]);
-        EXPECT_EQ(nVecResult.Z()[i], nV1.Z()[i] / nV2.Z()[i]);
-        EXPECT_EQ(nVecResult.W()[i], nV1.W()[i] / nV2.W()[i]);
-
-        EXPECT_EQ(nVPlusEqual.X()[i], nV1.X()[i] / nV2.X()[i]);
-        EXPECT_EQ(nVPlusEqual.Y()[i], nV1.Y()[i] / nV2.Y()[i]);
-        EXPECT_EQ(nVPlusEqual.Z()[i], nV1.Z()[i] / nV2.Z()[i]);
-        EXPECT_EQ(nVPlusEqual.W()[i], nV1.W()[i] / nV2.W()[i]);
-    }
-}
-
-// Define your test cases for multiplication here
-TEST_P(PairOfEightVec4AndScalarFloatFixture, Multiply)
-{
-    auto [nV1, nV2] = GetParam();
-
-    auto nVecResult = nV1 * nV2;
-    auto nVPlusEqual = nV1;
-    nVPlusEqual *= nV2;
-
-    for (int i = 0; i < EightVec4F::Size(); i++)
-    {
-        EXPECT_FLOAT_EQ(nVecResult.X()[i], nV1.X()[i] * nV2[i]);
-        EXPECT_FLOAT_EQ(nVecResult.Y()[i], nV1.Y()[i] * nV2[i]);
-        EXPECT_FLOAT_EQ(nVecResult.Z()[i], nV1.Z()[i] * nV2[i]);
-        EXPECT_FLOAT_EQ(nVecResult.W()[i], nV1.W()[i] * nV2[i]);
-
-        EXPECT_FLOAT_EQ(nVPlusEqual.X()[i], nV1.X()[i] * nV2[i]);
-        EXPECT_FLOAT_EQ(nVPlusEqual.Y()[i], nV1.Y()[i] * nV2[i]);
-        EXPECT_FLOAT_EQ(nVPlusEqual.Z()[i], nV1.Z()[i] * nV2[i]);
-        EXPECT_FLOAT_EQ(nVPlusEqual.W()[i], nV1.W()[i] * nV2[i]);
-    }
-}
-
-TEST_P(PairOfEightVec4AndScalarIntFixture, Multiply)
-{
-    auto [nV1, nV2] = GetParam();
-
-    auto nVecResult = nV1 * nV2;
-    auto nVPlusEqual = nV1;
-    nVPlusEqual *= nV2;
-
-    for (int i = 0; i < EightVec4F::Size(); i++)
-    {
-        EXPECT_EQ(nVecResult.X()[i], nV1.X()[i] * nV2[i]);
-        EXPECT_EQ(nVecResult.Y()[i], nV1.Y()[i] * nV2[i]);
-        EXPECT_EQ(nVecResult.Z()[i], nV1.Z()[i] * nV2[i]);
-        EXPECT_EQ(nVecResult.W()[i], nV1.W()[i] * nV2[i]);
-
-        EXPECT_EQ(nVPlusEqual.X()[i], nV1.X()[i] * nV2[i]);
-        EXPECT_EQ(nVPlusEqual.Y()[i], nV1.Y()[i] * nV2[i]);
-        EXPECT_EQ(nVPlusEqual.Z()[i], nV1.Z()[i] * nV2[i]);
-        EXPECT_EQ(nVPlusEqual.W()[i], nV1.W()[i] * nV2[i]);
-    }
-}
-
-TEST_P(PairOfEightVec4AndScalarFloatFixture, Division)
-{
-    auto [nV1, nV2] = GetParam();
-
-    for (int i = 0; i < EightVec4F::Size(); i++)
-    {
-        if (nV2[i] == 0 || nV2[i] == 0 || nV2[i] == 0 || nV2[i] == 0)
-        {
-            EXPECT_THROW(nV1 / nV2, DivisionByZeroException);
-            EXPECT_THROW(nV1 /= nV2, DivisionByZeroException);
-            return;
-        }
-    }
-
-    auto nVecResult = nV1 / nV2;
-    auto nVPlusEqual = nV1;
-    nVPlusEqual /= nV2;
-
-    for(int i = 0; i < EightVec4F::Size(); i++)
-    {
-        EXPECT_FLOAT_EQ(nVecResult.X()[i], nV1.X()[i] / nV2[i]);
-        EXPECT_FLOAT_EQ(nVecResult.Y()[i], nV1.Y()[i] / nV2[i]);
-        EXPECT_FLOAT_EQ(nVecResult.Z()[i], nV1.Z()[i] / nV2[i]);
-        EXPECT_FLOAT_EQ(nVecResult.W()[i], nV1.W()[i] / nV2[i]);
-
-        EXPECT_FLOAT_EQ(nVPlusEqual.X()[i], nV1.X()[i] / nV2[i]);
-        EXPECT_FLOAT_EQ(nVPlusEqual.Y()[i], nV1.Y()[i] / nV2[i]);
-        EXPECT_FLOAT_EQ(nVPlusEqual.Z()[i], nV1.Z()[i] / nV2[i]);
-        EXPECT_FLOAT_EQ(nVPlusEqual.W()[i], nV1.W()[i] / nV2[i]);
-    }
-}
-
-TEST_P(PairOfEightVec4AndScalarIntFixture, Division)
-{
-    auto [nV1, nV2] = GetParam();
-
-    for (int i = 0; i < EightVec4F::Size(); i++)
-    {
-        if (nV2[i] == 0 || nV2[i] == 0 || nV2[i] == 0 || nV2[i] == 0)
-        {
-            EXPECT_THROW(nV1 / nV2, DivisionByZeroException);
-            EXPECT_THROW(nV1 /= nV2, DivisionByZeroException);
-            return;
-        }
-    }
-
-    auto nVecResult = nV1 / nV2;
-    auto nVPlusEqual = nV1;
-    nVPlusEqual /= nV2;
-
-    for(int i = 0; i < EightVec4I::Size(); i++)
-    {
-        EXPECT_EQ(nVecResult.X()[i], nV1.X()[i] / nV2[i]);
-        EXPECT_EQ(nVecResult.Y()[i], nV1.Y()[i] / nV2[i]);
-        EXPECT_EQ(nVecResult.Z()[i], nV1.Z()[i] / nV2[i]);
-        EXPECT_EQ(nVecResult.W()[i], nV1.W()[i] / nV2[i]);
-
-        EXPECT_EQ(nVPlusEqual.X()[i], nV1.X()[i] / nV2[i]);
-        EXPECT_EQ(nVPlusEqual.Y()[i], nV1.Y()[i] / nV2[i]);
-        EXPECT_EQ(nVPlusEqual.Z()[i], nV1.Z()[i] / nV2[i]);
-        EXPECT_EQ(nVPlusEqual.W()[i], nV1.W()[i] / nV2[i]);
-    }
-}
-
-TEST_P(PairOfEightVec4FloatFixture, Dot)
-{
-    auto [nV1, nV2] = GetParam();
-
-    auto dotProduct = EightVec4F::Dot(nV1, nV2);
-
-    for (int i = 0; i < EightVec4F::Size(); i++)
-    {
-        EXPECT_FLOAT_EQ(dotProduct[i], nV1.X()[i] * nV2.X()[i] + nV1.Y()[i] * nV2.Y()[i] +
-                                 nV1.Z()[i] * nV2.Z()[i] + nV1.W()[i] * nV2.W()[i]);
-    }
-}
-
-TEST_P(PairOfEightVec4IntFixture, Dot)
-{
-    auto [nV1, nV2] = GetParam();
-
-    auto dotProduct = EightVec4I::Dot(nV1, nV2);
-
-    for (int i = 0; i < EightVec4F::Size(); i++)
-    {
-        EXPECT_FLOAT_EQ(dotProduct[i], nV1.X()[i] * nV2.X()[i] + nV1.Y()[i] * nV2.Y()[i] +
-                                 nV1.Z()[i] * nV2.Z()[i] + nV1.W()[i] * nV2.W()[i]);
-    }
-}
-
-// Define your test cases for square magnitude here
-TEST_P(OneEightVec4FloatFixture, SquareMagnitude)
-{
-    auto nV = GetParam();
-
-    auto sM = nV.SquareMagnitude();
-
-    for (int i = 0; i < EightVec4F::Size(); i++)
-    {
-        EXPECT_FLOAT_EQ(sM[i], nV.X()[i] * nV.X()[i] + nV.Y()[i] * nV.Y()[i] +
-                               nV.Z()[i] * nV.Z()[i] + nV.W()[i] * nV.W()[i]);
-    }
-}
-
-TEST_P(OneEightVec4IntFixture, SquareMagnitude)
-{
-    auto nV = GetParam();
-
-    auto sM = nV.SquareMagnitude();
-
-    for (int i = 0; i < EightVec4F::Size(); i++)
-    {
-        EXPECT_EQ(sM[i], nV.X()[i] * nV.X()[i] + nV.Y()[i] * nV.Y()[i] +
-                               nV.Z()[i] * nV.Z()[i] + nV.W()[i] * nV.W()[i]);
-    }
-}
-
-
-TEST_P(OneEightVec4FloatFixture, Magnitude)
-{
-    auto nV = GetParam();
-
-    auto sM = nV.SquareMagnitude();
-    auto m = nV.Magnitude();
-
-    for (int i = 0; i < EightVec4F::Size(); i++)
-    {
-        EXPECT_FLOAT_EQ(m[i], std::sqrt(sM[i]));
-    }
-}
-
-TEST_P(OneEightVec4IntFixture, Magnitude)
-{
-    auto nV = GetParam();
-
-    auto sM = nV.SquareMagnitude();
-    auto m = nV.Magnitude();
-
-    for (int i = 0; i < EightVec4F::Size(); i++)
-    {
-        EXPECT_EQ(m[i], static_cast<int>(std::sqrt(sM[i])));
-    }
-}
-
-
-TEST_P(OneEightVec4FloatFixture, Normalized)
-{
-    auto nV = GetParam();
-
-    auto magnitude = nV.Magnitude();
-
-    std::array<float, 8> normalized{};
-
-    for (int i = 0; i < FourVec4F::Size(); i++)
-    {
-        if (magnitude[i] == 0)
-        {
-            EXPECT_THROW(normalized = nV.Normalized(), DivisionByZeroException);
-            return;
-        }
-    }
-
-    normalized = nV.Normalized();
-    const auto array1N = nV.SquareMagnitude();
-    std::array<float, 8> reciprocalSqrt = std::array<float, 8>();
-
-    constexpr auto epsilon = 0.001f;
-
-    for (int i = 0; i < FourVec4F::Size(); i++)
-    {
-        reciprocalSqrt[i] = 1 / std::sqrt(array1N[i]);
-    }
-
-    for (int i = 0; i < FourVec4F::Size(); i++)
-    {
-        EXPECT_NEAR(normalized[i], reciprocalSqrt[i], epsilon);
-    }
-}
-
-TEST_P(OneEightVec4IntFixture, Normalized)
-{
-    auto nV = GetParam();
-
-    auto magnitude = nV.Magnitude();
-
-    std::array<int, 8> normalized{};
-
-    for (int i = 0; i < FourVec4F::Size(); i++)
-    {
-        if (magnitude[i] == 0)
-        {
-            EXPECT_THROW(normalized = nV.Normalized(), DivisionByZeroException);
-            return;
-        }
-    }
-
-    normalized = nV.Normalized();
-    const auto array1N = nV.SquareMagnitude();
-    std::array<int, 8> reciprocalSqrt = std::array<int, 8>();
-
-    constexpr auto epsilon = 0.001f;
-
-    for (int i = 0; i < FourVec4F::Size(); i++)
-    {
-        reciprocalSqrt[i] = static_cast<int>(1 / std::sqrt(array1N[i]));
-    }
-
-    for (int i = 0; i < FourVec4F::Size(); i++)
-    {
-        EXPECT_EQ(normalized[i], static_cast<int>(reciprocalSqrt[i]));
-    }
-}
-
-#pragma endregion EightVec4 Tests

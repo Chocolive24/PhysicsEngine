@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * @author Alexis
+ */
+
 #if defined(__x86_64__) || defined(_M_X64)
 #include <immintrin.h>
 #if !defined(__SSE__)

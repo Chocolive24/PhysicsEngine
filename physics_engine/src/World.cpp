@@ -69,7 +69,7 @@ namespace PhysicsEngine
             if (!body.IsValid()) continue;
 
             // a = F / m
-            Vec2F acceleration = body.Forces() / body.Mass();
+            Math::Vec2F acceleration = body.Forces() / body.Mass();
 
             // Change velocity according to delta time.
             body.SetVelocity(body.Velocity() + acceleration * deltaTime);
@@ -77,7 +77,7 @@ namespace PhysicsEngine
             // Change position according to velocity and delta time.
             body.SetPosition(body.Position() + body.Velocity() * deltaTime);
 
-            body.SetForces(Vec2F::Zero());
+            body.SetForces(Math::Vec2F::Zero());
         }
     }
 }

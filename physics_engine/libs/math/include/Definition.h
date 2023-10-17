@@ -1,7 +1,8 @@
 #pragma once
-//
-// Created by Coch on 07.10.2023.
-//
+
+/**
+ * @author Constantin
+ */
 
 #ifdef MSVC
 #define NOALIAS __declspec(noalias)

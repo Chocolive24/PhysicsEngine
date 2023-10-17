@@ -1,34 +1,25 @@
-
-// Olivier
+/**
+ * @author Olivier
+ */
 
 #include <array>
 #include "gtest/gtest.h"
 #include "Mat3x3.h"
-#include "MathUtility.h"
+#include "Utility.h"
 
-struct MatrixConstructorParamFixture : public ::testing::TestWithParam<std::array<Vec3I, 3>>
-{
-};
+using namespace Math;
 
-struct MatrixIntOperationFixture : public ::testing::TestWithParam<std::pair<Mat3x3I, Mat3x3I>>
-{
-};
+struct MatrixConstructorParamFixture : public ::testing::TestWithParam<std::array<Vec3I, 3>> {};
 
-struct MatrixAndScalarIntOperationFixture : public ::testing::TestWithParam<std::pair<Mat3x3I, int>>
-{
-};
+struct MatrixIntOperationFixture : public ::testing::TestWithParam<std::pair<Mat3x3I, Mat3x3I>> {};
 
-struct MatrixAndVectorIntOperationFixture : public ::testing::TestWithParam<std::pair<Mat3x3I, Vec3I>>
-{
-};
+struct MatrixAndScalarIntOperationFixture : public ::testing::TestWithParam<std::pair<Mat3x3I, int>> {};
 
-struct MatrixIntFixture : public ::testing::TestWithParam<Mat3x3I>
-{
-};
+struct MatrixAndVectorIntOperationFixture : public ::testing::TestWithParam<std::pair<Mat3x3I, Vec3I>> {};
 
-struct MatrixFloatFixture : public ::testing::TestWithParam<Mat3x3F>
-{
-};
+struct MatrixIntFixture : public ::testing::TestWithParam<Mat3x3I> {};
+
+struct MatrixFloatFixture : public ::testing::TestWithParam<Mat3x3F> {};
 
 INSTANTIATE_TEST_SUITE_P(Mat3x3I, MatrixConstructorParamFixture, testing::Values(
         std::array<Vec3I, 3>{Vec3I(1, 2, 3), Vec3I(4, 5, 6), Vec3I(7, 8, 9)},
@@ -106,8 +97,6 @@ TEST_P(MatrixConstructorParamFixture, ConstructorWithVec3I)
         EXPECT_EQ(m.Val[row][2], vectors[2][row]);
     }
 }
-
-
 
 TEST(ConstexprFunctions, Identity)
 {
@@ -299,8 +288,8 @@ TEST_P(MatrixFloatFixture, Inversion)
     {
         for (int col = 0; col < Mat3x3I::ColNbr; col++)
         {
-            EXPECT_NEAR(isInvertedCorrect.Val[row][col], identity.Val[row][col], MathUtility::Epsilon);
-            EXPECT_NEAR(isMInverted.Val[row][col], identity.Val[row][col], MathUtility::Epsilon);
+            EXPECT_NEAR(isInvertedCorrect.Val[row][col], identity.Val[row][col], Utility::Epsilon);
+            EXPECT_NEAR(isMInverted.Val[row][col], identity.Val[row][col], Utility::Epsilon);
         }
     }
 }

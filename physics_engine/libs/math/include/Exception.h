@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * @author Alexis
+ */
+
 #include <exception>
 
 class DivisionByZeroException : public std::exception

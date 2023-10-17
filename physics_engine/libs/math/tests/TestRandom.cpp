@@ -1,10 +1,11 @@
 /**
 * @headerfile Test the Random.h classes and functions
-* @author Alexis Haldy
+* @author Alexis
 */
 
-#include "gtest/gtest.h"
 #include "Random.h"
+
+#include "gtest/gtest.h"
 
 struct IntTestFixturePair : public ::testing::TestWithParam<std::pair<int, int>> {};
 struct FloatTestFixturePair : public ::testing::TestWithParam<std::pair<float, float>> {};
@@ -36,7 +37,7 @@ TEST_P(IntTestFixturePair, Range)
     int min = p.first;
     int max = p.second;
 
-    int result = Random::Range(min, max);
+    int result = Math::Random::Range(min, max);
 
     if (min < max)
     {
@@ -61,7 +62,7 @@ TEST_P(FloatTestFixturePair, Range)
     float min = p.first;
     float max = p.second;
 
-    float result = Random::Range(min, max);
+    float result = Math::Random::Range(min, max);
 
     if (min < max)
     {

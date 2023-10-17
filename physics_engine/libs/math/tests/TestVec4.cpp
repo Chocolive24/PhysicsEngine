@@ -3,10 +3,13 @@
  * @author Alexis
 */
 
-#include "gtest/gtest.h"
 #include "Vec4.h"
 
-constexpr int Size = 30;
+#include "gtest/gtest.h"
+
+using namespace Math;
+
+constexpr int ValuesSize = 30;
 
 enum numberType
 {
@@ -16,19 +19,19 @@ enum numberType
 template <typename T>
 T* GenerateValues(numberType type, bool reverseOrder = false)
 {
-    auto* list = new T[Size];
+    auto* list = new T[ValuesSize];
 
-    for (int i = 1; i < Size + 1; i++)
+    for (int i = 1; i < ValuesSize + 1; i++)
     {
         T number = 0;
-        int j = reverseOrder ? Size - i + 1 : i;
+        int j = reverseOrder ? ValuesSize - i + 1 : i;
 
         switch (type)
         {
             case Positive: number = j; break;
             case Negative: number = -j; break;
             case Mixed: number = j % 2 == 0 ? j : -j; break;
-            case Time: number = static_cast<float>(j) / static_cast<float>(Size); break;
+            case Time: number = static_cast<float>(j) / static_cast<float>(ValuesSize); break;
         }
 
         list[i - 1] = number;
@@ -40,13 +43,13 @@ T* GenerateValues(numberType type, bool reverseOrder = false)
 template <typename T>
 Vec4<T>* GenerateVectors(numberType type, bool reverseOrder = false)
 {
-    auto* list = new Vec4<T>[Size];
+    auto* list = new Vec4<T>[ValuesSize];
     auto* values = GenerateValues<T>(type);
     auto* values2 = GenerateValues<T>(type, true);
 
-    for (int i = 0; i < Size; i++)
+    for (int i = 0; i < ValuesSize; i++)
     {
-        const auto index = reverseOrder ? Size - i - 1 : i;
+        const auto index = reverseOrder ? ValuesSize - i - 1 : i;
 
         list[i] = Vec4<T>(values[index], values2[index], -values[index], -values2[index]);
     }
@@ -85,14 +88,14 @@ INSTANTIATE_TEST_SUITE_P(Vec4I, Vec4ITestFixtureMixedPairWithTime, testing::Valu
 
 TEST(Vec4, StaticVariables)
 {
-    EXPECT_EQ(Vec4<int>::Zero, Vec4<int>(0, 0, 0, 0));
-    EXPECT_EQ(Vec4<int>::One, Vec4<int>(1, 1, 1, 1));
-    EXPECT_EQ(Vec4<int>::Left, Vec4<int>(-1, 0, 0, 0));
-    EXPECT_EQ(Vec4<int>::Right, Vec4<int>(1, 0, 0, 0));
-    EXPECT_EQ(Vec4<int>::Up, Vec4<int>(0, 1, 0, 0));
-    EXPECT_EQ(Vec4<int>::Down, Vec4<int>(0, -1, 0, 0));
-    EXPECT_EQ(Vec4<int>::Forward, Vec4<int>(0, 0, 1, 0));
-    EXPECT_EQ(Vec4<int>::Backward, Vec4<int>(0, 0, -1, 0));
+    EXPECT_EQ(Vec4<int>::Zero(), Vec4<int>(0, 0, 0, 0));
+    EXPECT_EQ(Vec4<int>::One(), Vec4<int>(1, 1, 1, 1));
+    EXPECT_EQ(Vec4<int>::Left(), Vec4<int>(-1, 0, 0, 0));
+    EXPECT_EQ(Vec4<int>::Right(), Vec4<int>(1, 0, 0, 0));
+    EXPECT_EQ(Vec4<int>::Up(), Vec4<int>(0, 1, 0, 0));
+    EXPECT_EQ(Vec4<int>::Down(), Vec4<int>(0, -1, 0, 0));
+    EXPECT_EQ(Vec4<int>::Forward(), Vec4<int>(0, 0, 1, 0));
+    EXPECT_EQ(Vec4<int>::Backward(), Vec4<int>(0, 0, -1, 0));
 }
 
 #pragma region Vec4i
@@ -101,7 +104,7 @@ TEST_P(IntTestFixtureMixed, Constructors)
 {
     const auto* values = GetParam();
 
-    for (int i = 0; i < Size; i++)
+    for (int i = 0; i < ValuesSize; i++)
     {
         Vec4<int> vec(values[i], values[i], -values[i], -values[i]);
 
@@ -118,7 +121,7 @@ TEST_P(Vec4ITestFixtureMixedPair, OperatorPlus)
     auto* value = pairs.first;
     const auto* value2 = pairs.second;
 
-    for (int i = 0; i < Size; i++)
+    for (int i = 0; i < ValuesSize; i++)
     {
         const auto vec = value[i] + value2[i];
         auto vec2 = value[i];
@@ -144,7 +147,7 @@ TEST_P(Vec4ITestFixtureMixedPair, OperatorMinus)
     auto* value = pairs.first;
     const auto* value2 = pairs.second;
 
-    for (int i = 0; i < Size; i++)
+    for (int i = 0; i < ValuesSize; i++)
     {
         const auto vec = value[i] - value2[i];
         auto vec2 = value[i];
@@ -176,7 +179,7 @@ TEST_P(Vec4ITestFixtureMixedPairWithScalar, OperatorMultiply)
     const auto* multipliers = pairs.first.second;
     const auto* scalars = pairs.second;
 
-    for (int i = 0; i < Size; i++)
+    for (int i = 0; i < ValuesSize; i++)
     {
         const auto value = values[i];
         const auto multiplier = multipliers[i];
@@ -218,7 +221,7 @@ TEST_P(Vec4ITestFixtureMixedPairWithScalar, OperatorDivide)
     const auto* dividers = pairs.first.second;
     const auto* scalars = pairs.second;
 
-    for (size_t i = 0; i < Size; i++)
+    for (size_t i = 0; i < ValuesSize; i++)
     {
         const auto value = values[i];
         const auto divisor = dividers[i];
@@ -272,7 +275,7 @@ TEST_P(Vec4ITestFixtureMixedPair, OperatorEquality)
     auto* value = pairs.first;
     const auto* value2 = pairs.second;
 
-    for (int i = 0; i < Size; i++)
+    for (int i = 0; i < ValuesSize; i++)
     {
         EXPECT_EQ(value[i] == value2[i], value[i].X == value2[i].X && value[i].Y == value2[i].Y && value[i].Z == value2[i].Z && value[i].W == value2[i].W);
         EXPECT_EQ(value[i] != value2[i], value[i].X != value2[i].X || value[i].Y != value2[i].Y || value[i].Z != value2[i].Z || value[i].W != value2[i].W);
@@ -283,7 +286,7 @@ TEST_P(Vec4ITestFixtureMixedVec, OperatorIndex)
 {
     const auto* values = GetParam();
 
-    for (int i = 0; i < Size; i++)
+    for (int i = 0; i < ValuesSize; i++)
     {
         auto value = values[i];
         auto result = value.X;
@@ -301,7 +304,7 @@ TEST_P(Vec4ITestFixtureMixedVec, Abs)
 {
     const auto* values = GetParam();
 
-    for (int i = 0; i < Size; i++)
+    for (int i = 0; i < ValuesSize; i++)
     {
         auto value = values[i];
         auto absValue = Vec4I::Abs(value);
@@ -319,7 +322,7 @@ TEST_P(Vec4ITestFixtureMixedPair, Dot)
     auto* value = pairs.first;
     const auto* value2 = pairs.second;
 
-    for (int i = 0; i < Size; i++)
+    for (int i = 0; i < ValuesSize; i++)
     {
         EXPECT_EQ(Vec4I::Dot(value[i], value2[i]), value[i].X * value2[i].X + value[i].Y * value2[i].Y + value[i].Z * value2[i].Z + value[i].W * value2[i].W);
     }
@@ -329,7 +332,7 @@ TEST_P(Vec4ITestFixtureMixedVec, Length)
 {
     const auto* values = GetParam();
 
-    for (int i = 0; i < Size; i++)
+    for (int i = 0; i < ValuesSize; i++)
     {
         auto value = values[i];
         auto length = std::sqrt(value.X * value.X + value.Y * value.Y + value.Z * value.Z + value.W * value.W);
@@ -345,7 +348,7 @@ TEST_P(Vec4ITestFixtureMixedPairWithTime, Lerp)
     const auto* value2 = pairs.first.second;
     const auto* times = pairs.second;
 
-    for (int i = 0; i < Size; i++)
+    for (int i = 0; i < ValuesSize; i++)
     {
         auto vec = Vec4I::Lerp(value[i], value2[i], times[i]);
         auto vecLerp = value[i] + (value2[i] - value[i]) * times[i];
@@ -360,7 +363,7 @@ TEST_P(Vec4ITestFixtureMixedPair, Distance)
     auto* value = pairs.first;
     const auto* value2 = pairs.second;
 
-    for (int i = 0; i < Size; i++)
+    for (int i = 0; i < ValuesSize; i++)
     {
         auto distance = Vec4I::Distance(value[i], value2[i]);
         auto distance2 = (value[i] - value2[i]).Length();
@@ -377,7 +380,7 @@ TEST_P(FloatTestFixtureMixed, Constructors)
 {
     const auto* values = GetParam();
 
-    for (int i = 0; i < Size; i++)
+    for (int i = 0; i < ValuesSize; i++)
     {
         Vec4<float> vec(values[i], values[i], -values[i], -values[i]);
 
@@ -394,7 +397,7 @@ TEST_P(Vec4FTestFixtureMixedPair, OperatorPlus)
     auto* value = pairs.first;
     const auto* value2 = pairs.second;
 
-    for (int i = 0; i < Size; i++)
+    for (int i = 0; i < ValuesSize; i++)
     {
         const auto vec = value[i] + value2[i];
         auto vec2 = value[i];
@@ -420,7 +423,7 @@ TEST_P(Vec4FTestFixtureMixedPair, OperatorMinus)
     auto* value = pairs.first;
     const auto* value2 = pairs.second;
 
-    for (int i = 0; i < Size; i++)
+    for (int i = 0; i < ValuesSize; i++)
     {
         const auto vec = value[i] - value2[i];
         auto vec2 = value[i];
@@ -452,7 +455,7 @@ TEST_P(Vec4FTestFixtureMixedPairWithScalar, OperatorMultiply)
     const auto* multipliers = pairs.first.second;
     const auto* scalars = pairs.second;
 
-    for (int i = 0; i < Size; i++)
+    for (int i = 0; i < ValuesSize; i++)
     {
         const auto value = values[i];
         const auto multiplier = multipliers[i];
@@ -494,7 +497,7 @@ TEST_P(Vec4FTestFixtureMixedPairWithScalar, OperatorDivide)
     const auto* dividers = pairs.first.second;
     const auto* scalars = pairs.second;
 
-    for (size_t i = 0; i < Size; i++)
+    for (size_t i = 0; i < ValuesSize; i++)
     {
         const auto value = values[i];
         const auto divisor = dividers[i];
@@ -548,7 +551,7 @@ TEST_P(Vec4FTestFixtureMixedPair, OperatorEquality)
     auto* value = pairs.first;
     const auto* value2 = pairs.second;
 
-    for (int i = 0; i < Size; i++)
+    for (int i = 0; i < ValuesSize; i++)
     {
         EXPECT_EQ(value[i] == value2[i], value[i].X == value2[i].X && value[i].Y == value2[i].Y && value[i].Z == value2[i].Z && value[i].W == value2[i].W);
         EXPECT_EQ(value[i] != value2[i], value[i].X != value2[i].X || value[i].Y != value2[i].Y || value[i].Z != value2[i].Z || value[i].W != value2[i].W);
@@ -559,7 +562,7 @@ TEST_P(Vec4FTestFixtureMixedVec, OperatorIndex)
 {
     const auto* values = GetParam();
 
-    for (int i = 0; i < Size; i++)
+    for (int i = 0; i < ValuesSize; i++)
     {
         auto value = values[i];
         auto result = value.X;
@@ -577,7 +580,7 @@ TEST_P(Vec4FTestFixtureMixedVec, Abs)
 {
     const auto* values = GetParam();
 
-    for (int i = 0; i < Size; i++)
+    for (int i = 0; i < ValuesSize; i++)
     {
         auto value = values[i];
         auto absValue = Vec4F::Abs(value);
@@ -595,7 +598,7 @@ TEST_P(Vec4FTestFixtureMixedPair, Dot)
     auto* value = pairs.first;
     const auto* value2 = pairs.second;
 
-    for (int i = 0; i < Size; i++)
+    for (int i = 0; i < ValuesSize; i++)
     {
         EXPECT_EQ(Vec4F::Dot(value[i], value2[i]), value[i].X * value2[i].X + value[i].Y * value2[i].Y + value[i].Z * value2[i].Z + value[i].W * value2[i].W);
     }
@@ -605,7 +608,7 @@ TEST_P(Vec4FTestFixtureMixedVec, Length)
 {
     const auto* values = GetParam();
 
-    for (int i = 0; i < Size; i++)
+    for (int i = 0; i < ValuesSize; i++)
     {
         auto value = values[i];
         auto length = std::sqrt(value.X * value.X + value.Y * value.Y + value.Z * value.Z + value.W * value.W);
@@ -621,7 +624,7 @@ TEST_P(Vec4FTestFixtureMixedPairWithTime, Lerp)
     const auto* value2 = pairs.first.second;
     const auto* times = pairs.second;
 
-    for (int i = 0; i < Size; i++)
+    for (int i = 0; i < ValuesSize; i++)
     {
         auto vec = Vec4F::Lerp(value[i], value2[i], times[i]);
         auto vecLerp = value[i] + (value2[i] - value[i]) * times[i];
@@ -636,7 +639,7 @@ TEST_P(Vec4FTestFixtureMixedPair, Distance)
     auto* value = pairs.first;
     const auto* value2 = pairs.second;
 
-    for (int i = 0; i < Size; i++)
+    for (int i = 0; i < ValuesSize; i++)
     {
         auto distance = Vec4F::Distance(value[i], value2[i]);
         auto distance2 = (value[i] - value2[i]).Length();

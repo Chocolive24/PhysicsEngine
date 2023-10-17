@@ -1,5 +1,5 @@
 #include "RenderingManager.h"
-#include "MathUtility.h"
+#include "Utility.h"
 
 #include <iostream>
 
@@ -43,7 +43,7 @@ void RenderingManager::UnInit() const noexcept
     SDL_Quit();
 }
 
-void RenderingManager::AddVertex(Vec2F pos, SDL_Color color, float u, float v)
+void RenderingManager::AddVertex(Math::Vec2F pos, SDL_Color color, float u, float v)
 {
     //Vector2F vertexPos = PosToVertex(scaledVec);
 
@@ -66,17 +66,17 @@ void RenderingManager::ClearGeometry() noexcept
     _indices.clear();
 }
 
-void RenderingManager::DrawCircle(Vec2F position, float r, std::size_t segments, SDL_Color color) noexcept
+void RenderingManager::DrawCircle(Math::Vec2F position, float r, std::size_t segments, SDL_Color color) noexcept
 {
    ClearGeometry();
 
     // Calculate vertices for the circle
     for (int i = 0; i < segments; i++)
     {
-        float angle = 2 * MathUtility::Pi * static_cast<float>(i) / static_cast<float>(segments);
+        float angle = 2 * Math::Utility::Pi * static_cast<float>(i) / static_cast<float>(segments);
         float x = position.X + r * cos(angle);
         float y = position.Y + r * sin(angle);
-        AddVertex(Vec2F(x, y), color, 1, 1);
+        AddVertex(Math::Vec2F(x, y), color, 1, 1);
 
         if (i == segments -1) break;
 

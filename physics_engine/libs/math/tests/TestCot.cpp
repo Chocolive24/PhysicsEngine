@@ -3,8 +3,8 @@
 //
 #include "gtest/gtest.h"
 #include "Angle.h"
-#include "lookupTables/LookUpTableCot.h"
-#include "MathUtility.h"
+#include "lookupTables/CotLUT.h"
+#include "Utility.h"
 
 struct AngleFixture : public ::testing::TestWithParam<std::vector<Radian>>
 {
@@ -16,7 +16,7 @@ TEST_P(AngleFixture, CotWithLUT)
 
     for (auto a : angles)
     {
-        EXPECT_NEAR(MathUtility::CotLut(a), 1/std::tan(static_cast<float>(a)), 0.001f);
+        EXPECT_NEAR(Utility::Cot(a), 1 / std::tan(static_cast<float>(a)), 0.001f);
     }
 }
 
@@ -26,7 +26,7 @@ TEST_P(AngleFixture, CotWithTaylorSeries)
 
     for (auto a : angles)
     {
-        EXPECT_NEAR(MathUtility::Cot(a),  1/std::tan(static_cast<float>(a)), 0.001f);
+        EXPECT_NEAR(Utility::Cot(a), 1 / std::tan(static_cast<float>(a)), 0.001f);
     }
 }
 
@@ -39,13 +39,13 @@ std::vector<Radian> GetRadianAngles()
     int errorMargin = 12;
 
     v.reserve(CotTableSize - 2 * errorMargin);
-    float value = MathUtility::CotRangeStart + static_cast<float>(errorMargin) * MathUtility::CotStepSize;
+    float value = Utility::CotRangeStart + static_cast<float>(errorMargin) * Utility::CotStepSize;
 
     for (int i = 0; i < CotTableSize - 2 * errorMargin; i++)
     {
         Radian r(value);
         v.push_back(r);
-        value += MathUtility::CotStepSize;
+        value += Utility::CotStepSize;
     }
 
     return v;

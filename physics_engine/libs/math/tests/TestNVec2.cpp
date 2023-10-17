@@ -1,24 +1,16 @@
-#include "gtest/gtest.h"
 #include "NVec2.h"
+
+#include "gtest/gtest.h"
 
 /**
  * @headerfile Test the NVec2.h classes and functions
  * @author Alexis
  */
 
-struct TwoVec2FTestFixture : public ::testing::TestWithParam<std::pair<NVec2<float, 2>, NVec2<float, 2>>>
-{
-};
-struct TwoVec2FTestFixtureScalar : public ::testing::TestWithParam<std::pair<NVec2<float, 2>, std::array<float, 2>>>
-{
-};
+using namespace Math;
 
-struct EightVec2FTestFixture : public ::testing::TestWithParam<std::pair<EightVec2F, EightVec2F>>
-{
-};
-struct EightVec2FTestFixtureScalar : public ::testing::TestWithParam<std::pair<EightVec2F, std::array<float, 8>>>
-{
-};
+struct TwoVec2FTestFixture : public ::testing::TestWithParam<std::pair<NVec2<float, 2>, NVec2<float, 2>>> {};
+struct TwoVec2FTestFixtureScalar : public ::testing::TestWithParam<std::pair<NVec2<float, 2>, std::array<float, 2>>> {};
 
 struct FourVec2FTestFixtureMixed : public ::testing::TestWithParam<std::pair<FourVec2F, FourVec2F>>
 {
@@ -29,13 +21,6 @@ struct FourVec2FTestFixtureScalar : public ::testing::TestWithParam<std::pair<Fo
 
 struct TwoVec2ITestFixture : public ::testing::TestWithParam<std::pair<NVec2<int, 2>, NVec2<int, 2>>>{};
 struct TwoVec2ITestFixtureScalar : public ::testing::TestWithParam<std::pair<NVec2<int, 2>, std::array<int, 2>>>{};
-
-struct EightVec2ITestFixture : public ::testing::TestWithParam<std::pair<EightVec2I, EightVec2I>>
-{
-};
-struct EightVec2ITestFixtureScalar : public ::testing::TestWithParam<std::pair<EightVec2I, std::array<int, 8>>>
-{
-};
 
 struct FourVec2ITestFixtureMixed : public ::testing::TestWithParam<std::pair<FourVec2I, FourVec2I>>
 {
@@ -50,95 +35,85 @@ INSTANTIATE_TEST_SUITE_P(NVec2, TwoVec2FTestFixture, testing::Values(
 	std::make_pair(
 		NVec2<float, 2>(std::array<Vec2F, 2>{ Vec2F{ 1.3f, 2.4f }, Vec2F{ 3.5f, 4.6f } }),
 		NVec2<float, 2>(std::array<Vec2F, 2>{ Vec2F{ 10.3f, 2.4f }, Vec2F{ 32.5f, 4.6f } })
-	)
+	),
+    std::make_pair(
+        NVec2<float, 2>(std::array<Vec2F, 2>{ Vec2F{ 1.3f, 2.4f }, Vec2F{ 3.5f, 4.6f } }),
+        NVec2<float, 2>(std::array<Vec2F, 2>{ Vec2F{ 0, 2.4f }, Vec2F{ 32.5f, 4.6f } })
+    )
 ));
 INSTANTIATE_TEST_SUITE_P(NVec2, TwoVec2FTestFixtureScalar, testing::Values(
 	std::make_pair(
 		NVec2<float, 2>(std::array<Vec2F, 2>{ Vec2F{ 1.3f, 2.4f }, Vec2F{ 3.5f, 4.6f } }),
 		std::array<float, 2>{ 10.3f, 2.4f }
-	)
-));
-
-INSTANTIATE_TEST_SUITE_P(NVec2, EightVec2FTestFixture, testing::Values(
-	std::make_pair(
-		EightVec2F(std::array<Vec2F, 8>{
-			Vec2F(1.3f, 2.4f), Vec2F(3.5f, 4.6f), Vec2F(5.7f, 6.8f), Vec2F(7.9f, 8.10f),
-			Vec2F(9.11f, 10.12f), Vec2F(11.13f, 12.14f), Vec2F(13.15f, 14.16f), Vec2F(15.17f, 16.18f)
-		}),
-		EightVec2F(std::array<Vec2F, 8>{
-			Vec2F(10.3f, 2.4f), Vec2F(32.5f, 4.6f), Vec2F(54.7f, 6.8f), Vec2F(76.9f, 8.10f),
-			Vec2F(0, 10.12f), Vec2F(111.13f, 12.14f), Vec2F(113.15f, 14.16f), Vec2F(115.17f, 16.18f)
-		}))
-));
-INSTANTIATE_TEST_SUITE_P(NVec2, EightVec2FTestFixtureScalar, testing::Values(
-	std::make_pair(
-		EightVec2F(std::array<Vec2F, 8>{
-			Vec2F(1.3f, 2.4f), Vec2F(3.5f, 4.6f), Vec2F(5.7f, 6.8f), Vec2F(7.9f, 8.10f),
-			Vec2F(9.11f, 10.12f), Vec2F(11.13f, 12.14f), Vec2F(13.15f, 14.16f), Vec2F(15.17f, 16.18f)
-		}),
-		std::array<float, 8>{10.3f, 2.4f, 32.5f, 4.6f, 54.7f, 6.8f, 76.9f, 0})
+	),
+    std::make_pair(
+        NVec2<float, 2>(std::array<Vec2F, 2>{ Vec2F{ 1.3f, 2.4f }, Vec2F{ 3.5f, 4.6f } }),
+        std::array<float, 2>{ 0, 2.4f }
+    )
 ));
 
 INSTANTIATE_TEST_SUITE_P(NVec2, FourVec2FTestFixtureMixed, testing::Values(
 	std::make_pair(
 		FourVec2F(std::array<Vec2F, 4>{Vec2F(1.4f, 2.5f), Vec2F(3.6f, 4.7f), Vec2F(5.8f, 6.9f), Vec2F(7.10f, 8.11f)}),
-		FourVec2F(std::array<Vec2F, 4>{Vec2F(0, 2.5f), Vec2F(32.6f, 4.7f), Vec2F(54.8f, 6.9f), Vec2F(76.10f, 8.11f)})
-	)
+		FourVec2F(std::array<Vec2F, 4>{Vec2F(5.f, 2.5f), Vec2F(32.6f, 4.7f), Vec2F(54.8f, 6.9f), Vec2F(76.10f, 8.11f)})
+	),
+    std::make_pair(
+        FourVec2F(std::array<Vec2F, 4>{Vec2F(1.4f, 2.5f), Vec2F(3.6f, 4.7f), Vec2F(5.8f, 6.9f), Vec2F(7.10f, 8.11f)}),
+        FourVec2F(std::array<Vec2F, 4>{Vec2F(0, 2.5f), Vec2F(32.6f, 4.7f), Vec2F(54.8f, 6.9f), Vec2F(76.10f, 8.11f)})
+    )
 ));
 INSTANTIATE_TEST_SUITE_P(NVec2, FourVec2FTestFixtureScalar, testing::Values(
 	std::make_pair(
 		FourVec2F(std::array<Vec2F, 4>{Vec2F(1.4f, 2.5f), Vec2F(3.6f, 4.7f), Vec2F(5.8f, 6.9f), Vec2F(7.10f, 8.11f)}),
-		std::array<float, 4>{10.3f, 2.4f, 0, 4.6f}
-	)
+		std::array<float, 4>{10.3f, 2.4f, 9.f, 4.6f}
+	),
+    std::make_pair(
+        FourVec2F(std::array<Vec2F, 4>{Vec2F(1.4f, 2.5f), Vec2F(3.6f, 4.7f), Vec2F(5.8f, 6.9f), Vec2F(7.10f, 8.11f)}),
+        std::array<float, 4>{0, 2.4f, 9.f, 4.6f}
+    )
 ));
 
 INSTANTIATE_TEST_SUITE_P(NVec2, TwoVec2ITestFixture, testing::Values(
 	std::make_pair(
 		NVec2<int, 2>(std::array<Vec2I, 2>{ Vec2I{ 1, 2 }, Vec2I{ 3, 4 } }),
 		NVec2<int, 2>(std::array<Vec2I, 2>{ Vec2I{ 10, 2 }, Vec2I{ 32, 4 } })
-	)
+	),
+    std::make_pair(
+        NVec2<int, 2>(std::array<Vec2I, 2>{ Vec2I{ 1, 2 }, Vec2I{ 3, 4 } }),
+        NVec2<int, 2>(std::array<Vec2I, 2>{ Vec2I{ 0, 2 }, Vec2I{ 32, 4 } })
+    )
 ));
 INSTANTIATE_TEST_SUITE_P(NVec2, TwoVec2ITestFixtureScalar, testing::Values(
 	std::make_pair(
 		NVec2<int, 2>(std::array<Vec2I, 2>{ Vec2I{ 1, 2 }, Vec2I{ 3, 4 } }),
 		std::array<int, 2>{ 10, 2 }
-	)
-));
-
-INSTANTIATE_TEST_SUITE_P(NVec2, EightVec2ITestFixture, testing::Values(
-	std::make_pair(
-		EightVec2I(std::array<Vec2I, 8>{
-			Vec2I(1, 2), Vec2I(3, 4), Vec2I(5, 6), Vec2I(7, 8),
-			Vec2I(9, 10), Vec2I(11, 12), Vec2I(13, 14), Vec2I(15, 16)
-		}),
-		EightVec2I(std::array<Vec2I, 8>{
-			Vec2I(10, 2), Vec2I(32, 4), Vec2I(54, 6), Vec2I(76, 8),
-			Vec2I(98, 10), Vec2I(0, 12), Vec2I(113, 14), Vec2I(115, 16)
-		})
-	)
-));
-INSTANTIATE_TEST_SUITE_P(NVec2, EightVec2ITestFixtureScalar, testing::Values(
-	std::make_pair(
-		EightVec2I(std::array<Vec2I, 8>{
-			Vec2I(1, 2), Vec2I(3, 4), Vec2I(5, 6), Vec2I(7, 8),
-			Vec2I(9, 10), Vec2I(11, 12), Vec2I(13, 14), Vec2I(15, 16)
-		}),
-		std::array<int, 8>{10, 2, 0, 4, 54, 6, 76, 8}
-	)
+	),
+    std::make_pair(
+        NVec2<int, 2>(std::array<Vec2I, 2>{ Vec2I{ 1, 2 }, Vec2I{ 3, 4 } }),
+        std::array<int, 2>{ 0, 2 }
+    )
 ));
 
 INSTANTIATE_TEST_SUITE_P(NVec2, FourVec2ITestFixtureMixed, testing::Values(
 	std::make_pair(
 		FourVec2I(std::array<Vec2I, 4>{Vec2I(1, 2), Vec2I(3, 4), Vec2I(5, 6), Vec2I(7, 8)}),
 		FourVec2I(std::array<Vec2I, 4>{Vec2I(10, 2), Vec2I(0, 4), Vec2I(54, 6), Vec2I(76, 8)})
-	)
+	),
+    std::make_pair(
+        FourVec2I(std::array<Vec2I, 4>{Vec2I(1, 2), Vec2I(3, 4), Vec2I(5, 6), Vec2I(7, 8)}),
+        FourVec2I(std::array<Vec2I, 4>{Vec2I(0, 2), Vec2I(0, 4), Vec2I(54, 6), Vec2I(76, 8)})
+    )
 ));
 
 INSTANTIATE_TEST_SUITE_P(NVec2, FourVec2ITestFixtureScalar, testing::Values(
 	std::make_pair(
 		FourVec2I(std::array<Vec2I, 4>{Vec2I(1, 2), Vec2I(3, 4), Vec2I(5, 6), Vec2I(7, 8)}),
 		std::array<int, 4>{0, 2, 32, 4}
-	)
+	),
+    std::make_pair(
+        FourVec2I(std::array<Vec2I, 4>{Vec2I(1, 2), Vec2I(3, 4), Vec2I(5, 6), Vec2I(7, 8)}),
+        std::array<int, 4>{0, 2, 0, 4}
+    )
 ));
 
 #pragma endregion
@@ -257,7 +232,8 @@ TEST_P(TwoVec2FTestFixture, OperatorDivide)
 	{
 		if (nV2.X()[i] == 0 || nV2.Y()[i] == 0)
 		{
-			EXPECT_THROW(nV1 / nV2, DivisionByZeroException);
+            NVec2<float, 2> result;
+			EXPECT_THROW(result = nV1 / nV2, DivisionByZeroException);
 			EXPECT_THROW(nV1 /= nV2, DivisionByZeroException);
 			return;
 		}
@@ -289,7 +265,8 @@ TEST_P(TwoVec2FTestFixtureScalar, OperatorDivide)
 	{
 		if (scalar[i] == 0)
 		{
-			EXPECT_THROW(nV1 / scalar, DivisionByZeroException);
+            NVec2<float, 2> result;
+			EXPECT_THROW(result = nV1 / scalar, DivisionByZeroException);
 			EXPECT_THROW(nV1 /= scalar, DivisionByZeroException);
 			return;
 		}
@@ -333,7 +310,7 @@ TEST_P(TwoVec2FTestFixture, SquareMagnitude)
 
 	for (int i = 0; i < 2; i++)
 	{
-		EXPECT_EQ(result[i], nV1.X()[i] * nV1.X()[i] + nV1.Y()[i] * nV1.Y()[i]);
+		EXPECT_FLOAT_EQ(result[i], nV1.X()[i] * nV1.X()[i] + nV1.Y()[i] * nV1.Y()[i]);
 	}
 }
 
@@ -381,254 +358,6 @@ TEST_P(TwoVec2FTestFixture, Normalized)
 		EXPECT_NEAR(nV1Norm[i], reciprocalSqrt[i], epsilon);
 	}
 }
-
-#pragma endregion
-
-#pragma region EightVec2F
-
-TEST_P(EightVec2FTestFixture, Constructor)
-{
-	auto pair = GetParam();
-	auto nV1 = pair.first;
-	auto nV2 = EightVec2F(nV1);
-
-	for (int i = 0; i < 8; i++)
-	{
-		EXPECT_EQ(nV1.X()[i], nV2.X()[i]);
-		EXPECT_EQ(nV1.Y()[i], nV2.Y()[i]);
-	}
-}
-
-TEST_P(EightVec2FTestFixture, OperatorPlus)
-{
-	auto pair = GetParam();
-	auto nV1 = pair.first;
-	auto nV2 = pair.second;
-
-	auto result = nV1 + nV2;
-	auto result2 = nV1;
-	result2 += nV2;
-
-	for (int i = 0; i < 8; i++)
-	{
-		// +
-		EXPECT_EQ(result.X()[i], nV1.X()[i] + nV2.X()[i]);
-		EXPECT_EQ(result.Y()[i], nV1.Y()[i] + nV2.Y()[i]);
-		// +=
-		EXPECT_EQ(result2.X()[i], nV1.X()[i] + nV2.X()[i]);
-		EXPECT_EQ(result2.Y()[i], nV1.Y()[i] + nV2.Y()[i]);
-	}
-}
-
-TEST_P(EightVec2FTestFixture, OperatorMinus)
-{
-	auto pair = GetParam();
-	auto nV1 = pair.first;
-	auto nV2 = pair.second;
-
-	auto result = nV1 - nV2;
-	auto result2 = nV1;
-	result2 -= nV2;
-	auto result3 = -nV1;
-
-	for (int i = 0; i < 8; i++)
-	{
-		// -
-		EXPECT_EQ(result.X()[i], nV1.X()[i] - nV2.X()[i]);
-		EXPECT_EQ(result.Y()[i], nV1.Y()[i] - nV2.Y()[i]);
-		// -=
-		EXPECT_EQ(result2.X()[i], nV1.X()[i] - nV2.X()[i]);
-		EXPECT_EQ(result2.Y()[i], nV1.Y()[i] - nV2.Y()[i]);
-		// - unary
-		EXPECT_EQ(result3.X()[i], -nV1.X()[i]);
-		EXPECT_EQ(result3.Y()[i], -nV1.Y()[i]);
-	}
-}
-
-TEST_P(EightVec2FTestFixture, OperatorMultiply)
-{
-	auto pair = GetParam();
-	auto nV1 = pair.first;
-	auto nV2 = pair.second;
-
-	auto result = nV1 * nV2;
-	auto result2 = nV1;
-	result2 *= nV2;
-
-	for (int i = 0; i < 8; i++)
-	{
-		// *
-		EXPECT_EQ(result.X()[i], nV1.X()[i] * nV2.X()[i]);
-		EXPECT_EQ(result.Y()[i], nV1.Y()[i] * nV2.Y()[i]);
-		// *=
-		EXPECT_EQ(result2.X()[i], nV1.X()[i] * nV2.X()[i]);
-		EXPECT_EQ(result2.Y()[i], nV1.Y()[i] * nV2.Y()[i]);
-	}
-}
-
-TEST_P(EightVec2FTestFixtureScalar, OperatorMultiply)
-{
-	auto pair = GetParam();
-	auto nV1 = pair.first;
-	auto scalar = pair.second;
-
-	auto result = nV1 * scalar;
-	auto result2 = nV1;
-	result2 *= scalar;
-
-	for (int i = 0; i < 8; i++)
-	{
-		// *
-		EXPECT_EQ(result.X()[i], nV1.X()[i] * scalar[i]);
-		EXPECT_EQ(result.Y()[i], nV1.Y()[i] * scalar[i]);
-		// *=
-		EXPECT_EQ(result2.X()[i], nV1.X()[i] * scalar[i]);
-		EXPECT_EQ(result2.Y()[i], nV1.Y()[i] * scalar[i]);
-	}
-}
-
-TEST_P(EightVec2FTestFixture, OperatorDivide)
-{
-	auto pair = GetParam();
-	auto nV1 = pair.first;
-	auto nV2 = pair.second;
-	constexpr auto epsilon = 0.0001f;
-
-	for (int i = 0; i < 8; i++)
-	{
-		if (nV2.X()[i] == 0 || nV2.Y()[i] == 0)
-		{
-			EXPECT_THROW(nV1 / nV2, DivisionByZeroException);
-			EXPECT_THROW(nV1 /= nV2, DivisionByZeroException);
-			return;
-		}
-	}
-
-	auto result = nV1 / nV2;
-	auto result2 = nV1;
-	result2 /= nV2;
-
-	for (int i = 0; i < 8; i++)
-	{
-		// /
-		EXPECT_NEAR(result.X()[i], nV1.X()[i] / nV2.X()[i], epsilon);
-		EXPECT_NEAR(result.Y()[i], nV1.Y()[i] / nV2.Y()[i], epsilon);
-		// /=
-		EXPECT_NEAR(result2.X()[i], nV1.X()[i] / nV2.X()[i], epsilon);
-		EXPECT_NEAR(result2.Y()[i], nV1.Y()[i] / nV2.Y()[i], epsilon);
-	}
-}
-
-TEST_P(EightVec2FTestFixtureScalar, OperatorDivide)
-{
-	auto pair = GetParam();
-	auto nV1 = pair.first;
-	auto scalar = pair.second;
-	constexpr auto epsilon = 0.0001f;
-
-	for (int i = 0; i < 8; i++)
-	{
-		if (scalar[i] == 0)
-		{
-			EXPECT_THROW(nV1 / scalar, DivisionByZeroException);
-			EXPECT_THROW(nV1 /= scalar, DivisionByZeroException);
-			return;
-		}
-	}
-
-	auto result = nV1 / scalar;
-	auto result2 = nV1;
-	result2 /= scalar;
-
-	for (int i = 0; i < 8; i++)
-	{
-		// /
-		EXPECT_NEAR(result.X()[i], nV1.X()[i] / scalar[i], epsilon);
-		EXPECT_NEAR(result.Y()[i], nV1.Y()[i] / scalar[i], epsilon);
-		// /=
-		EXPECT_NEAR(result2.X()[i], nV1.X()[i] / scalar[i], epsilon);
-		EXPECT_NEAR(result2.Y()[i], nV1.Y()[i] / scalar[i], epsilon);
-	}
-}
-
-TEST_P(EightVec2FTestFixture, Dot)
-{
-	auto pair = GetParam();
-	auto nV1 = pair.first;
-	auto nV2 = pair.second;
-
-	auto dotVec = EightVec2F::Dot(nV1, nV2);
-
-	for (int i = 0; i < 8; i++)
-	{
-		auto result = nV1.X()[i] * nV2.X()[i] + nV1.Y()[i] * nV2.Y()[i];
-		EXPECT_EQ(dotVec[i], result);
-	}
-}
-
-TEST_P(EightVec2FTestFixture, SquareMagnitude)
-{
-	auto pair = GetParam();
-	auto nV1 = pair.first;
-	constexpr auto epsilon = 0.0001f;
-
-	auto squareMagnitude = nV1.SquareMagnitude();
-
-	for (int i = 0; i < 8; i++)
-	{
-		auto result = nV1.X()[i] * nV1.X()[i] + nV1.Y()[i] * nV1.Y()[i];
-		EXPECT_NEAR(squareMagnitude[i], result, epsilon);
-	}
-}
-
-TEST_P(EightVec2FTestFixture, Magnitude)
-{
-	auto pair = GetParam();
-	auto nV1 = pair.first;
-	constexpr auto epsilon = 0.0001f;
-
-	auto magnitude = nV1.Magnitude();
-
-	for (int i = 0; i < 8; i++)
-	{
-		auto result = std::sqrt(nV1.X()[i] * nV1.X()[i] + nV1.Y()[i] * nV1.Y()[i]);
-		EXPECT_NEAR(magnitude[i], result, epsilon);
-	}
-}
-
-TEST_P(EightVec2FTestFixture, Normalized)
-{
-	auto pair = GetParam();
-	auto nV1 = pair.first;
-	auto magnitude = nV1.Magnitude();
-	constexpr auto epsilon = 0.001f;
-	std::array<float, 8> nV1Norm = {};
-
-	for (int i = 0; i < 8; i++)
-	{
-		if (magnitude[i] == 0)
-		{
-			EXPECT_THROW(nV1Norm = nV1.Normalized(), DivisionByZeroException);
-			EXPECT_THROW(nV1Norm = nV1.Normalized(), DivisionByZeroException);
-			return;
-		}
-	}
-
-	nV1Norm = nV1.Normalized();
-	const auto array1N = nV1.SquareMagnitude();
-	std::array<float, 8> reciprocalSqrt = std::array<float, 8>();
-
-	for (int i = 0; i < 8; i++)
-	{
-		reciprocalSqrt[i] = 1 / std::sqrt(array1N[i]);
-	}
-
-	for (int i = 0; i < 8; i++)
-	{
-		EXPECT_NEAR(nV1Norm[i], reciprocalSqrt[i], epsilon);
-	}
-}
-
 
 #pragma endregion
 
@@ -733,7 +462,8 @@ TEST_P(FourVec2FTestFixtureMixed, OperatorDivide)
 	{
 		if (nV2.X()[i] == 0 || nV2.Y()[i] == 0)
 		{
-			EXPECT_THROW(nV1 / nV2, DivisionByZeroException);
+            NVec2<float, 4> result;
+			EXPECT_THROW(result = nV1 / nV2, DivisionByZeroException);
 			EXPECT_THROW(nV1 /= nV2, DivisionByZeroException);
 			return;
 		}
@@ -765,7 +495,8 @@ TEST_P(FourVec2FTestFixtureScalar, OperatorDivide)
 	{
 		if (scalar[i] == 0)
 		{
-			EXPECT_THROW(nV1 / scalar, DivisionByZeroException);
+            NVec2<float, 4> result;
+			EXPECT_THROW(result = nV1 / scalar, DivisionByZeroException);
 			EXPECT_THROW(nV1 /= scalar, DivisionByZeroException);
 			return;
 		}
@@ -979,7 +710,8 @@ TEST_P(TwoVec2ITestFixture, OperatorDivide)
 	{
 		if (nV2.X()[i] == 0 || nV2.Y()[i] == 0)
 		{
-			EXPECT_THROW(nV1 / nV2, DivisionByZeroException);
+            NVec2<int, 2> result;
+			EXPECT_THROW(result = nV1 / nV2, DivisionByZeroException);
 			EXPECT_THROW(nV1 /= nV2, DivisionByZeroException);
 			return;
 		}
@@ -1010,7 +742,8 @@ TEST_P(TwoVec2ITestFixtureScalar, OperatorDivide)
 	{
 		if (scalar[i] == 0)
 		{
-			EXPECT_THROW(nV1 / scalar, DivisionByZeroException);
+            NVec2<int, 2> result;
+			EXPECT_THROW(result = nV1 / scalar, DivisionByZeroException);
 			EXPECT_THROW(nV1 /= scalar, DivisionByZeroException);
 			return;
 		}
@@ -1108,235 +841,6 @@ TEST_P(TwoVec2ITestFixture, Normalized)
 
 #pragma endregion
 
-#pragma region EightVec2I
-
-TEST_P(EightVec2ITestFixture, OperatorPlus)
-{
-	auto pair = GetParam();
-	auto nV1 = pair.first;
-	auto nV2 = pair.second;
-
-	auto result = nV1 + nV2;
-	auto result2 = nV1;
-	result2 += nV2;
-
-	for (int i = 0; i < 8; i++)
-	{
-		// +
-		EXPECT_EQ(result.X()[i], nV1.X()[i] + nV2.X()[i]);
-		EXPECT_EQ(result.Y()[i], nV1.Y()[i] + nV2.Y()[i]);
-		// +=
-		EXPECT_EQ(result2.X()[i], nV1.X()[i] + nV2.X()[i]);
-		EXPECT_EQ(result2.Y()[i], nV1.Y()[i] + nV2.Y()[i]);
-	}
-}
-
-TEST_P(EightVec2ITestFixture, OperatorMinus)
-{
-	auto pair = GetParam();
-	auto nV1 = pair.first;
-	auto nV2 = pair.second;
-
-	auto result = nV1 - nV2;
-	auto result2 = nV1;
-	result2 -= nV2;
-	auto result3 = -nV1;
-
-	for (int i = 0; i < 8; i++)
-	{
-		// -
-		EXPECT_EQ(result.X()[i], nV1.X()[i] - nV2.X()[i]);
-		EXPECT_EQ(result.Y()[i], nV1.Y()[i] - nV2.Y()[i]);
-		// -=
-		EXPECT_EQ(result2.X()[i], nV1.X()[i] - nV2.X()[i]);
-		EXPECT_EQ(result2.Y()[i], nV1.Y()[i] - nV2.Y()[i]);
-		// - unary
-		EXPECT_EQ(result3.X()[i], -nV1.X()[i]);
-		EXPECT_EQ(result3.Y()[i], -nV1.Y()[i]);
-	}
-}
-
-TEST_P(EightVec2ITestFixture, OperatorMultiply)
-{
-	auto pair = GetParam();
-	auto nV1 = pair.first;
-	auto nV2 = pair.second;
-
-	auto result = nV1 * nV2;
-	auto result2 = nV1;
-	result2 *= nV2;
-
-	for (int i = 0; i < 8; i++)
-	{
-		// *
-		EXPECT_EQ(result.X()[i], nV1.X()[i] * nV2.X()[i]);
-		EXPECT_EQ(result.Y()[i], nV1.Y()[i] * nV2.Y()[i]);
-		// *=
-		EXPECT_EQ(result2.X()[i], nV1.X()[i] * nV2.X()[i]);
-		EXPECT_EQ(result2.Y()[i], nV1.Y()[i] * nV2.Y()[i]);
-	}
-}
-
-TEST_P(EightVec2ITestFixtureScalar, OperatorMultiply)
-{
-	auto pair = GetParam();
-	auto nV1 = pair.first;
-	auto scalar = pair.second;
-
-	auto result = nV1 * scalar;
-	auto result2 = nV1;
-	result2 *= scalar;
-
-	for (int i = 0; i < 8; i++)
-	{
-		// *
-		EXPECT_EQ(result.X()[i], nV1.X()[i] * scalar[i]);
-		EXPECT_EQ(result.Y()[i], nV1.Y()[i] * scalar[i]);
-		// *=
-		EXPECT_EQ(result2.X()[i], nV1.X()[i] * scalar[i]);
-		EXPECT_EQ(result2.Y()[i], nV1.Y()[i] * scalar[i]);
-	}
-}
-
-TEST_P(EightVec2ITestFixture, OperatorDivide)
-{
-	auto pair = GetParam();
-	auto nV1 = pair.first;
-	auto nV2 = pair.second;
-
-	for (int i = 0; i < 8; i++)
-	{
-		if (nV2.X()[i] == 0 || nV2.Y()[i] == 0)
-		{
-			EXPECT_THROW(nV1 / nV2, DivisionByZeroException);
-			EXPECT_THROW(nV1 /= nV2, DivisionByZeroException);
-			return;
-		}
-	}
-
-	auto result = nV1 / nV2;
-	auto result2 = nV1;
-	result2 /= nV2;
-
-	for (int i = 0; i < 8; i++)
-	{
-		// /
-		EXPECT_EQ(result.X()[i], nV1.X()[i] / nV2.X()[i]);
-		EXPECT_EQ(result.Y()[i], nV1.Y()[i] / nV2.Y()[i]);
-		// /=
-		EXPECT_EQ(result2.X()[i], nV1.X()[i] / nV2.X()[i]);
-		EXPECT_EQ(result2.Y()[i], nV1.Y()[i] / nV2.Y()[i]);
-	}
-}
-
-TEST_P(EightVec2ITestFixtureScalar, OperatorDivide)
-{
-	auto pair = GetParam();
-	auto nV1 = pair.first;
-	auto scalar = pair.second;
-
-	for (int i = 0; i < 8; i++)
-	{
-		if (scalar[i] == 0)
-		{
-			EXPECT_THROW(nV1 / scalar, DivisionByZeroException);
-			EXPECT_THROW(nV1 /= scalar, DivisionByZeroException);
-			return;
-		}
-	}
-
-	auto result = nV1 / scalar;
-	auto result2 = nV1;
-	result2 /= scalar;
-
-	for (int i = 0; i < 8; i++)
-	{
-		// /
-		EXPECT_EQ(result.X()[i], nV1.X()[i] / scalar[i]);
-		EXPECT_EQ(result.Y()[i], nV1.Y()[i] / scalar[i]);
-		// /=
-		EXPECT_EQ(result2.X()[i], nV1.X()[i] / scalar[i]);
-		EXPECT_EQ(result2.Y()[i], nV1.Y()[i] / scalar[i]);
-	}
-}
-
-TEST_P(EightVec2ITestFixture, Dot)
-{
-	auto pair = GetParam();
-	auto nV1 = pair.first;
-	auto nV2 = pair.second;
-
-	auto dotVec = EightVec2I::Dot(nV1, nV2);
-
-	for (int i = 0; i < 8; i++)
-	{
-		auto result = nV1.X()[i] * nV2.X()[i] + nV1.Y()[i] * nV2.Y()[i];
-		EXPECT_EQ(dotVec[i], result);
-	}
-}
-
-TEST_P(EightVec2ITestFixture, SquareMagnitude)
-{
-	auto pair = GetParam();
-	auto nV1 = pair.first;
-
-	auto squareMagnitude = nV1.SquareMagnitude();
-
-	for (int i = 0; i < 8; i++)
-	{
-		auto result = nV1.X()[i] * nV1.X()[i] + nV1.Y()[i] * nV1.Y()[i];
-		EXPECT_EQ(squareMagnitude[i], result);
-	}
-}
-
-TEST_P(EightVec2ITestFixture, Magnitude)
-{
-	auto pair = GetParam();
-	auto nV1 = pair.first;
-
-	auto magnitude = nV1.Magnitude();
-
-	for (int i = 0; i < 8; i++)
-	{
-		auto result = (int) std::sqrt(nV1.X()[i] * nV1.X()[i] + nV1.Y()[i] * nV1.Y()[i]);
-		EXPECT_EQ(magnitude[i], result);
-	}
-}
-
-TEST_P(EightVec2ITestFixture, Normalized)
-{
-	auto pair = GetParam();
-	auto nV1 = pair.first;
-	auto magnitude = nV1.Magnitude();
-	std::array<int, 8> nV1Norm = {};
-
-	for (int i = 0; i < 8; i++)
-	{
-		if (magnitude[i] == 0)
-		{
-			EXPECT_THROW(nV1Norm = nV1.Normalized(), DivisionByZeroException);
-			EXPECT_THROW(nV1Norm = nV1.Normalized(), DivisionByZeroException);
-			return;
-		}
-	}
-
-	nV1Norm = nV1.Normalized();
-	const auto array1N = nV1.SquareMagnitude();
-	std::array<int, 8> reciprocalSqrt = std::array<int, 8>();
-
-	for (int i = 0; i < 8; i++)
-	{
-		reciprocalSqrt[i] = 1 / std::sqrt(array1N[i]);
-	}
-
-	for (int i = 0; i < 8; i++)
-	{
-		EXPECT_EQ(nV1Norm[i], reciprocalSqrt[i]);
-	}
-}
-
-#pragma endregion
-
 #pragma region FourVec2I
 
 TEST_P(FourVec2ITestFixtureMixed, OperatorPlus)
@@ -1416,7 +920,8 @@ TEST_P(FourVec2ITestFixtureMixed, OperatorDivide)
 	{
 		if (nV2.X()[i] == 0 || nV2.Y()[i] == 0)
 		{
-			EXPECT_THROW(nV1 / nV2, DivisionByZeroException);
+            NVec2<int, 4> result;
+			EXPECT_THROW(result = nV1 / nV2, DivisionByZeroException);
 			EXPECT_THROW(nV1 /= nV2, DivisionByZeroException);
 			return;
 		}
@@ -1489,7 +994,8 @@ TEST_P(FourVec2ITestFixtureScalar, OperatorDivideScalar)
 	{
 		if (scalar[i] == 0)
 		{
-			EXPECT_THROW(nV1 / scalar, DivisionByZeroException);
+            NVec2<int, 4> result;
+			EXPECT_THROW(result = nV1 / scalar, DivisionByZeroException);
 			EXPECT_THROW(nV1 /= scalar, DivisionByZeroException);
 			return;
 		}
@@ -1520,7 +1026,8 @@ TEST_P(FourVec2ITestFixtureScalar, OperatorDivide)
 	{
 		if (scalar[i] == 0)
 		{
-			EXPECT_THROW(nV1 / scalar, DivisionByZeroException);
+            NVec2<int, 4> result;
+			EXPECT_THROW(result = nV1 / scalar, DivisionByZeroException);
 			EXPECT_THROW(nV1 /= scalar, DivisionByZeroException);
 			return;
 		}

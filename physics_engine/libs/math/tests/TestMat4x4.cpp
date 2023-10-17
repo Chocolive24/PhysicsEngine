@@ -1,10 +1,15 @@
+/**
+ * @author Olivier, Alexis, Rémy, Constantin
+ */
 
-// //Remy, Constantin, Alexis, Olivier
+#include "Mat4x4.h"
+#include "Utility.h"
 
 #include "gtest/gtest.h"
-#include "Mat4x4.h"
-#include "MathUtility.h"
+
 #include <array>
+
+using namespace Math;
 
 struct MatrixConstructorParamFixture : public ::testing::TestWithParam<std::array<Vec4I, Mat4x4I::RowNbr>>
 {
@@ -332,8 +337,8 @@ TEST_P(MatrixFloatFixture, Inversion)
     {
         for (int col = 0; col < Mat3x3I::ColNbr; col++)
         {
-            EXPECT_NEAR(isInvertedCorrect.Val[row][col], identity.Val[row][col], MathUtility::Epsilon);
-            EXPECT_NEAR(isMInverted.Val[row][col], identity.Val[row][col], MathUtility::Epsilon);
+            EXPECT_NEAR(isInvertedCorrect.Val[row][col], identity.Val[row][col], Utility::Epsilon);
+            EXPECT_NEAR(isMInverted.Val[row][col], identity.Val[row][col], Utility::Epsilon);
         }
     }
 }

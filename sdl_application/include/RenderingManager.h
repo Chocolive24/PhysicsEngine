@@ -25,9 +25,9 @@ public:
 
     void UnInit() const noexcept;
 
-    void AddVertex(Vec2F pos, SDL_Color color, float u = 1, float v = 1);
+    void AddVertex(Math::Vec2F pos, SDL_Color color, float u = 1, float v = 1);
     void ClearGeometry()  noexcept;
-    void DrawCircle(Vec2F position, float r, std::size_t segments, SDL_Color color) noexcept;
+    void DrawCircle(Math::Vec2F position, float r, std::size_t segments, SDL_Color color) noexcept;
 
     [[nodiscard]] constexpr SDL_Window* Window() const noexcept { return _window; }
     [[nodiscard]] constexpr SDL_Renderer* Renderer() const noexcept { return _renderer; }

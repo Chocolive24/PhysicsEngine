@@ -127,7 +127,12 @@ namespace Math::Utility
 NOALIAS constexpr float CalculateLut(Math::Radian radian, std::array<float, Size> table, float step, float rangeStart)
 {
     const auto angle = static_cast<float>(radian);
-    const int index = Math::Utility::Abs(static_cast<int>((angle - rangeStart) / step));
+	int index = Math::Utility::Abs(static_cast<int>((angle - rangeStart) / step));
+
+	while (index >= Size)
+	{
+		index -= Size;
+	}
 
     if (index == Size - 1) return table[index];
 

@@ -1,259 +1,266 @@
 #pragma once
 
 /**
- * \brief A collection of classes and functions for working with angles.
- * \author Alexis Haldy
+ * @brief A collection of classes and functions to work with angles.
+ * @author Alexis
  */
 
-#include <stdexcept>
 #include "Exception.h"
+#include "Definition.h"
 
-class Radian;
+#include <stdexcept>
 
-class Degree
+namespace Math
 {
-public:
-    Degree() = default;
-    constexpr explicit Degree(float value) noexcept
+    class Radian;
+
+    class Degree
     {
-        _value = value;
-    }
+    public:
+        constexpr Degree() noexcept = default;
 
-private:
-    float _value { 0 };
-
-public:
-    constexpr explicit operator float() const noexcept
-    {
-        return _value;
-    }
-
-    constexpr operator Radian() const noexcept;
-
-    [[nodiscard]] constexpr Degree(Radian radian) noexcept;
-
-    constexpr Degree operator+(const Degree degree) const noexcept
-    {
-        return Degree(_value + degree._value);
-    }
-
-    constexpr Degree operator-(const Degree degree) const noexcept
-    {
-        return Degree(_value - degree._value);
-    }
-
-    constexpr Degree operator-() const noexcept
-    {
-        return Degree(-_value);
-    }
-
-    constexpr Degree operator+=(const Degree degree) noexcept
-    {
-        _value += degree._value;
-
-        return *this;
-    }
-
-    constexpr Degree operator-=(const Degree degree) noexcept
-    {
-        _value -= degree._value;
-
-        return *this;
-    }
-
-    constexpr Degree operator*(const float scalar) const noexcept
-    {
-        return Degree(_value * scalar);
-    }
-
-    constexpr Degree operator/(const float scalar) const
-    {
-        if (scalar == 0)
+        constexpr explicit Degree(float value) noexcept
         {
-            throw DivisionByZeroException();
+            _value = value;
         }
 
-        return Degree(_value / scalar);
-    }
+    private:
+        float _value{ 0.f };
 
-    constexpr Degree operator*=(const float scalar) noexcept
-    {
-        _value *= scalar;
-
-        return *this;
-    }
-
-    constexpr Degree operator/=(const float scalar)
-    {
-        if (scalar == 0)
+    public:
+        NOALIAS constexpr explicit operator float() const noexcept
         {
-            throw DivisionByZeroException();
+            return _value;
         }
 
-        _value /= scalar;
+        NOALIAS constexpr operator Radian() const noexcept;
 
-        return *this;
-    }
+        NOALIAS constexpr Degree(Radian radian) noexcept;
 
-    constexpr bool operator==(const Degree degree) const noexcept
-    {
-        return _value == degree._value;
-    }
-
-    constexpr bool operator!=(const Degree degree) const noexcept
-    {
-        return !operator==(degree);
-    }
-
-    constexpr bool operator<(const Degree degree) const noexcept
-    {
-        return _value < degree._value;
-    }
-
-    constexpr bool operator>(const Degree degree) const noexcept
-    {
-        return _value > degree._value;
-    }
-
-    constexpr bool operator<=(const Degree degree) const noexcept
-    {
-        return !operator>(degree);
-    }
-
-    constexpr bool operator>=(const Degree degree) const noexcept
-    {
-        return !operator<(degree);
-    }
-};
-
-class Radian
-{
-public:
-    Radian() = default;
-    constexpr explicit Radian(float value) noexcept
-    {
-        _value = value;
-    }
-
-private:
-    float _value { 0 };
-    
-public:
-    [[nodiscard]] constexpr Radian(Degree degree) noexcept
-    {
-	    _value = static_cast<float>(degree) * 3.14159265358979323846f / 180.0f;
-    }
-
-    constexpr explicit operator float() const noexcept
-    {
-        return _value;
-    }
-
-    constexpr Radian operator+(const Radian radian) const noexcept
-    {
-        return Radian(_value + radian._value);
-    }
-
-    constexpr Radian operator-(const Radian radian) const noexcept
-    {
-        return Radian(_value - radian._value);
-    }
-
-    constexpr Radian operator-() const noexcept
-    {
-        return Radian(-_value);
-    }
-
-    constexpr Radian operator+=(const Radian radian) noexcept
-    {
-        _value += radian._value;
-
-        return *this;
-    }
-
-    constexpr Radian operator-=(const Radian radian) noexcept
-    {
-        _value -= radian._value;
-
-        return *this;
-    }
-
-    constexpr Radian operator*(const float scalar) const noexcept
-    {
-        return Radian(_value * scalar);
-    }
-
-	friend Radian operator*(const float scalar, const Radian radian) noexcept
-	{
-		return radian * scalar;
-	}
-
-    constexpr Radian operator/(const float scalar) const
-    {
-        if (scalar == 0)
+        [[nodiscard]] NOALIAS constexpr Degree operator+(const Degree degree) const noexcept
         {
-            throw DivisionByZeroException();
+            return Degree(_value + degree._value);
         }
 
-        return Radian(_value / scalar);
-    }
-
-    constexpr Radian operator*=(const float scalar) noexcept
-    {
-        _value *= scalar;
-
-        return *this;
-    }
-
-    constexpr Radian operator/=(const float scalar)
-    {
-        if (scalar == 0)
+        [[nodiscard]] NOALIAS constexpr Degree operator-(const Degree degree) const noexcept
         {
-            throw DivisionByZeroException();
+            return Degree(_value - degree._value);
         }
 
-        _value /= scalar;
+        [[nodiscard]] NOALIAS constexpr Degree operator-() const noexcept
+        {
+            return Degree(-_value);
+        }
 
-        return *this;
-    }
+        constexpr Degree operator+=(const Degree degree) noexcept
+        {
+            _value += degree._value;
 
-    constexpr bool operator==(const Radian radian) const noexcept
+            return *this;
+        }
+
+        constexpr Degree operator-=(const Degree degree) noexcept
+        {
+            _value -= degree._value;
+
+            return *this;
+        }
+
+        [[nodiscard]] NOALIAS constexpr Degree operator*(const float scalar) const noexcept
+        {
+            return Degree(_value * scalar);
+        }
+
+        [[nodiscard]] NOALIAS constexpr Degree operator/(const float scalar) const
+        {
+            if (scalar == 0)
+            {
+                throw DivisionByZeroException();
+            }
+
+            return Degree(_value / scalar);
+        }
+
+        constexpr Degree operator*=(const float scalar) noexcept
+        {
+            _value *= scalar;
+
+            return *this;
+        }
+
+        constexpr Degree operator/=(const float scalar)
+        {
+            if (scalar == 0)
+            {
+                throw DivisionByZeroException();
+            }
+
+            _value /= scalar;
+
+            return *this;
+        }
+
+        NOALIAS constexpr bool operator==(const Degree degree) const noexcept
+        {
+            return _value == degree._value;
+        }
+
+        NOALIAS constexpr bool operator!=(const Degree degree) const noexcept
+        {
+            return !operator==(degree);
+        }
+
+        NOALIAS constexpr bool operator<(const Degree degree) const noexcept
+        {
+            return _value < degree._value;
+        }
+
+        NOALIAS constexpr bool operator>(const Degree degree) const noexcept
+        {
+            return _value > degree._value;
+        }
+
+        NOALIAS constexpr bool operator<=(const Degree degree) const noexcept
+        {
+            return !operator>(degree);
+        }
+
+        NOALIAS constexpr bool operator>=(const Degree degree) const noexcept
+        {
+            return !operator<(degree);
+        }
+    };
+
+    class Radian
     {
-        return _value == radian._value;
-    }
+    public:
+        constexpr Radian() noexcept = default;
 
-    constexpr bool operator!=(const Radian radian) const noexcept
-    {
-        return !operator==(radian);
-    }
+        constexpr explicit Radian(float value) noexcept
+        {
+            _value = value;
+        }
 
-    constexpr bool operator<(const Radian radian) const noexcept
-    {
-        return _value < radian._value;
-    }
+    private:
+        float _value{ 0 };
 
-    constexpr bool operator>(const Radian radian) const noexcept
-    {
-        return _value > radian._value;
-    }
+    public:
+        constexpr Radian(Degree degree) noexcept
+        {
+            _value = static_cast<float>(degree) * 3.14159265358979323846f / 180.0f;
+        }
 
-    constexpr bool operator<=(const Radian radian) const noexcept
-    {
-        return !operator>(radian);
-    }
+        NOALIAS constexpr explicit operator float() const noexcept
+        {
+            return _value;
+        }
 
-    constexpr bool operator>=(const Radian radian) const noexcept
-    {
-        return !operator<(radian);
-    }
-};
+        NOALIAS constexpr Radian operator+(const Radian radian) const noexcept
+        {
+            return Radian(_value + radian._value);
+        }
 
-constexpr Degree::operator Radian() const noexcept
-{
-	return Radian(_value);
+        NOALIAS constexpr Radian operator-(const Radian radian) const noexcept
+        {
+            return Radian(_value - radian._value);
+        }
+
+        NOALIAS constexpr Radian operator-() const noexcept
+        {
+            return Radian(-_value);
+        }
+
+        constexpr Radian operator+=(const Radian radian) noexcept
+        {
+            _value += radian._value;
+
+            return *this;
+        }
+
+        constexpr Radian operator-=(const Radian radian) noexcept
+        {
+            _value -= radian._value;
+
+            return *this;
+        }
+
+        NOALIAS constexpr Radian operator*(const float scalar) const noexcept
+        {
+            return Radian(_value * scalar);
+        }
+
+        NOALIAS friend Radian operator*(const float scalar, const Radian radian) noexcept
+        {
+            return radian * scalar;
+        }
+
+        NOALIAS constexpr Radian operator/(const float scalar) const
+        {
+            if (scalar == 0)
+            {
+                throw DivisionByZeroException();
+            }
+
+            return Radian(_value / scalar);
+        }
+
+        constexpr Radian operator*=(const float scalar) noexcept
+        {
+            _value *= scalar;
+
+            return *this;
+        }
+
+        constexpr Radian operator/=(const float scalar)
+        {
+            if (scalar == 0)
+            {
+                throw DivisionByZeroException();
+            }
+
+            _value /= scalar;
+
+            return *this;
+        }
+
+        NOALIAS constexpr bool operator==(const Radian radian) const noexcept
+        {
+            return _value == radian._value;
+        }
+
+        NOALIAS constexpr bool operator!=(const Radian radian) const noexcept
+        {
+            return !operator==(radian);
+        }
+
+        NOALIAS constexpr bool operator<(const Radian radian) const noexcept
+        {
+            return _value < radian._value;
+        }
+
+        NOALIAS constexpr bool operator>(const Radian radian) const noexcept
+        {
+            return _value > radian._value;
+        }
+
+        NOALIAS constexpr bool operator<=(const Radian radian) const noexcept
+        {
+            return !operator>(radian);
+        }
+
+        NOALIAS constexpr bool operator>=(const Radian radian) const noexcept
+        {
+            return !operator<(radian);
+        }
+    };
 }
 
-constexpr Degree::Degree(Radian radian) noexcept
+constexpr Math::Degree::operator Radian() const noexcept
 {
-	_value = static_cast<float>(radian) * 180.0f / 3.14159265358979323846f;
+    return Radian(_value);
+}
+
+constexpr Math::Degree::Degree(Radian radian) noexcept
+{
+    _value = static_cast<float>(radian) * 180.0f / 3.14159265358979323846f;
 }

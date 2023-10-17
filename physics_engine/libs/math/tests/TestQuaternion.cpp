@@ -1,10 +1,14 @@
-//
-// Olivier
-//
+/**
+ * @author Olivier
+ */
+
+#include "Quaternion.h"
+
+#include "gtest/gtest.h"
 
 #include <array>
-#include "gtest/gtest.h"
-#include "Quaternion.h"
+
+using namespace Math;
 
 struct ConstructorWithFloatValuesFixture : public ::testing::TestWithParam<std::array<float, 4>>{};
 
@@ -14,7 +18,7 @@ struct QuaternionFloatFixture : public ::testing::TestWithParam<QuaternionF>{};
 
 struct QuaternionAndVectorFloatOperationFixture : public ::testing::TestWithParam<std::pair<QuaternionF, Vec3F>>{};
 
-struct AngleAxisFloatFixture : public testing::TestWithParam<std::pair<Radian, Vec3F>>{};
+struct AngleAxisFloatFixture : public ::testing::TestWithParam<std::pair<Radian, Vec3F>>{};
 
 struct ArrayOfAngleFixture : public ::testing::TestWithParam<std::array<Radian, 3>> {};
 
@@ -34,29 +38,25 @@ INSTANTIATE_TEST_SUITE_P(QuaternionF, QuaternionFloatOperationsFixture, testing:
         ));
 
 INSTANTIATE_TEST_SUITE_P(QuaternionF, QuaternionAndVectorFloatOperationFixture, testing::Values(
-        std::pair{QuaternionF(1.f, 0.f, 1.f, 0.f),
-                  Vec3F(5.0f, 10.0f, 4.0f)}
-        ));
+    std::pair{QuaternionF(1.f, 0.f, 1.f, 0.f), Vec3F(5.0f, 10.0f, 4.0f)}
+));
 
 INSTANTIATE_TEST_SUITE_P(QuaternionF, QuaternionFloatFixture, testing::Values(
-        QuaternionF(13.345f, 23.213f, 56.f, 0.000001f),
-        QuaternionF(1.f, 0.f, 0.f, 0.f),
-        QuaternionF(0.f, 0.f, 0.f, 0.f)
-        ));
+    QuaternionF(13.345f, 23.213f, 56.f, 0.000001f),
+    QuaternionF(1.f, 0.f, 0.f, 0.f)
+));
 
 INSTANTIATE_TEST_SUITE_P(QuaternionF, AngleAxisFloatFixture, testing::Values(
-        std::pair{static_cast<Radian>(Degree(0.f)), Vec3F(0, 0, 0)},
-        std::pair{static_cast<Radian>(Degree(65.f)), Vec3F(0, 1, 0)},
-        std::pair{static_cast<Radian>(Degree(345.f)), Vec3F(1, 0, 0)},
-        std::pair{static_cast<Radian>(Degree(197.f)), Vec3F(0, 0, 1)},
-        std::pair{static_cast<Radian>(Degree(45.f)), Vec3F(10, 24, 100)},
-        std::pair{static_cast<Radian>(Degree(123.f)), Vec3F(-5, -245, -123)},
-        std::pair{static_cast<Radian>(Degree(-245.f)), Vec3F(1, 0, 0)},
-        std::pair{static_cast<Radian>(Degree(650.f)), Vec3F(0, 1, 0)},
-        std::pair{static_cast<Radian>(Degree(-890.f)), Vec3F(0, 0, 1)},
-        std::pair{static_cast<Radian>(Degree(-1298.454f)),
-                  Vec3F(178, -54.32f, -0.00009f)}
-        ));
+    std::pair{static_cast<Radian>(Degree(65.f)), Vec3F(0, 1, 0)},
+    std::pair{static_cast<Radian>(Degree(345.f)), Vec3F(1, 0, 0)},
+    std::pair{static_cast<Radian>(Degree(197.f)), Vec3F(0, 0, 1)},
+    std::pair{static_cast<Radian>(Degree(45.f)), Vec3F(10, 24, 100)},
+    std::pair{static_cast<Radian>(Degree(123.f)), Vec3F(-5, -245, -123)},
+    std::pair{static_cast<Radian>(Degree(-245.f)), Vec3F(1, 0, 0)},
+    std::pair{static_cast<Radian>(Degree(650.f)), Vec3F(0, 1, 0)},
+    std::pair{static_cast<Radian>(Degree(-890.f)), Vec3F(0, 0, 1)},
+    std::pair{static_cast<Radian>(Degree(-1298.454f)), Vec3F(178, -54.32f, -0.00009f)}
+));
 
 INSTANTIATE_TEST_SUITE_P(QuaternionF, ArrayOfAngleFixture, testing::Values(
         std::array<Radian, 3>{ static_cast<Radian>(Degree(0.f)),
@@ -159,9 +159,9 @@ TEST_P(QuaternionAndVectorFloatOperationFixture, Multiplication)
 
     for (int i = 0; i < 3; i++)
     {
-        EXPECT_NEAR(qV[i], vExpected[i], MathUtility::Epsilon);
-        EXPECT_NEAR(vQ[i], vExpected[i], MathUtility::Epsilon);
-        EXPECT_NEAR(vTimeEqualQ[i], vExpected[i], MathUtility::Epsilon);
+        EXPECT_NEAR(qV[i], vExpected[i], Utility::Epsilon);
+        EXPECT_NEAR(vQ[i], vExpected[i], Utility::Epsilon);
+        EXPECT_NEAR(vTimeEqualQ[i], vExpected[i], Utility::Epsilon);
     }
 }
 
@@ -236,10 +236,10 @@ TEST_P(AngleAxisFloatFixture, AngleAxis)
 
     axisNorm = Vec3F::Normalized(axis);
 
-    EXPECT_FLOAT_EQ(q.W, MathUtility::Cos(angle / 2.f));
-    EXPECT_FLOAT_EQ(q.V.X, axisNorm.X * MathUtility::Sin(angle / 2.f));
-    EXPECT_FLOAT_EQ(q.V.Y, axisNorm.Y * MathUtility::Sin(angle / 2.f));
-    EXPECT_FLOAT_EQ(q.V.Z, axisNorm.Z * MathUtility::Sin(angle / 2.f));
+    EXPECT_FLOAT_EQ(q.W, Utility::Cos(angle / 2.f));
+    EXPECT_FLOAT_EQ(q.V.X, axisNorm.X * Utility::Sin(angle / 2.f));
+    EXPECT_FLOAT_EQ(q.V.Y, axisNorm.Y * Utility::Sin(angle / 2.f));
+    EXPECT_FLOAT_EQ(q.V.Z, axisNorm.Z * Utility::Sin(angle / 2.f));
 }
 
 TEST_P(ArrayOfAngleFixture, EulerMethod)
@@ -248,12 +248,12 @@ TEST_P(ArrayOfAngleFixture, EulerMethod)
 
     auto q = QuaternionF::Euler<float>(angles[0], angles[1], angles[2]);
 
-    float cosX = MathUtility::Cos(angles[0] * 0.5);
-    float sinX = MathUtility::Sin(angles[0] * 0.5);
-    float cosY = MathUtility::Cos(angles[1] * 0.5);
-    float sinY = MathUtility::Sin(angles[1] * 0.5);
-    float cosZ = MathUtility::Cos(angles[2] * 0.5);
-    float sinZ = MathUtility::Sin(angles[2] * 0.5);
+    float cosX = Utility::Cos(angles[0] * 0.5);
+    float sinX = Utility::Sin(angles[0] * 0.5);
+    float cosY = Utility::Cos(angles[1] * 0.5);
+    float sinY = Utility::Sin(angles[1] * 0.5);
+    float cosZ = Utility::Cos(angles[2] * 0.5);
+    float sinZ = Utility::Sin(angles[2] * 0.5);
 
     QuaternionF qExpected;
     qExpected.W = cosX * cosY * cosZ + sinX * sinY * sinZ;

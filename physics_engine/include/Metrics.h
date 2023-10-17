@@ -19,9 +19,9 @@ namespace PhysicsEngine::Metrics
     }
 
     template<typename T>
-    [[nodiscard]] constexpr Vec2<T> PixelsToMeters(const Vec2<T> pixelPos) noexcept
+    [[nodiscard]] constexpr Math::Vec2<T> PixelsToMeters(const Math::Vec2<T> pixelPos) noexcept
     {
-        return Vec2<T>(pixelPos.X * PixelsToMetersRatio, pixelPos.Y * PixelsToMetersRatio * -1.f);
+        return Math::Vec2<T>(pixelPos.X * PixelsToMetersRatio, pixelPos.Y * PixelsToMetersRatio * -1.f);
     }
 
     template<typename T>
@@ -31,8 +31,8 @@ namespace PhysicsEngine::Metrics
     }
 
     template<typename T>
-    [[nodiscard]] constexpr Vec2<T> MetersToPixels(const Vec2<T> meterPos) noexcept
+    [[nodiscard]] constexpr Math::Vec2<T> MetersToPixels(const Math::Vec2<T> meterPos) noexcept
     {
-        return Vec2<T>(meterPos.X * MetersToPixelsRatio, meterPos.Y * MetersToPixelsRatio * -1.f);
+        return Math::Vec2<T>(meterPos.X * MetersToPixelsRatio, meterPos.Y * MetersToPixelsRatio * -1.f);
     }
 }
