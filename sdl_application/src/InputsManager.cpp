@@ -8,9 +8,22 @@ void InputsManager::HandleInputs(bool& quit) noexcept
 {
     while (SDL_PollEvent(&event))
     {
-        if (event.type == SDL_QUIT)
+        switch (event.type)
         {
-            quit = true;
+            case SDL_QUIT:
+                quit = true;
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                _mouseButtonsDown[event.button.button] = true;
+                break;
+            case SDL_MOUSEBUTTONUP:
+                _mouseButtonsUp[event.button.button] = true;
+                _mouseButtonsDown[event.button.button] = false;
+                break;
+            case SDL_MOUSEMOTION:
+                _mousePosition.X = event.motion.x;
+                _mousePosition.Y = event.motion.y;
+                break;
         }
     }
 }

@@ -21,11 +21,16 @@ class PlanetSystem
 {
 public:
     static constexpr float G = 0.0667f;
-    static constexpr std::size_t PlanetToCreate = 200;
+    static constexpr std::size_t StartPlanetNbr = 200;
+    static constexpr std::size_t PlanetsResizeAmount = 500;
+    std::size_t _currentPlanetNbr = 0;
 
 private:
-    std::array<CelestialBody, PlanetToCreate> _planets{};
+    std::vector<CelestialBody> _planets{};
     CelestialBody _sun{};
+
+    [[nodiscard]] CelestialBody createPlanet(PhysicsEngine::World& world, Vec2F pos, float radius,
+                                             SDL_Color color) noexcept;
 
 public:
     PlanetSystem() noexcept = default;

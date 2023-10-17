@@ -1,5 +1,6 @@
 /**
  * @brief A planet system sample using the physics engine.
+ * In the future, the main would handle many samples using ImGUI to switch between them.
  * @author Olivier Pachoud
  */
 
@@ -16,7 +17,7 @@ int main()
     timer.Init();
 
     PhysicsEngine::World world;
-    world.Init(PlanetSystem::PlanetToCreate + 1);
+    world.Init(PlanetSystem::StartPlanetNbr + 1);
 
     PlanetSystem planetSystem;
     planetSystem.Init(world);
