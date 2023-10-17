@@ -35,6 +35,19 @@ TEST_P(FloatFixture, UniquePtrDestructor)
     EXPECT_NE(*floatPtr, param);
 }
 
+TEST_P(FloatFixture, UniquePtrArrowOperator)
+{
+    struct TestStruct
+    {
+        float value;
+        explicit TestStruct(float val) : value(val) {}
+    };
+
+    auto value = GetParam();
+    UniquePtr<TestStruct> ptr(new TestStruct(value));
+    EXPECT_EQ(ptr->value, value);
+}
+
 TEST_P(FloatFixture, SharedPtrConstructorAndDereference)
 {
     auto value = GetParam();
@@ -50,13 +63,13 @@ TEST_P(FloatFixture, SharedPtrConstructorAndDereference)
 TEST_P(FloatFixture, SharedPtrCopyConstructor)
 {
     auto param = GetParam();
-    auto* createdPtr = new float(param);
+    auto* floatPtr = new float(param);
 
-    SharedPtr<float> ptr(createdPtr);
+    SharedPtr<float> ptr(floatPtr);
     SharedPtr<float> ptrCopy(ptr);
 
-    EXPECT_EQ(ptr.Get(), createdPtr);
-    EXPECT_EQ(ptrCopy.Get(), createdPtr);
+    EXPECT_EQ(ptr.Get(), floatPtr);
+    EXPECT_EQ(ptrCopy.Get(), floatPtr);
     EXPECT_EQ(*ptr.Get(), param);
     EXPECT_EQ(*ptrCopy.Get(), param);
 
@@ -64,28 +77,65 @@ TEST_P(FloatFixture, SharedPtrCopyConstructor)
     EXPECT_EQ(ptrCopy.SharedCount(), 2);
 }
 
-//TEST(SharedPtrTest, AssignmentOperator) {
-//    int* intPtr = new int(42);
-//    SharedPtr<int> intSharedPtr(intPtr);
-//    SharedPtr<int> intSharedPtr2;
-//    intSharedPtr2 = intSharedPtr;  // Assignment operator
-//
-//    EXPECT_EQ(*intSharedPtr2, 42);  // Check the value via operator*
-//    EXPECT_EQ(intSharedPtr2.Get(), intPtr);  // Check that Get() returns the original pointer
-//}
+TEST_P(FloatFixture, SharedPtrCopyAssignmentOperator)
+{
+    auto param = GetParam();
+    auto* floatPtr = new float(param);
 
-//TEST_P(FloatFixture, SharedDestructor)
-//{
-//    auto param = GetParam();
-//    auto* floatPtr = new float(param);
-//
-//    // Expect that the value is the same.
-//    EXPECT_FLOAT_EQ(*floatPtr, param);
-//
-//    {
-//        UniquePtr<float> ptr(floatPtr);
-//    } // Call the destructor.
-//
-//    // Expect that the value is undefined.
-//    EXPECT_NE(*floatPtr, param);
-//}
+    SharedPtr<float> ptr(floatPtr);
+
+    // Self assignment.
+    ptr = ptr;
+    EXPECT_EQ(ptr.Get(), floatPtr);
+    EXPECT_EQ(ptr.SharedCount(), 1);
+
+    SharedPtr<float> ptr2;
+    ptr2 = ptr;
+
+    EXPECT_EQ(*ptr2, param);
+    EXPECT_EQ(ptr2.Get(), ptr.Get());
+    EXPECT_EQ(ptr2.Get(), floatPtr);
+    EXPECT_EQ(ptr.SharedCount(), 2);
+    EXPECT_EQ(ptr2.SharedCount(), 2);
+}
+
+TEST_P(FloatFixture, SharedPtrDestructor)
+{
+    auto param = GetParam();
+    auto* floatPtr = new float(param);
+
+    {
+        SharedPtr<float> ptr(floatPtr);
+
+        // Expect that the value is the same.
+        EXPECT_FLOAT_EQ(*floatPtr, param);
+
+        {
+            SharedPtr<float> ptr2(ptr);
+            EXPECT_EQ(ptr.SharedCount(), 2);
+            EXPECT_EQ(ptr2.SharedCount(), 2);
+        } // Call the ptr2 destructor.
+
+        EXPECT_EQ(ptr.SharedCount(), 1);
+    } // Call the ptr destructor.
+
+    // Expect that the value is undefined.
+    EXPECT_NE(*floatPtr, param);
+}
+
+TEST_P(FloatFixture, SharedPtrArrowOperator)
+{
+    struct TestStruct
+    {
+        float value;
+        explicit TestStruct(float val) : value(val) {}
+    };
+
+    auto value = GetParam();
+    SharedPtr<TestStruct> ptr(new TestStruct(value));
+    EXPECT_EQ(ptr->value, value);
+
+    SharedPtr<TestStruct> ptr2(ptr);
+    EXPECT_EQ(ptr2->value, value);
+    EXPECT_EQ(ptr2->value, ptr->value);
+}
