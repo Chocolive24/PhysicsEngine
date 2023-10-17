@@ -5,6 +5,7 @@
 #include <array>
 
 using namespace PhysicsEngine;
+using namespace Math;
 
 struct IntFixture : public ::testing::TestWithParam<int>{};
 

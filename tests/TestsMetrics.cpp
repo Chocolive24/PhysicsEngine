@@ -3,6 +3,7 @@
 #include "gtest/gtest.h"
 
 using namespace PhysicsEngine;
+using namespace Math;
 
 struct FloatFixture : public ::testing::TestWithParam<float>{};
 

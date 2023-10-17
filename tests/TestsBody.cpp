@@ -4,6 +4,7 @@
 #include <array>
 
 using namespace PhysicsEngine;
+using namespace Math;
 
 struct PairOfVec2FFixture : public ::testing::TestWithParam<std::tuple<Vec2F, Vec2F, float, Vec2F>>{};
 
