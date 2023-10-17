@@ -2,9 +2,9 @@
 // Created by Olivier on 13.10.2023.
 //
 
-#include "InputManager.h"
+#include "InputsManager.h"
 
-void InputManager::HandleInputs(bool& quit) noexcept
+void InputsManager::HandleInputs(bool& quit) noexcept
 {
     while (SDL_PollEvent(&event))
     {

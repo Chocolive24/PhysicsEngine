@@ -6,27 +6,27 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(SDL2 REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 
-file(GLOB_RECURSE PHYSICS_SRC_FILES PhysicsEngineCommon/include/*.h PhysicsEngineCommon/src/*.cpp)
+file(GLOB_RECURSE PHYSICS_SRC_FILES physics_engine/include/*.h physics_engine/src/*.cpp)
 add_library(PhysicsEngineCommon ${PHYSICS_SRC_FILES})
 set_target_properties(PhysicsEngineCommon PROPERTIES LINKER_LANGUAGE CXX)
-target_include_directories(PhysicsEngineCommon PUBLIC PhysicsEngineCommon/include/)
-target_include_directories(PhysicsEngineCommon PUBLIC PhysicsEngineCommon/libs/Math922/include/)
+target_include_directories(PhysicsEngineCommon PUBLIC physics_engine/include/)
+target_include_directories(PhysicsEngineCommon PUBLIC physics_engine/libs/math/include/)
 
-file(GLOB_RECURSE SRC_FILES include/*.h src/*.cpp)
-add_library(Common ${SRC_FILES})
-set_target_properties(Common PROPERTIES LINKER_LANGUAGE CXX)
-target_include_directories(Common PUBLIC include/)
-target_link_libraries(Common PUBLIC PhysicsEngineCommon)
-target_link_libraries(Common PUBLIC SDL2::SDL2)
+file(GLOB_RECURSE SDL_APP_SRC_FILES sdl_application/include/*.h sdl_application/src/*.cpp)
+add_library(SDL_AppCommon ${SDL_APP_SRC_FILES})
+set_target_properties(SDL_AppCommon PROPERTIES LINKER_LANGUAGE CXX)
+target_include_directories(SDL_AppCommon PUBLIC sdl_application/include/)
+target_link_libraries(SDL_AppCommon PUBLIC PhysicsEngineCommon)
+target_link_libraries(SDL_AppCommon PUBLIC SDL2::SDL2)
 
 file(GLOB_RECURSE SAMPLES_SRC_FILES samples/include/*.h samples/src/*.cpp)
 add_library(Samples ${SAMPLES_SRC_FILES})
 set_target_properties(Samples PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(Samples PUBLIC samples/include/)
-target_link_libraries(Samples PUBLIC Common)
+target_link_libraries(Samples PUBLIC SDL_AppCommon)
 
 add_executable(PhysicsEngine main.cpp)
-target_link_libraries(PhysicsEngine PRIVATE Common)
+target_link_libraries(PhysicsEngine PRIVATE SDL_AppCommon)
 target_link_libraries(PhysicsEngine PRIVATE Samples)
 
 # Disable SDL main
@@ -38,18 +38,23 @@ file(GLOB TEST_FILES ${TEST_DIR}/*.cpp )
 
 foreach(test_file ${TEST_FILES} )
     get_filename_component(test_name ${test_file} NAME_WE)
-    add_executable(PhysicsEngine${test_name} ${test_file})
 
-    target_link_libraries(PhysicsEngine${test_name} PUBLIC Common)
-    target_link_libraries(PhysicsEngine${test_name} PRIVATE GTest::gtest GTest::gtest_main)
+    IF(test_name STREQUAL RunAllTests)
+        continue()
+    ENDIF ()
 
-    target_include_directories(PhysicsEngine${test_name} PUBLIC include/)
+    add_executable(${test_name} ${test_file})
+
+    target_link_libraries(${test_name} PUBLIC SDL_AppCommon)
+    target_link_libraries(${test_name} PRIVATE GTest::gtest GTest::gtest_main)
+
+    target_include_directories(${test_name} PUBLIC include/)
 
     IF(MSVC)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX2 /Oi /Oy-")
     else()
-        set_target_properties(PhysicsEngine${test_name} PROPERTIES COMPILE_FLAGS "-save-temps -march=haswell -ffast-math -fno-omit-frame-pointer")
+        set_target_properties(${test_name} PROPERTIES COMPILE_FLAGS "-save-temps -march=haswell -ffast-math -fno-omit-frame-pointer")
     ENDIF()
 
-    set_target_properties (PhysicsEngine${test_name} PROPERTIES FOLDER Courses)
+    set_target_properties (${test_name} PROPERTIES FOLDER Courses)
 endforeach()

@@ -102,8 +102,8 @@ TEST_P(ArrayOfBody, Update)
 
         bodyRefs[i] = bodyRef;
 
-        body.AddForce(Vec2F(1.0f, 0.0f));
-        bodies[i].AddForce(Vec2F(1.0f, 0.0f));
+        body.ApplyForce(Vec2F(1.0f, 0.0f));
+        bodies[i].ApplyForce(Vec2F(1.0f, 0.0f));
     }
 
     world.Update(deltaTime);

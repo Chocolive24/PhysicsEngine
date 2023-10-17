@@ -1,8 +1,7 @@
-//
-// Created by Olivier on 15.10.2023.
-//
+/**
+ * @author Olivier
+ */
 
-#include <iostream>
 #include "World.h"
 
 namespace PhysicsEngine
@@ -15,7 +14,7 @@ namespace PhysicsEngine
         _generationIndices.resize(bodyCount, 0);
     }
 
-    BodyRef World::CreateBody() noexcept
+    [[nodiscard]] BodyRef World::CreateBody() noexcept
     {
         auto it = std::find_if(_bodies.begin(), _bodies.end(),[](const Body& body)
         {
@@ -27,14 +26,22 @@ namespace PhysicsEngine
             // Found an invalid body.
             std::size_t index = std::distance(_bodies.begin(), it);
 
+            _bodies[index].SetMass(1.f);
+
             return BodyRef{index, _generationIndices[index]};
         }
 
         // No body with negative mass found.
         std::size_t previousSize = _bodies.size();
+        std::size_t newSize = previousSize + _bodyResizeAmount;
 
-        _bodies.resize(previousSize + _bodyResizeAmount, Body());
-        _generationIndices.resize(previousSize + _bodyResizeAmount, 0);
+        _bodies.resize(newSize);
+        _generationIndices.resize(newSize);
+
+        std::fill(_bodies.begin() + previousSize, _bodies.end(), Body());
+        std::fill(_generationIndices.begin() + previousSize, _generationIndices.end(), 0);
+
+        _bodies[previousSize].SetMass(1.f);
 
         return { previousSize, _generationIndices[previousSize] };
     }

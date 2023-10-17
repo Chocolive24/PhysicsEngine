@@ -3,6 +3,8 @@
 
 #include "gtest/gtest.h"
 
+using namespace PhysicsEngine;
+
 struct FloatFixture : public ::testing::TestWithParam<float>{};
 
 INSTANTIATE_TEST_SUITE_P(UniquePtr, FloatFixture, testing::Values(

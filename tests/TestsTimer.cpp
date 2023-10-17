@@ -4,6 +4,8 @@
 
 #include <chrono>
 
+using namespace PhysicsEngine;
+
 TEST(Timer, DeltaTime)
 {
     Timer timer;

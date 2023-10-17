@@ -2,7 +2,7 @@
 
 #include "World.h"
 #include "RenderingManager.h"
-#include "InputManager.h"
+#include "InputsManager.h"
 #include "Timer.h"
 
 #include "SDL.h"
@@ -12,6 +12,7 @@
 struct CelestialBody
 {
     PhysicsEngine::BodyRef BodyRef;
+    // In Pixels
     float Radius;
     SDL_Color Color;
 };
@@ -19,7 +20,7 @@ struct CelestialBody
 class PlanetSystem
 {
 public:
-    static constexpr float G = 100.f;
+    static constexpr float G = 0.0667f;
     static constexpr std::size_t PlanetToCreate = 200;
 
 private:
@@ -32,7 +33,7 @@ public:
     void Init(PhysicsEngine::World& world);
 
     void CalculatePlanetMovements(PhysicsEngine::World& world, float deltaTime);
-    void RunGameLoop(RenderingManager& renderingManager, InputManager& inputManager, PhysicsEngine::World& world,
-                     Timer& timer);
+    void RunGameLoop(RenderingManager& renderingManager, InputsManager& inputManager, PhysicsEngine::World& world,
+                     PhysicsEngine::Timer& timer);
     void RenderScreen(RenderingManager& renderingManager, PhysicsEngine::World& world);
 };

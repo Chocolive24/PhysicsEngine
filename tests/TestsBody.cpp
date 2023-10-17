@@ -150,7 +150,7 @@ TEST_P(ArrayOfVec2FloatFixture, AddForce)
 
     for (auto& force : forces)
     {
-        b.AddForce(force);
+        b.ApplyForce(force);
         sumOfForces += force;
     }
 

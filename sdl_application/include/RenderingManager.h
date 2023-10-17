@@ -11,6 +11,9 @@
 class RenderingManager
 {
 private:
+    SDL_Window* _window{};
+    SDL_Renderer* _renderer{};
+
     std::vector<SDL_Vertex> _vertices;
     std::vector<int> _indices;
 
@@ -18,15 +21,14 @@ public:
     static constexpr int WindowWidth = 880;
     static constexpr int WindowHeight = 680;
 
-    SDL_Window* Window{};
-    SDL_Renderer* Renderer{};
-
     void Init() noexcept;
 
     void UnInit() const noexcept;
 
     void AddVertex(Vec2F pos, SDL_Color color, float u = 1, float v = 1);
     void ClearGeometry()  noexcept;
-    //void DrawCircle(float centerX, float centerY, float r, std::size_t pointNbr) const noexcept;
-    void DrawFilledCircle(Vec2F position, float r, std::size_t segments, SDL_Color color) noexcept;
+    void DrawCircle(Vec2F position, float r, std::size_t segments, SDL_Color color) noexcept;
+
+    [[nodiscard]] constexpr SDL_Window* Window() const noexcept { return _window; }
+    [[nodiscard]] constexpr SDL_Renderer* Renderer() const noexcept { return _renderer; }
 };

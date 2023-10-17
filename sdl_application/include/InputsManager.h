@@ -2,7 +2,7 @@
 
 #include "SDL.h"
 
-class InputManager
+class InputsManager
 {
 public:
     SDL_Event event;
