@@ -11,19 +11,16 @@ int main()
     RenderingManager renderingManager{};
     renderingManager.Init();
 
-    InputsManager inputManager{};
+    InputsManager inputsManager{};
 
     PhysicsEngine::Timer timer;
     timer.Init();
 
-    PhysicsEngine::World world;
-    world.Init(PlanetSystem::StartPlanetNbr + 1);
-
     PlanetSystem planetSystem;
-    planetSystem.Init(world);
-    planetSystem.RunGameLoop(renderingManager, inputManager, world, timer);
+    planetSystem.Init();
+    planetSystem.RunGameLoop(renderingManager, inputsManager, timer);
 
-    renderingManager.UnInit();
+    renderingManager.Deinit();
 
     return 0;
 }

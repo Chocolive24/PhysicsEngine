@@ -12,10 +12,8 @@ namespace PhysicsEngine
     class Timer
     {
     private:
-        std::chrono::time_point<std::chrono::steady_clock> _startOfProgramTime;
-        std::chrono::time_point<std::chrono::steady_clock> _startOfFrameTime;
-        std::chrono::time_point<std::chrono::steady_clock> _endOfFrameTime;
-        std::chrono::duration<float> _frameTime{0.f};
+        std::chrono::time_point<std::chrono::steady_clock> _startTime;
+        std::chrono::duration<float> _deltaTime{0.f};
 
     public:
         /**

@@ -2,20 +2,22 @@
 // Created by Olivier on 15.10.2023.
 //
 
-#include "Metrics.h"
+#include "../../common/include/Metrics.h"
 #include "Random.h"
 #include "PlanetSystem.h"
 
 #include <iostream>
 
-void PlanetSystem::Init(PhysicsEngine::World& world)
+void PlanetSystem::Init()
 {
+    _world.Init(PlanetSystem::StartPlanetNbr + 1);
+
     constexpr Math::Vec2F centerOfScreen(RenderingManager::WindowWidth / 2.f, RenderingManager::WindowHeight / 2.f);
     constexpr Math::Vec2F sunPos = PhysicsEngine::Metrics::PixelsToMeters(centerOfScreen);
 
     // Create the sun.
-    _sun = {world.CreateBody(), 5.f, {255, 0, 0, 255}};
-    auto& body = world.GetBody(_sun.BodyRef);
+    _sun = {_world.CreateBody(), 5.f, {255, 0, 0, 255}};
+    auto& body = _world.GetBody(_sun.BodyRef);
     body = PhysicsEngine::Body(sunPos, Math::Vec2F::Zero(), 100.f);
 
     _planets.resize(StartPlanetNbr, CelestialBody());
@@ -25,54 +27,86 @@ void PlanetSystem::Init(PhysicsEngine::World& world)
         Math::Vec2F rndScreenPos(Math::Random::Range(300.f, 600.f), Math::Random::Range(100.f, 500.f));
         Math::Vec2F rndPos = PhysicsEngine::Metrics::PixelsToMeters(rndScreenPos);
 
-        planet = createPlanet(world, rndPos, Math::Random::Range(3.f, 10.f),
+        planet = createPlanet(rndPos, Math::Random::Range(3.f, 10.f),
                               {0, 0, static_cast<std::uint8_t>(Math::Random::Range(75, 255)),
                                255});
     }
 }
 
-void PlanetSystem::RunGameLoop(RenderingManager& renderingManager, InputsManager& inputManager,
-                               PhysicsEngine::World& world, PhysicsEngine::Timer& timer)
+void PlanetSystem::RunGameLoop(RenderingManager& renderingManager,
+                               InputsManager& inputsManager,
+                               PhysicsEngine::Timer& timer)
 {
+    SDL_Event event;
     bool quit = false;
+    bool mouseDown = false;
 
     while (!quit)
     {
-        inputManager.HandleInputs(quit);
-
-        if (inputManager.IsMouseButtonDown(SDL_BUTTON_LEFT))
+        while (SDL_PollEvent(&event))
         {
-            auto mouseScreenPos = inputManager.MousePositionInPixels();
+            switch (event.type)
+            {
+                case SDL_QUIT:
+                    quit = true;
+                    break;
+                case SDL_MOUSEBUTTONDOWN:
+                    if (event.button.button == SDL_BUTTON_LEFT)
+                    {
+                        mouseDown = true;
+                    }
+                    break;
+                case SDL_MOUSEBUTTONUP:
+                    if (event.button.button == SDL_BUTTON_LEFT)
+                    {
+                        mouseDown = false;
+                    }
+                    break;
+            }
+        }
 
-            constexpr float rangeVariation = 20.f;
+        if (mouseDown)
+        {
+            Math::Vec2I mousePosition;
+            SDL_GetMouseState(&mousePosition.X, &mousePosition.Y);
 
-            Math::Vec2F rndMousePos(Math::Random::Range(mouseScreenPos.X - rangeVariation,
-                                               mouseScreenPos.X + rangeVariation),
-                              Math::Random::Range(mouseScreenPos.Y - rangeVariation,
-                                               mouseScreenPos.Y + rangeVariation));
+            constexpr int rangeVariation = 20;
 
-            auto planet = createPlanet(world, PhysicsEngine::Metrics::PixelsToMeters(rndMousePos),
+            Math::Vec2I rndMousePos(Math::Random::Range(mousePosition.X - rangeVariation,
+                                                        mousePosition.X + rangeVariation),
+                                    Math::Random::Range(mousePosition.Y - rangeVariation,
+                                                        mousePosition.Y + rangeVariation));
+
+            auto rndMousePosInMeters = PhysicsEngine::Metrics::PixelsToMeters(
+                    static_cast<Math::Vec2F>(rndMousePos));
+
+            auto planet = createPlanet(rndMousePosInMeters,
                                        Math::Random::Range(3.f, 10.f),
-                                       {0, 0,
-                                        static_cast<std::uint8_t>(Math::Random::Range(75, 255)),255});
+                                       {0,
+                                        0,
+                                        static_cast<std::uint8_t>(Math::Random::Range(75, 255)),
+                                        255});
 
             _planets.push_back(planet);
         }
 
         timer.Tick();
+        const auto deltaTime = timer.DeltaTime();
 
-        CalculatePlanetMovements(world,timer.DeltaTime());
+        calculatePlanetMovements();
 
-        RenderScreen(renderingManager, world);
+        _world.Update(deltaTime);
+
+        renderScreen(renderingManager);
     }
 }
 
-void PlanetSystem::CalculatePlanetMovements(PhysicsEngine::World& world, float deltaTime)
+void PlanetSystem::calculatePlanetMovements() noexcept
 {
     for (auto& p : _planets)
     {
-        auto& sunBody = world.GetBody(_sun.BodyRef);
-        PhysicsEngine::Body& planetBody = world.GetBody(p.BodyRef);
+        auto& sunBody = _world.GetBody(_sun.BodyRef);
+        PhysicsEngine::Body& planetBody = _world.GetBody(p.BodyRef);
 
         Math::Vec2F r = sunBody.Position() - planetBody.Position();
 
@@ -83,40 +117,42 @@ void PlanetSystem::CalculatePlanetMovements(PhysicsEngine::World& world, float d
 
         planetBody.ApplyForce(a);
     }
-
-    world.Update(deltaTime);
 }
 
-void PlanetSystem::RenderScreen(RenderingManager& renderingManager, PhysicsEngine::World& world)
+void PlanetSystem::renderScreen(RenderingManager& renderingManager) noexcept
 {
     SDL_RenderClear(renderingManager.Renderer());
+    renderingManager.ClearGeometry();
 
     constexpr SDL_Color backgroundColor{0, 0, 0, 255};
     SDL_SetRenderDrawColor(renderingManager.Renderer(), backgroundColor.r, backgroundColor.g, backgroundColor.b,
                            backgroundColor.a);
 
     // Draw the sun.
-    auto sunBodyPos = world.GetBody(_sun.BodyRef).Position();
+    auto sunBodyPos = _world.GetBody(_sun.BodyRef).Position();
     auto sunScreenPos = PhysicsEngine::Metrics::MetersToPixels(sunBodyPos);
-    renderingManager.DrawCircle(sunScreenPos, _sun.Radius, 50, _sun.Color);
+    renderingManager.DrawCircle(sunScreenPos, _sun.Radius, 40, _sun.Color);
 
     // Draw the planets.
     for(auto& p : _planets)
     {
-        auto planetBodyPos = world.GetBody(p.BodyRef).Position();
+        auto planetBodyPos = _world.GetBody(p.BodyRef).Position();
         auto planetScreenPos = PhysicsEngine::Metrics::MetersToPixels(planetBodyPos);
-        renderingManager.DrawCircle(planetScreenPos, p.Radius, 50, p.Color);
+        renderingManager.DrawCircle(planetScreenPos, p.Radius, 40, p.Color);
     }
+
+    SDL_RenderGeometry(renderingManager.Renderer(), nullptr, renderingManager._vertices.data(),
+                       static_cast<int>(renderingManager._vertices.size()),renderingManager._indices.data(),
+                       static_cast<int>(renderingManager._indices.size()));
 
     SDL_RenderPresent(renderingManager.Renderer());
 }
 
-[[nodiscard]] CelestialBody PlanetSystem::createPlanet(PhysicsEngine::World& world, Math::Vec2F pos, float radius,
-                                                       SDL_Color color) noexcept
+[[nodiscard]] CelestialBody PlanetSystem::createPlanet(Math::Vec2F pos, float radius, SDL_Color color) noexcept
 {
-    auto& sunBody = world.GetBody(_sun.BodyRef);
-    CelestialBody p = {world.CreateBody(), radius, color };
-    auto& pBody = world.GetBody(p.BodyRef);
+    auto& sunBody = _world.GetBody(_sun.BodyRef);
+    CelestialBody p = {_world.CreateBody(), radius, color };
+    auto& pBody = _world.GetBody(p.BodyRef);
 
     // Distance between the sun and the planet.
     Math::Vec2F r = sunBody.Position() - pos;
@@ -125,8 +161,6 @@ void PlanetSystem::RenderScreen(RenderingManager& renderingManager, PhysicsEngin
     Math::Vec2F initVel = std::sqrt(G * (sunBody.Mass() / distance)) * Math::Vec2F(-r.Y, r.X).Normalized();
 
     pBody = PhysicsEngine::Body(pos, initVel, 10.f);
-
-    _currentPlanetNbr++;
 
     return p;
 }

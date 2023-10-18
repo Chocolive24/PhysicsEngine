@@ -10,13 +10,19 @@ file(GLOB_RECURSE PHYSICS_SRC_FILES physics_engine/include/*.h physics_engine/sr
 add_library(PhysicsEngineCommon ${PHYSICS_SRC_FILES})
 set_target_properties(PhysicsEngineCommon PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(PhysicsEngineCommon PUBLIC physics_engine/include/)
-target_include_directories(PhysicsEngineCommon PUBLIC physics_engine/libs/math/include/)
+target_include_directories(PhysicsEngineCommon PUBLIC libs/math/include/)
+
+file(GLOB_RECURSE COMMON_SRC_FILES common/include/*.h common/src/*.cpp)
+add_library(Common ${COMMON_SRC_FILES})
+set_target_properties(Common PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries(Common PUBLIC PhysicsEngineCommon)
+target_include_directories(Common PUBLIC common/include/)
 
 file(GLOB_RECURSE SDL_APP_SRC_FILES sdl_application/include/*.h sdl_application/src/*.cpp)
 add_library(SDL_AppCommon ${SDL_APP_SRC_FILES})
 set_target_properties(SDL_AppCommon PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(SDL_AppCommon PUBLIC sdl_application/include/)
-target_link_libraries(SDL_AppCommon PUBLIC PhysicsEngineCommon)
+target_link_libraries(SDL_AppCommon PUBLIC Common)
 target_link_libraries(SDL_AppCommon PUBLIC SDL2::SDL2)
 
 file(GLOB_RECURSE SAMPLES_SRC_FILES samples/include/*.h samples/src/*.cpp)

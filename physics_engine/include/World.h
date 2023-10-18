@@ -38,9 +38,9 @@ namespace PhysicsEngine
         /**
          * @brief Init is a method that allocates memory for the desired number of bodies at the start of the program,
          * and instantiates invalid bodies for this number.
-         * @param bodyCount Number of bodies to allocate in memory. Default value is 100.
+         * @param preallocatedBodyCount Number of bodies to allocate in memory. Default value is 100.
          */
-        void Init(int bodyCount = 100) noexcept;
+        void Init(int preallocatedBodyCount = 100) noexcept;
 
         /**
          * @brief CreateBody is a method that creates a body in the world and returns a BodyRef to this body.
@@ -69,7 +69,7 @@ namespace PhysicsEngine
          */
         void Update(float deltaTime) noexcept;
 
-        [[nodiscard]] std::size_t BodyCount() { return _bodies.size(); }
+        [[nodiscard]] std::size_t BodyCount() const noexcept { return _bodies.size(); }
     };
 }
 

@@ -10,12 +10,14 @@
 
 class RenderingManager
 {
-private:
+public:
     SDL_Window* _window{};
     SDL_Renderer* _renderer{};
 
     std::vector<SDL_Vertex> _vertices;
     std::vector<int> _indices;
+
+    void addVertex(Math::Vec2F pos, SDL_Color color, float u = 1, float v = 1);
 
 public:
     static constexpr int WindowWidth = 880;
@@ -23,9 +25,8 @@ public:
 
     void Init() noexcept;
 
-    void UnInit() const noexcept;
+    void Deinit() const noexcept;
 
-    void AddVertex(Math::Vec2F pos, SDL_Color color, float u = 1, float v = 1);
     void ClearGeometry()  noexcept;
     void DrawCircle(Math::Vec2F position, float r, std::size_t segments, SDL_Color color) noexcept;
 

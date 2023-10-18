@@ -35,11 +35,6 @@ namespace PhysicsEngine
         constexpr Body() noexcept = default;
         constexpr Body(Math::Vec2F pos, Math::Vec2F vel, float mass) noexcept : _position(pos), _velocity(vel), _mass(mass){}
 
-        /**
-         * @brief ApplyForce is a method that applies a force to the body and adds it to the sum of the body's forces.
-         */
-        constexpr void ApplyForce(Math::Vec2F force) noexcept { _forces += force; };
-
         [[nodiscard]] constexpr Math::Vec2F Position() const noexcept { return _position; }
         void constexpr SetPosition(const Math::Vec2F newPosition) noexcept { _position = newPosition; }
 
@@ -50,13 +45,19 @@ namespace PhysicsEngine
         void constexpr SetMass(const float newMass) noexcept { _mass = newMass; }
 
         /**
+         * @brief ApplyForce is a method that applies a force to the body and adds it to the sum of the body's forces.
+         */
+        constexpr void ApplyForce(Math::Vec2F force) noexcept { _forces += force; };
+
+        /**
          * @return Sum of the forces applied to the body.
          */
         [[nodiscard]] constexpr Math::Vec2F Forces() const noexcept { return _forces; }
-        void constexpr SetForces(const Math::Vec2F force) noexcept { _forces = force; }
+        constexpr void ResetForces() noexcept { _forces = Math::Vec2F::Zero(); }
 
         /**
-         * @return If the mass is greater than 0.
+         * @brief IsValid is a method that checks if an object is valid (aka if it has a mass greater than 0).
+         * @return True if the body is valid.
          */
         [[nodiscard]] constexpr bool IsValid() const noexcept { return _mass > 0; }
     };

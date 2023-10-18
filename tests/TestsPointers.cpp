@@ -1,5 +1,5 @@
-#include "UniquePtr.h"
-#include "SharedPtr.h"
+#include "../common/include/UniquePtr.h"
+#include "../common/include/SharedPtr.h"
 
 #include "gtest/gtest.h"
 

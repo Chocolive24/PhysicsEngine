@@ -3,7 +3,7 @@
 #include "World.h"
 #include "RenderingManager.h"
 #include "InputsManager.h"
-#include "Timer.h"
+#include "../../common/include/Timer.h"
 
 #include "SDL.h"
 
@@ -19,26 +19,24 @@ struct CelestialBody
 
 class PlanetSystem
 {
-public:
-    static constexpr float G = 0.0667f;
-    static constexpr std::size_t StartPlanetNbr = 200;
-    static constexpr std::size_t PlanetsResizeAmount = 500;
-    std::size_t _currentPlanetNbr = 0;
-
 private:
+    PhysicsEngine::World _world;
+
     std::vector<CelestialBody> _planets{};
     CelestialBody _sun{};
 
-    [[nodiscard]] CelestialBody createPlanet(PhysicsEngine::World& world, Math::Vec2F pos, float radius,
-                                             SDL_Color color) noexcept;
+    [[nodiscard]] CelestialBody createPlanet(Math::Vec2F pos, float radius, SDL_Color color) noexcept;
+    void calculatePlanetMovements() noexcept;
+    void renderScreen(RenderingManager& renderingManager) noexcept;
 
 public:
+    static constexpr float G = 0.0667f;
+    static constexpr std::size_t StartPlanetNbr = 200;
+
     constexpr PlanetSystem() noexcept = default;
 
-    void Init(PhysicsEngine::World& world);
-
-    void CalculatePlanetMovements(PhysicsEngine::World& world, float deltaTime);
-    void RunGameLoop(RenderingManager& renderingManager, InputsManager& inputManager, PhysicsEngine::World& world,
+    void Init();
+    void RunGameLoop(RenderingManager& renderingManager,
+                     InputsManager& inputsManager,
                      PhysicsEngine::Timer& timer);
-    void RenderScreen(RenderingManager& renderingManager, PhysicsEngine::World& world);
 };

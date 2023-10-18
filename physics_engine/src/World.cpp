@@ -6,12 +6,12 @@
 
 namespace PhysicsEngine
 {
-    void World::Init(int bodyCount) noexcept
+    void World::Init(int preallocatedBodyCount) noexcept
     {
-        if (bodyCount < 0) bodyCount = 0;
+        if (preallocatedBodyCount < 0) preallocatedBodyCount = 0;
 
-        _bodies.resize(bodyCount, Body());
-        _generationIndices.resize(bodyCount, 0);
+        _bodies.resize(preallocatedBodyCount, Body());
+        _generationIndices.resize(preallocatedBodyCount, 0);
     }
 
     [[nodiscard]] BodyRef World::CreateBody() noexcept
@@ -35,11 +35,8 @@ namespace PhysicsEngine
         std::size_t previousSize = _bodies.size();
         std::size_t newSize = previousSize + _bodyResizeAmount;
 
-        _bodies.resize(newSize);
-        _generationIndices.resize(newSize);
-
-        std::fill(_bodies.begin() + previousSize, _bodies.end(), Body());
-        std::fill(_generationIndices.begin() + previousSize, _generationIndices.end(), 0);
+        _bodies.resize(newSize, Body());
+        _generationIndices.resize(newSize, 0);
 
         _bodies[previousSize].SetMass(1.f);
 
@@ -77,7 +74,7 @@ namespace PhysicsEngine
             // Change position according to velocity and delta time.
             body.SetPosition(body.Position() + body.Velocity() * deltaTime);
 
-            body.SetForces(Math::Vec2F::Zero());
+            body.ResetForces();
         }
     }
 }

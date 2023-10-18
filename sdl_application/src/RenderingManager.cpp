@@ -7,7 +7,7 @@ void RenderingManager::Init() noexcept
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
-        std::cout << "Failed to initialize the SDL2 library Error :" <<  " " << SDL_GetError() << "\n";
+        std::cerr << "Failed to initialize the SDL2 library Error :" <<  " " << SDL_GetError() << "\n";
         exit(-1);
     }
 
@@ -19,7 +19,7 @@ void RenderingManager::Init() noexcept
 
     if (!_window)
     {
-        std::cout << "Failed to create  Error :" <<  " " << SDL_GetError() << "\n";
+        std::cerr << "Failed to create  Error :" <<  " " << SDL_GetError() << "\n";
         exit(-1);
     }
 
@@ -27,7 +27,7 @@ void RenderingManager::Init() noexcept
 
     if (_renderer == nullptr)
     {
-        std::cout << "Renderer could not be created! Error :" << " " << SDL_GetError() << "\n";
+        std::cerr << "Renderer could not be created! Error :" << " " << SDL_GetError() << "\n";
         exit(1);
     }
 
@@ -36,14 +36,14 @@ void RenderingManager::Init() noexcept
     _indices.clear();
 }
 
-void RenderingManager::UnInit() const noexcept
+void RenderingManager::Deinit() const noexcept
 {
     SDL_DestroyRenderer(_renderer);
     SDL_DestroyWindow(_window);
     SDL_Quit();
 }
 
-void RenderingManager::AddVertex(Math::Vec2F pos, SDL_Color color, float u, float v)
+void RenderingManager::addVertex(Math::Vec2F pos, SDL_Color color, float u, float v)
 {
     //Vector2F vertexPos = PosToVertex(scaledVec);
 
@@ -68,28 +68,24 @@ void RenderingManager::ClearGeometry() noexcept
 
 void RenderingManager::DrawCircle(Math::Vec2F position, float r, std::size_t segments, SDL_Color color) noexcept
 {
-   ClearGeometry();
+   const int indicesOffset = _vertices.size();
 
     // Calculate vertices for the circle
     for (int i = 0; i < segments; i++)
     {
-        float angle = 2 * Math::Utility::Pi * static_cast<float>(i) / static_cast<float>(segments);
+        float angle = 2.0f * Math::Utility::Pi * static_cast<float>(i) / static_cast<float>(segments);
         float x = position.X + r * cos(angle);
         float y = position.Y + r * sin(angle);
-        AddVertex(Math::Vec2F(x, y), color, 1, 1);
+        addVertex(Math::Vec2F(x, y), color, 1, 1);
 
-        if (i == segments -1) break;
+        if (i == segments - 1) break;
 
-        _indices.push_back(0); // Center point
-        _indices.push_back(i);
-        _indices.push_back(i + 1);
+        _indices.push_back(indicesOffset); // Center point
+        _indices.push_back(indicesOffset + i);
+        _indices.push_back(indicesOffset + i + 1);
     }
 
-    _indices.push_back(0); // Center point
-    _indices.push_back(static_cast<int>(segments) - 1);
-    _indices.push_back(0);  // Connect the last vertex to the center
-
-    SDL_RenderGeometry(_renderer, nullptr, _vertices.data(),
-                       static_cast<int>(_vertices.size()),_indices.data(),
-                       static_cast<int>(_indices.size()));
+    _indices.push_back(indicesOffset); // Center point
+    _indices.push_back(indicesOffset + static_cast<int>(segments) - 1);
+    _indices.push_back(indicesOffset);  // Connect the last vertex to the center
 }

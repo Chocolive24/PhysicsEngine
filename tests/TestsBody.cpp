@@ -131,14 +131,14 @@ TEST_P(Vec2FloatFixture, GetAndSetForces)
     Body b(Vec2F::Zero(), Vec2F::Zero(), 0.f);
 
     auto bForces = b.Forces();
-    b.SetForces(v * 3);
+    b.ResetForces();
     auto newBForces = b.Forces();
 
     EXPECT_FLOAT_EQ(bForces.X, 0.f);
     EXPECT_FLOAT_EQ(bForces.Y, 0.f);
 
-    EXPECT_FLOAT_EQ(newBForces.X, v.X * 3);
-    EXPECT_FLOAT_EQ(newBForces.Y, v.Y * 3);
+    EXPECT_FLOAT_EQ(newBForces.X, 0);
+    EXPECT_FLOAT_EQ(newBForces.Y, 0);
 }
 
 TEST_P(ArrayOfVec2FloatFixture, AddForce)

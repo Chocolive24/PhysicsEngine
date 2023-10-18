@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Metrics.h"
+#include "../../common/include/Metrics.h"
 #include "Vec2.h"
 
 #include "SDL.h"
@@ -21,7 +21,7 @@ private:
     Math::Vec2F _mousePosition = Math::Vec2F::Zero();
 
 public:
-    SDL_Event event{};
+
 
     void HandleInputs(bool& quit) noexcept;
 
