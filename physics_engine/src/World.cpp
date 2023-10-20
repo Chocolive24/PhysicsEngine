@@ -77,4 +77,10 @@ namespace PhysicsEngine
             body.ResetForces();
         }
     }
+
+    void World::Deinit() noexcept
+    {
+        _bodies.clear();
+        _generationIndices.clear();
+    }
 }

@@ -5,11 +5,11 @@
 #include "DrawableGeometry.h"
 #include "Metrics.h"
 #include "Random.h"
-#include "PlanetSystem.h"
+#include "PlanetSystemSample.h"
 
 #include <iostream>
 
-void PlanetSystem::Init() noexcept
+void PlanetSystemSample::Init() noexcept
 {
     Sample::Init();
 
@@ -34,7 +34,7 @@ void PlanetSystem::Init() noexcept
     }
 }
 
-void PlanetSystem::HandleInputs(const SDL_Event event) noexcept
+void PlanetSystemSample::HandleInputs(const SDL_Event event) noexcept
 {
     switch (event.type)
     {
@@ -54,7 +54,7 @@ void PlanetSystem::HandleInputs(const SDL_Event event) noexcept
 }
 
 
-void PlanetSystem::Update() noexcept
+void PlanetSystemSample::Update() noexcept
 {
     if (_mustCreatePlanet)
     {
@@ -63,22 +63,26 @@ void PlanetSystem::Update() noexcept
 
         constexpr int rangeVariation = 20;
 
-        Math::Vec2I rndMousePos(Math::Random::Range(mousePosition.X - rangeVariation,
-                                                    mousePosition.X + rangeVariation),
-                                Math::Random::Range(mousePosition.Y - rangeVariation,
-                                                    mousePosition.Y + rangeVariation));
+        if((Metrics::PixelsToMeters(static_cast<Math::Vec2F>(mousePosition)) -
+        _world.GetBody(_sun.BodyRef).Position()).Length() > Metrics::PixelsToMeters(rangeVariation))
+        {
+            Math::Vec2I rndMousePos(Math::Random::Range(mousePosition.X - rangeVariation,
+                                                        mousePosition.X + rangeVariation),
+                                    Math::Random::Range(mousePosition.Y - rangeVariation,
+                                                        mousePosition.Y + rangeVariation));
 
-        auto rndMousePosInMeters = Metrics::PixelsToMeters(
-                static_cast<Math::Vec2F>(rndMousePos));
+            auto rndMousePosInMeters = Metrics::PixelsToMeters(
+                    static_cast<Math::Vec2F>(rndMousePos));
 
-        auto planet = createPlanet(rndMousePosInMeters,
-                                   Math::Random::Range(3.f, 10.f),
-                                   {0,
-                                    0,
-                                    static_cast<std::uint8_t>(Math::Random::Range(75, 255)),
-                                    255});
+            auto planet = createPlanet(rndMousePosInMeters,
+                                       Math::Random::Range(3.f, 10.f),
+                                       {0,
+                                        0,
+                                        static_cast<std::uint8_t>(Math::Random::Range(75, 255)),
+                                        255});
 
-        _planets.push_back(planet);
+            _planets.push_back(planet);
+        }
     }
 
     _timer.Tick();
@@ -91,7 +95,7 @@ void PlanetSystem::Update() noexcept
     drawCelestialBodies();
 }
 
-[[nodiscard]] CelestialBody PlanetSystem::createPlanet(Math::Vec2F pos, float radius, SDL_Color color) noexcept
+[[nodiscard]] CelestialBody PlanetSystemSample::createPlanet(Math::Vec2F pos, float radius, SDL_Color color) noexcept
 {
     auto& sunBody = _world.GetBody(_sun.BodyRef);
     CelestialBody p = {_world.CreateBody(), radius, color };
@@ -108,7 +112,7 @@ void PlanetSystem::Update() noexcept
     return p;
 }
 
-void PlanetSystem::calculatePlanetMovements() noexcept
+void PlanetSystemSample::calculatePlanetMovements() noexcept
 {
     for (auto& p : _planets)
     {
@@ -126,11 +130,8 @@ void PlanetSystem::calculatePlanetMovements() noexcept
     }
 }
 
-void PlanetSystem::drawCelestialBodies() noexcept
+void PlanetSystemSample::drawCelestialBodies() noexcept
 {
-    //SDL_RenderClear(_window.Renderer());
-    DrawableGeometry::ClearGeometry();
-
     // Draw the sun.
     auto sunBodyPos = _world.GetBody(_sun.BodyRef).Position();
     auto sunScreenPos = Metrics::MetersToPixels(sunBodyPos);
@@ -143,10 +144,11 @@ void PlanetSystem::drawCelestialBodies() noexcept
         auto planetScreenPos = Metrics::MetersToPixels(planetBodyPos);
         DrawableGeometry::Circle(planetScreenPos, p.Radius, 15, p.Color);
     }
+}
 
-//    SDL_RenderGeometry(_window.Renderer(), nullptr, Geometry::Vertices.data(),
-//                       static_cast<int>(Geometry::Vertices.size()), Geometry::Indices.data(),
-//                       static_cast<int>(Geometry::Indices.size()));
-//
-//    SDL_RenderPresent(_window.Renderer());
+void PlanetSystemSample::Deinit() noexcept
+{
+    Sample::Deinit();
+
+    _planets.clear();
 }

@@ -14,7 +14,7 @@ struct CelestialBody
     SDL_Color Color;
 };
 
-class PlanetSystem : public Sample
+class PlanetSystemSample : public Sample
 {
 private:
     std::vector<CelestialBody> _planets{};
@@ -30,9 +30,10 @@ public:
     static constexpr float G = 0.0667f;
     static constexpr std::size_t StartPlanetNbr = 200;
 
-    explicit PlanetSystem() noexcept = default;
+    explicit PlanetSystemSample() noexcept = default;
 
     void Init() noexcept override;
     void HandleInputs(SDL_Event event) noexcept override;
     void Update() noexcept override;
+    void Deinit() noexcept override;
 };

@@ -17,7 +17,9 @@
     //TODO: va faire la loop while(!quit) et les inputs
     // TODO: va recevoir des datas a draw et render
 
-#include "PlanetSystem.h"
+#include "UniquePtr.h"
+#include "PlanetSystemSample.h"
+#include "TriggerColliderSample.h"
 #include "DrawableGeometry.h"
 
 int main()
@@ -25,8 +27,7 @@ int main()
     Window window{};
     window.Init();
 
-    PlanetSystem planetSystem;
-    planetSystem.Init();
+    UniquePtr<Sample> currentSample;
 
     SDL_Event event;
     bool quit = false;
@@ -35,16 +36,38 @@ int main()
 
     while(!quit)
     {
+        bool isCurrentSampleNull = currentSample.Get() == nullptr;
+
         while(SDL_PollEvent(&event))
         {
-            if (event.type == SDL_QUIT)
+            switch (event.type) 
             {
-                quit = true;
+                case SDL_QUIT:
+                    quit = true;
+                    break;
+                case SDL_KEYDOWN:
+                    switch(event.key.keysym.scancode)
+                    {
+                        case SDL_SCANCODE_1:
+                            currentSample = UniquePtr<Sample>(new PlanetSystemSample);
+                            currentSample->Init();
+                            break;
+                        case SDL_SCANCODE_2:
+                            currentSample = UniquePtr<Sample>(new TriggerColliderSample);
+                            currentSample->Init();
+                            break;
+                        default:
+                            break;
+                    }
             }
 
-            planetSystem.HandleInputs(event);
+            if (!isCurrentSampleNull)
+            {
+                currentSample->HandleInputs(event);
+            }
         }
 
+        DrawableGeometry::ClearGeometry();
         SDL_RenderClear(window.Renderer());
 
         SDL_SetRenderDrawColor(window.Renderer(),
@@ -53,7 +76,10 @@ int main()
                                backgroundColor.b,
                                backgroundColor.a);
 
-        planetSystem.Update();
+        if(!isCurrentSampleNull)
+        {
+            currentSample->Update();
+        }
 
         SDL_RenderGeometry(window.Renderer(),
                            nullptr,

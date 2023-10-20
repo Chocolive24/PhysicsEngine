@@ -74,6 +74,8 @@ namespace PhysicsEngine
          * @return The number of allocated bodies.
          */
         [[nodiscard]] std::size_t AllocatedBodies() const noexcept { return _bodies.size(); }
+
+        void Deinit() noexcept;
     };
 }
 

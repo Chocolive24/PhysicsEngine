@@ -35,4 +35,6 @@ public:
     * @return The time since the Init() function was called in seconds.
     */
     [[nodiscard]] float TotalTime() const noexcept;
+
+    void Deinit() noexcept;
 };

@@ -9,3 +9,8 @@ void Sample::Init() noexcept
     _world.Init(_startBodyCount);
     _timer.Init();
 }
+
+void Sample::Deinit() noexcept
+{
+    _world.Deinit();
+}

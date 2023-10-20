@@ -52,7 +52,7 @@ public:
         return UniquePtr<U>(ptrToCast);
     }
 
-    [[nodiscard]] constexpr UniquePtr<T> MakeUnique(T value) const noexcept
+    [[nodiscard]] static constexpr UniquePtr<T> MakeUnique(T value) noexcept
     {
         return UniquePtr<T>(new T(value));
     }
