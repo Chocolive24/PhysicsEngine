@@ -234,10 +234,10 @@ namespace Math
         [[nodiscard]] NOALIAS constexpr static Vec3<T> Slerp(const Vec3<T> vec3A, const Vec3<T> vec3B, const float time) noexcept
         {
             Radian omega = GetVectorAngle(vec3A, vec3B);
-            T calculation = (Utility::Sin(omega * (1 - time)) / Utility::Sin(omega));
+            T calculation = (Sin(omega * (1 - time)) / Sin(omega));
             Vec3<T> vec = Vec3<T>(vec3A.X * calculation, vec3A.Y * calculation, vec3A.Z * calculation);
 
-            float cal = Utility::Sin(omega * time) / Utility::Sin(omega);
+            float cal = Sin(omega * time) / Sin(omega);
             vec = vec + vec3B * cal;
 
             return vec;

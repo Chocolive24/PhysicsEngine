@@ -1,10 +1,6 @@
-#include "../common/include/Timer.h"
+#include "Timer.h"
 
 #include "gtest/gtest.h"
-
-#include <chrono>
-
-using namespace PhysicsEngine;
 
 TEST(Timer, DeltaTime)
 {

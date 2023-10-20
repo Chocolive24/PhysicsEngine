@@ -5,8 +5,6 @@
 * @author Alexis
 */
 
-#include "Definition.h"
-
 #include <random>
 
 /**
@@ -15,7 +13,7 @@
 namespace Math::Random
 {
     template <class T>
-    [[nodiscard]] NOALIAS T Range(T min, T max) noexcept
+    [[nodiscard]] T Range(T min, T max) noexcept
     {
         if (min > max)
         {
@@ -32,7 +30,7 @@ namespace Math::Random
     }
 
     template <>
-    [[nodiscard]] NOALIAS int Range(int min, int max) noexcept
+    [[nodiscard]] int Range(int min, int max) noexcept
     {
         if (min > max)
         {
@@ -49,7 +47,7 @@ namespace Math::Random
     }
 
     template <>
-    [[nodiscard]] NOALIAS unsigned int Range(unsigned int min, unsigned int max) noexcept
+    [[nodiscard]] unsigned int Range(unsigned int min, unsigned int max) noexcept
     {
         if (min > max)
         {
@@ -66,7 +64,7 @@ namespace Math::Random
     }
 
     template <>
-    [[nodiscard]] NOALIAS long Range(long min, long max) noexcept
+    [[nodiscard]] long Range(long min, long max) noexcept
     {
         if (min > max)
         {

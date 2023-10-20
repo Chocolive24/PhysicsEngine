@@ -1,15 +1,13 @@
-#include "../common/include/UniquePtr.h"
-#include "../common/include/SharedPtr.h"
+#include "UniquePtr.h"
+#include "SharedPtr.h"
 
 #include "gtest/gtest.h"
-
-using namespace PhysicsEngine;
 
 struct FloatFixture : public ::testing::TestWithParam<float>{};
 
 INSTANTIATE_TEST_SUITE_P(UniquePtr, FloatFixture, testing::Values(
         0.f, 1.f, 5.f, 99999.11111f
-        ));
+));
 
 TEST_P(FloatFixture, UniquePtrConstructorAndDereference)
 {

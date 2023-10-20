@@ -27,7 +27,7 @@ TEST(World, DefaultConstructor)
 {
     World world;
 
-    EXPECT_EQ(world.BodyCount(), 0);
+    EXPECT_EQ(world.AllocatedBodies(), 0);
 }
 
 TEST_P(IntFixture, Init)
@@ -39,11 +39,11 @@ TEST_P(IntFixture, Init)
 
     if (bodyCount < 0)
     {
-        EXPECT_EQ(world.BodyCount(), 0);
+        EXPECT_EQ(world.AllocatedBodies(), 0);
         return;
     }
 
-    EXPECT_EQ(world.BodyCount(), bodyCount);
+    EXPECT_EQ(world.AllocatedBodies(), bodyCount);
 }
 
 TEST(World, CreateAndDestroyBody)

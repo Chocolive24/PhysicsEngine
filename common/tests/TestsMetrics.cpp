@@ -1,8 +1,7 @@
-#include "../common/include/Metrics.h"
+#include "Metrics.h"
 
 #include "gtest/gtest.h"
 
-using namespace PhysicsEngine;
 using namespace Math;
 
 struct FloatFixture : public ::testing::TestWithParam<float>{};

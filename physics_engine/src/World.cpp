@@ -33,7 +33,7 @@ namespace PhysicsEngine
 
         // No body with negative mass found.
         std::size_t previousSize = _bodies.size();
-        std::size_t newSize = previousSize + _bodyResizeAmount;
+        auto newSize = static_cast<std::size_t>(static_cast<float>(previousSize) * _bodyAllocationResizeFactor);
 
         _bodies.resize(newSize, Body());
         _generationIndices.resize(newSize, 0);

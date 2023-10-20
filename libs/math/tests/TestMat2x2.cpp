@@ -160,10 +160,10 @@ TEST_P(MatrixIntFixture, MatIntInvertedTest)
     mInv *= static_cast<Mat2x2F>(m);
 
     // Check that the inverted matrix * base matrix = identity matrix
-    EXPECT_NEAR(mInv.Val[0][0], mId.Val[0][0], Utility::Epsilon);
-    EXPECT_NEAR(mInv.Val[0][1], mId.Val[0][1], Utility::Epsilon);
-    EXPECT_NEAR(mInv.Val[1][0], mId.Val[1][0], Utility::Epsilon);
-    EXPECT_NEAR(mInv.Val[1][1], mId.Val[1][1], Utility::Epsilon);
+    EXPECT_NEAR(mInv.Val[0][0], mId.Val[0][0], Epsilon);
+    EXPECT_NEAR(mInv.Val[0][1], mId.Val[0][1], Epsilon);
+    EXPECT_NEAR(mInv.Val[1][0], mId.Val[1][0], Epsilon);
+    EXPECT_NEAR(mInv.Val[1][1], mId.Val[1][1], Epsilon);
 }
 
 TEST_P(MatrixIntFixture, AdditionInt)

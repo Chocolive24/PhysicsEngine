@@ -337,8 +337,8 @@ TEST_P(MatrixFloatFixture, Inversion)
     {
         for (int col = 0; col < Mat3x3I::ColNbr; col++)
         {
-            EXPECT_NEAR(isInvertedCorrect.Val[row][col], identity.Val[row][col], Utility::Epsilon);
-            EXPECT_NEAR(isMInverted.Val[row][col], identity.Val[row][col], Utility::Epsilon);
+            EXPECT_NEAR(isInvertedCorrect.Val[row][col], identity.Val[row][col], Epsilon);
+            EXPECT_NEAR(isMInverted.Val[row][col], identity.Val[row][col], Epsilon);
         }
     }
 }

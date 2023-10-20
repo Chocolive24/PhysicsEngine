@@ -159,9 +159,9 @@ TEST_P(QuaternionAndVectorFloatOperationFixture, Multiplication)
 
     for (int i = 0; i < 3; i++)
     {
-        EXPECT_NEAR(qV[i], vExpected[i], Utility::Epsilon);
-        EXPECT_NEAR(vQ[i], vExpected[i], Utility::Epsilon);
-        EXPECT_NEAR(vTimeEqualQ[i], vExpected[i], Utility::Epsilon);
+        EXPECT_NEAR(qV[i], vExpected[i], Epsilon);
+        EXPECT_NEAR(vQ[i], vExpected[i], Epsilon);
+        EXPECT_NEAR(vTimeEqualQ[i], vExpected[i], Epsilon);
     }
 }
 
@@ -236,10 +236,10 @@ TEST_P(AngleAxisFloatFixture, AngleAxis)
 
     axisNorm = Vec3F::Normalized(axis);
 
-    EXPECT_FLOAT_EQ(q.W, Utility::Cos(angle / 2.f));
-    EXPECT_FLOAT_EQ(q.V.X, axisNorm.X * Utility::Sin(angle / 2.f));
-    EXPECT_FLOAT_EQ(q.V.Y, axisNorm.Y * Utility::Sin(angle / 2.f));
-    EXPECT_FLOAT_EQ(q.V.Z, axisNorm.Z * Utility::Sin(angle / 2.f));
+    EXPECT_FLOAT_EQ(q.W, Cos(angle / 2.f));
+    EXPECT_FLOAT_EQ(q.V.X, axisNorm.X * Sin(angle / 2.f));
+    EXPECT_FLOAT_EQ(q.V.Y, axisNorm.Y * Sin(angle / 2.f));
+    EXPECT_FLOAT_EQ(q.V.Z, axisNorm.Z * Sin(angle / 2.f));
 }
 
 TEST_P(ArrayOfAngleFixture, EulerMethod)
@@ -248,12 +248,12 @@ TEST_P(ArrayOfAngleFixture, EulerMethod)
 
     auto q = QuaternionF::Euler<float>(angles[0], angles[1], angles[2]);
 
-    float cosX = Utility::Cos(angles[0] * 0.5);
-    float sinX = Utility::Sin(angles[0] * 0.5);
-    float cosY = Utility::Cos(angles[1] * 0.5);
-    float sinY = Utility::Sin(angles[1] * 0.5);
-    float cosZ = Utility::Cos(angles[2] * 0.5);
-    float sinZ = Utility::Sin(angles[2] * 0.5);
+    float cosX = Cos(angles[0] * 0.5);
+    float sinX = Sin(angles[0] * 0.5);
+    float cosY = Cos(angles[1] * 0.5);
+    float sinY = Sin(angles[1] * 0.5);
+    float cosZ = Cos(angles[2] * 0.5);
+    float sinZ = Sin(angles[2] * 0.5);
 
     QuaternionF qExpected;
     qExpected.W = cosX * cosY * cosZ + sinX * sinY * sinZ;

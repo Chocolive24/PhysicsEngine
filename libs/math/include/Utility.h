@@ -10,7 +10,7 @@
 
 constexpr float CalculateLut(Math::Radian radian, std::array<float, Size> table, float step, float rangeStart = 0.f);
 
-namespace Math::Utility
+namespace Math
 {
     constexpr static float Pi = 3.14159265358979323846f;
     constexpr static float Epsilon = 0.001f;
@@ -127,7 +127,7 @@ namespace Math::Utility
 NOALIAS constexpr float CalculateLut(Math::Radian radian, std::array<float, Size> table, float step, float rangeStart)
 {
     const auto angle = static_cast<float>(radian);
-	int index = Math::Utility::Abs(static_cast<int>((angle - rangeStart) / step));
+	int index = Math::Abs(static_cast<int>((angle - rangeStart) / step));
 
 	while (index >= Size)
 	{

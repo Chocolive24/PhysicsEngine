@@ -487,9 +487,9 @@ TEST_P(Vec2ITestFixtureMixedPairWithTime, Slerp)
 			continue;
 		}
 
-		float sinAngle = Utility::Sin(angleBetween);
-		float sinAngleT = Utility::Sin(times[i] * angleBetween);
-		float sinAngle1T = Utility::Sin((1 - times[i]) * angleBetween);
+		float sinAngle = Sin(angleBetween);
+		float sinAngleT = Sin(times[i] * angleBetween);
+		float sinAngle1T = Sin((1 - times[i]) * angleBetween);
 
 		if (sinAngle == 0)
 		{
@@ -532,8 +532,8 @@ TEST_P(Vec2ITestFixtureVecAndScalar, Rotate)
 		auto vecAf = Vec2I(values[i].X, values[i].Y);
 		auto angle = Radian(scalars[i]);
 
-		float cos = Utility::Cos(angle);
-		float sin = Utility::Sin(angle);
+		float cos = Cos(angle);
+		float sin = Sin(angle);
 
 		int x = values[i].X * cos - values[i].Y * sin;
 		int y = values[i].X * sin + values[i].Y * cos;
@@ -752,6 +752,19 @@ TEST_P(Vec2FTestFixtureMixedPair, Length)
 	}
 }
 
+TEST_P(Vec2FTestFixtureMixedPair, SquareLength)
+{
+    auto pair = GetParam();
+    auto* values = pair.first;
+    auto* values2 = pair.second;
+
+    for (size_t i = 0; i < ValuesSize; i++)
+    {
+        auto length = values[i].X * values[i].X + values[i].Y * values[i].Y;
+        EXPECT_FLOAT_EQ(length, values[i].SquareLength());
+    }
+}
+
 TEST_P(Vec2FTestFixtureMixedVec, Normalized)
 {
 	auto* values = GetParam();
@@ -965,9 +978,9 @@ TEST_P(Vec2FTestFixtureMixedPairWithTime, Slerp)
 			FAIL();
 		}
 
-		float sinAngle = Utility::Sin(angleBetween);
-		float sinAngleT = Utility::Sin(times[i] * angleBetween);
-		float sinAngle1T = Utility::Sin((1 - times[i]) * angleBetween);
+		float sinAngle = Sin(angleBetween);
+		float sinAngleT = Sin(times[i] * angleBetween);
+		float sinAngle1T = Sin((1 - times[i]) * angleBetween);
 
 		if (sinAngle == 0)
 		{
@@ -1014,8 +1027,8 @@ TEST_P(Vec2FTestFixtureVecAndScalar, Rotate)
 		auto result = values[i];
 		auto angle = Radian(Degree(scalars[i]));
 
-		const float cos = Utility::Cos(angle);
-		const float sin = Utility::Sin(angle);
+		const float cos = Cos(angle);
+		const float sin = Sin(angle);
 
 		auto x = vecAf.X * cos - vecAf.Y * sin;
 		auto y = vecAf.X * sin + vecAf.Y * cos;

@@ -48,12 +48,12 @@ INSTANTIATE_TEST_SUITE_P(Maths, FunctionsFixture, testing::Values(
 
 TEST_P(FunctionsFixture, Abs){
     auto values = FunctionsFixture::GetParam();
-    EXPECT_EQ(Math::Utility::Abs<int>(-1 * static_cast<int>(values)), static_cast<int>(values));
-    EXPECT_EQ(Math::Utility::Abs<int>(static_cast<int>(values)), static_cast<int>(values));
-    EXPECT_EQ(Math::Utility::Abs<int>(0), 0);
+    EXPECT_EQ(Math::Abs<int>(-1 * static_cast<int>(values)), static_cast<int>(values));
+    EXPECT_EQ(Math::Abs<int>(static_cast<int>(values)), static_cast<int>(values));
+    EXPECT_EQ(Math::Abs<int>(0), 0);
 
-    EXPECT_EQ(Math::Utility::Abs<float>(-1 * values), values);
-    EXPECT_EQ(Math::Utility::Abs<float>(values), values);
+    EXPECT_EQ(Math::Abs<float>(-1 * values), values);
+    EXPECT_EQ(Math::Abs<float>(values), values);
 }
 
 TEST_P(FunctionsFixture, Clamp)
@@ -68,7 +68,7 @@ TEST_P(FunctionsFixture, Clamp)
     {
         result = 10;
     }
-    EXPECT_EQ(Math::Utility::Clamp<int>(static_cast<int>(values), 0, 10), static_cast<int>(result));
+    EXPECT_EQ(Math::Clamp<int>(static_cast<int>(values), 0, 10), static_cast<int>(result));
 
     if (values < 0.f)
     {
@@ -78,29 +78,29 @@ TEST_P(FunctionsFixture, Clamp)
     {
         result = 0.0001f;
     }
-    EXPECT_FLOAT_EQ(Math::Utility::Clamp<float>(values, 0.0001f, 0.f), result);
+    EXPECT_FLOAT_EQ(Math::Clamp<float>(values, 0.0001f, 0.f), result);
 }
 
 TEST_P(FunctionsFixture, Min)
 {
     auto values = FunctionsFixture::GetParam();
     auto result = values < 20 ? values : 20;
-    EXPECT_EQ(Math::Utility::Min<int>(static_cast<int>(values), 20), static_cast<int>(result));
-    EXPECT_EQ(Math::Utility::Min<int>(20, static_cast<int>(values)), static_cast<int>(result));
-    EXPECT_EQ(Math::Utility::Min<int>(-0, 0), -0);
+    EXPECT_EQ(Math::Min<int>(static_cast<int>(values), 20), static_cast<int>(result));
+    EXPECT_EQ(Math::Min<int>(20, static_cast<int>(values)), static_cast<int>(result));
+    EXPECT_EQ(Math::Min<int>(-0, 0), -0);
     result = values < 0.001f ? values : 0.001f;
-    EXPECT_FLOAT_EQ(Math::Utility::Min<float>(values, 0.001f), result);
+    EXPECT_FLOAT_EQ(Math::Min<float>(values, 0.001f), result);
 }
 
 TEST_P(FunctionsFixture, Max)
 {
     auto values = FunctionsFixture::GetParam();
     auto result = values > 20 ? 20 : values;
-    EXPECT_EQ(Math::Utility::Min<int>(static_cast<int>(values), 20), static_cast<int>(result));
-    EXPECT_EQ(Math::Utility::Min<int>(20, static_cast<int>(values)), static_cast<int>(result));
-    EXPECT_EQ(Math::Utility::Min<int>(-0, 0), -0);
+    EXPECT_EQ(Math::Min<int>(static_cast<int>(values), 20), static_cast<int>(result));
+    EXPECT_EQ(Math::Min<int>(20, static_cast<int>(values)), static_cast<int>(result));
+    EXPECT_EQ(Math::Min<int>(-0, 0), -0);
     result = values > 0.001f ? 0.001f : values;
-    EXPECT_FLOAT_EQ(Math::Utility::Min<float>(values, 0.001f), result);
+    EXPECT_FLOAT_EQ(Math::Min<float>(values, 0.001f), result);
 }
 
 TEST_P(FunctionsFixture, Factorial)
@@ -108,7 +108,7 @@ TEST_P(FunctionsFixture, Factorial)
     auto values = FunctionsFixture::GetParam();
     auto result = 1;
 
-    for (int i = 2; i <= Math::Utility::Abs(values); i++)
+    for (int i = 2; i <= Math::Abs(values); i++)
     {
         result *= i;
     }
@@ -118,9 +118,9 @@ TEST_P(FunctionsFixture, Factorial)
         result = -result;
     }
 
-    EXPECT_EQ(Math::Utility::Fact<int>(0), 1);
-    EXPECT_EQ(Math::Utility::Fact<int>(static_cast<int>(values)), static_cast<int>(result));
-    EXPECT_FLOAT_EQ(Math::Utility::Fact<int>(values), result);
+    EXPECT_EQ(Math::Fact<int>(0), 1);
+    EXPECT_EQ(Math::Fact<int>(static_cast<int>(values)), static_cast<int>(result));
+    EXPECT_FLOAT_EQ(Math::Fact<int>(values), result);
 }
 
 TEST_P(FunctionsFixture, PowInt)
@@ -136,7 +136,7 @@ TEST_P(FunctionsFixture, PowInt)
     {
         result = 0;
     }
-    EXPECT_EQ(Math::Utility::Pow<int>(values, 5), result);
+    EXPECT_EQ(Math::Pow<int>(values, 5), result);
 }
 
 TEST_P(FunctionsFixture, PowFloat)
@@ -152,7 +152,7 @@ TEST_P(FunctionsFixture, PowFloat)
     {
         result = 0;
     }
-    EXPECT_FLOAT_EQ(Math::Utility::Pow<float>(values, 5), result);
+    EXPECT_FLOAT_EQ(Math::Pow<float>(values, 5), result);
 }
 
 
@@ -163,7 +163,7 @@ TEST_P(RadianTestFixture, Sin)
 
     for (int i = 0; i < 720; i++)
     {
-        EXPECT_NEAR(Math::Utility::Sin(angles[i]), std::sin(static_cast<float>(angles[i])), epsilon);
+        EXPECT_NEAR(Math::Sin(angles[i]), std::sin(static_cast<float>(angles[i])), epsilon);
     }
 }
 
@@ -174,7 +174,7 @@ TEST_P(RadianTestFixture, Cos)
 
     for (int i = 0; i < 720; i++)
     {
-        EXPECT_NEAR(Math::Utility::Cos(angles[i]), std::cos(static_cast<float>(angles[i])), epsilon);
+        EXPECT_NEAR(Math::Cos(angles[i]), std::cos(static_cast<float>(angles[i])), epsilon);
     }
 }
 
@@ -185,7 +185,7 @@ TEST_P(RadianInTanRangeTestFixture, Tan)
 
     for (int i = 0; i < 100; i++)
     {
-        EXPECT_NEAR(Math::Utility::Tan(angles[i]), std::tan(static_cast<float>(angles[i])), epsilon);
+        EXPECT_NEAR(Math::Tan(angles[i]), std::tan(static_cast<float>(angles[i])), epsilon);
     }
 }
 
@@ -201,8 +201,8 @@ std::vector<Radian> GetRadianAngles()
     // Value to be withdrawn from the start and the end of the range, because tan isn't precise for values
     // too far from zero.
     constexpr int errorMargin = 12;
-    constexpr float rangeStart = Math::Utility::TanMargin;
-    float value = rangeStart + static_cast<float>(errorMargin) * Math::Utility::CotStep;
+    constexpr float rangeStart = Math::TanMargin;
+    float value = rangeStart + static_cast<float>(errorMargin) * Math::CotStep;
 
     v.reserve(Size - 2 * errorMargin);
 
@@ -210,7 +210,7 @@ std::vector<Radian> GetRadianAngles()
     {
         Radian r(value);
         v.push_back(r);
-        value += Math::Utility::CotStep;
+        value += Math::CotStep;
     }
     return v;
 }
@@ -225,6 +225,6 @@ TEST_P(AngleFixture, CotWithLUT)
 
     for (auto a : angles)
     {
-        EXPECT_NEAR(Math::Utility::Cot(a), 1 / std::tan(static_cast<float>(a)), 0.001f);
+        EXPECT_NEAR(Math::Cot(a), 1 / std::tan(static_cast<float>(a)), 0.001f);
     }
 }

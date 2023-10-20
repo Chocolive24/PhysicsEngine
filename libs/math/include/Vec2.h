@@ -192,6 +192,12 @@ namespace Math
             return static_cast<U>(std::sqrt(X * X + Y * Y));
         }
 
+        template<typename U = T>
+        [[nodiscard]] NOALIAS U SquareLength() const noexcept
+        {
+            return static_cast<U>(X * X + Y * Y);
+        }
+
         // Returns a normalized copy of the vector
         template<typename U = T>
         [[nodiscard]] Vec2<U> Normalized() const
@@ -314,9 +320,9 @@ namespace Math
             auto vec2u = static_cast<Vec2<U>>(vec2);
             Radian angleBetween = vec1u.Angle(vec2u);
 
-            float sinAngle = Utility::Sin(angleBetween);
-            float sinAngleT = Utility::Sin(angleBetween * t);
-            float sinAngle1T = Utility::Sin(angleBetween * (1 - t));
+            float sinAngle = Sin(angleBetween);
+            float sinAngleT = Sin(angleBetween * t);
+            float sinAngle1T = Sin(angleBetween * (1 - t));
 
             if (sinAngle == 0)
             {
@@ -348,8 +354,8 @@ namespace Math
 
 	    constexpr void Rotate(Radian angle) noexcept
         {
-            const float cos = Utility::Cos(angle);
-            const float sin = Utility::Sin(angle);
+            const float cos = Cos(angle);
+            const float sin = Sin(angle);
 
             T x = X * cos - Y * sin;
             T y = X * sin + Y * cos;

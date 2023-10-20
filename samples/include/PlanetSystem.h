@@ -1,9 +1,6 @@
 #pragma once
 
-#include "World.h"
-#include "RenderingManager.h"
-#include "InputsManager.h"
-#include "../../common/include/Timer.h"
+#include "Sample.h"
 
 #include "SDL.h"
 
@@ -17,26 +14,25 @@ struct CelestialBody
     SDL_Color Color;
 };
 
-class PlanetSystem
+class PlanetSystem : public Sample
 {
 private:
-    PhysicsEngine::World _world;
-
     std::vector<CelestialBody> _planets{};
     CelestialBody _sun{};
 
+    bool _mustCreatePlanet = false;
+
     [[nodiscard]] CelestialBody createPlanet(Math::Vec2F pos, float radius, SDL_Color color) noexcept;
     void calculatePlanetMovements() noexcept;
-    void renderScreen(RenderingManager& renderingManager) noexcept;
+    void drawCelestialBodies() noexcept;
 
 public:
     static constexpr float G = 0.0667f;
     static constexpr std::size_t StartPlanetNbr = 200;
 
-    constexpr PlanetSystem() noexcept = default;
+    explicit PlanetSystem() noexcept = default;
 
-    void Init();
-    void RunGameLoop(RenderingManager& renderingManager,
-                     InputsManager& inputsManager,
-                     PhysicsEngine::Timer& timer);
+    void Init() noexcept override;
+    void HandleInputs(SDL_Event event) noexcept override;
+    void Update() noexcept override;
 };

@@ -508,7 +508,7 @@ TEST_P(Vec3IntFixture, GetAngle)
     Math::Vec3I vecA(values, values, values);
     Math::Vec3I vecB(1, 2, -3);
     auto omega = static_cast<float>(Math::Vec3I::GetVectorAngle(vecA, vecB));
-    EXPECT_NEAR(omega, std::acos(Math::Vec3I::Dot(vecA, vecB) / (vecA.Length<int>() * vecB.Length<int>())), Math::Utility::Epsilon);
+    EXPECT_NEAR(omega, std::acos(Math::Vec3I::Dot(vecA, vecB) / (vecA.Length<int>() * vecB.Length<int>())), Math::Epsilon);
 }
 
 TEST_P(Vec3FloatFixture, GetAngle)
@@ -517,7 +517,7 @@ TEST_P(Vec3FloatFixture, GetAngle)
     Math::Vec3F vecA(values, values, values);
     Math::Vec3F vecB(1, 2.2, -3);
     auto omega = static_cast<float>(Math::Vec3F::GetVectorAngle(vecA, vecB));
-    EXPECT_NEAR(omega, std::acos(Math::Vec3F::Dot(vecA, vecB) / (vecA.Length<float>() * vecB.Length<float>())), Math::Utility::Epsilon);
+    EXPECT_NEAR(omega, std::acos(Math::Vec3F::Dot(vecA, vecB) / (vecA.Length<float>() * vecB.Length<float>())), Math::Epsilon);
 }
 
 TEST_P(Vec3FloatFixture, Slerp)
@@ -530,14 +530,14 @@ TEST_P(Vec3FloatFixture, Slerp)
     Math::Vec3F vec = Math::Vec3F::Slerp(vecA, vecB, time);
 
     auto omega = Math::Vec3F::GetVectorAngle(vecA, vecB);
-    auto calculation = (Math::Utility::Sin(omega * (1-time))/Math::Utility::Sin(omega));
+    auto calculation = (Math::Sin(omega * (1-time))/Math::Sin(omega));
     Math::Vec3F vecZ(vecA.X * calculation, vecA.Y * calculation, vecA.Z * calculation);
-    auto cal = Math::Utility::Sin(time * omega)/Math::Utility::Sin(omega);
+    auto cal = Math::Sin(time * omega)/Math::Sin(omega);
     vecZ = vecZ + vecB * cal;
 
-    EXPECT_NEAR(vec.X, vecZ.X, Math::Utility::Epsilon);
-    EXPECT_NEAR(vec.Y, vecZ.Y, Math::Utility::Epsilon);
-    EXPECT_NEAR(vec.Z, vecZ.Z, Math::Utility::Epsilon);
+    EXPECT_NEAR(vec.X, vecZ.X, Math::Epsilon);
+    EXPECT_NEAR(vec.Y, vecZ.Y, Math::Epsilon);
+    EXPECT_NEAR(vec.Z, vecZ.Z, Math::Epsilon);
 }
 
 TEST_P(Vec3FloatFixture, Distance)

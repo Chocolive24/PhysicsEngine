@@ -136,8 +136,8 @@ namespace Math
 		{
 			Quaternion<U> q;
 
-			q.W = Utility::Cos(angle / 2.f);
-			q.V = Vec3<U>::Normalized(axis) * Utility::Sin(angle / 2.f);
+			q.W = Cos(angle / 2.f);
+			q.V = Vec3<U>::Normalized(axis) * Sin(angle / 2.f);
 
 			return q;
 		}
@@ -151,12 +151,12 @@ namespace Math
 		template<typename U>
 		[[nodiscard]] NOALIAS constexpr static Quaternion<U> Euler(const Radian x, const Radian y, const Radian z) noexcept
 		{
-			float cosX = Utility::Cos(x * 0.5f);
-			float sinX = Utility::Sin(x * 0.5f);
-			float cosY = Utility::Cos(y * 0.5f);
-			float sinY = Utility::Sin(y * 0.5f);
-			float cosZ = Utility::Cos(z * 0.5f);
-			float sinZ = Utility::Sin(z * 0.5f);
+			float cosX = Cos(x * 0.5f);
+			float sinX = Sin(x * 0.5f);
+			float cosY = Cos(y * 0.5f);
+			float sinY = Sin(y * 0.5f);
+			float cosZ = Cos(z * 0.5f);
+			float sinZ = Sin(z * 0.5f);
 
 			Quaternion<U> q;
 			q.W = cosX * cosY * cosZ + sinX * sinY * sinZ;
