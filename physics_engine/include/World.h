@@ -28,8 +28,7 @@ namespace PhysicsEngine
         std::vector<std::size_t> _collidersGenIndices{};
 
         std::vector<CircleCollider> _circleColliders{};
-        std::vector<CircleCollider> _rectangleColliders{};
-        std::vector<CircleCollider> _polygonColliders{};
+        std::vector<RectangleCollider> _rectangleColliders{};
 
         std::unordered_set<ColliderPair, ColliderHash> _colliderPairs{};
 
@@ -90,7 +89,13 @@ namespace PhysicsEngine
         void DestroyCollider(ColliderRef colRef) noexcept;
 
         [[nodiscard]] ColliderRef CreateCircleCollider(BodyRef bodyRef) noexcept;
-        [[nodiscard]] CircleCollider& GetCircleCollider(int shapeIndex);
+        [[nodiscard]] CircleCollider& GetCircleCollider(int shapeIdx) noexcept { return _circleColliders[shapeIdx]; }
+
+        [[nodiscard]] ColliderRef CreateRectangleCollider(BodyRef bodyRef) noexcept;
+        [[nodiscard]] RectangleCollider& GetRectangleCollider(int shapeIdx) noexcept
+        {
+            return _rectangleColliders[shapeIdx];
+        }
     };
 }
 

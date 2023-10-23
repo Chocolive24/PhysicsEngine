@@ -152,9 +152,9 @@ TEST_P(FloatFixture, Friction)
     Collider collider;
     EXPECT_FLOAT_EQ(collider.Friction(), -1.f);
 
-    collider.SetRestitution(frict);
+    collider.SetFriction(frict);
 
-    EXPECT_FLOAT_EQ(collider.Restitution(), frict);
+    EXPECT_FLOAT_EQ(collider.Friction(), frict);
 }
 
 TEST(Collider, IsTrigger)

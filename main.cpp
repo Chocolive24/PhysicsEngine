@@ -6,17 +6,17 @@
 
 //TODO: Refactor code :
     //TODO: linker ImGUI
-//TODO: Colliders struct
-//TODO: Contact Listener
 //TODO: Pres sega saturne.
-//TODO: Pres taff perso<3
 
 // TODO: balancer tout le main dans une classe Application
 
-//TODO: les tests des classes colliders
+//TODO: les tests des classes colliders Circle, REctangle, Polygon
+// TODO: TEster les fonctions collide du world.
 
 //TODO: CreateBody(Vec2F pos, vel, mass) -> modifie direct dans le fonction le body.
 // pour éviter de chopper la ref puis la modif.
+
+//TODO: TOUT COMMENTER
 
 #include "UniquePtr.h"
 #include "PlanetSystemSample.h"

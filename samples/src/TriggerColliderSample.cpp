@@ -17,17 +17,17 @@ void TriggerColliderSample::Init() noexcept
     constexpr Math::Vec2F centerOfScreen(Window::WindowWidth / 2.f, Window::WindowHeight / 2.f);
     constexpr Math::Vec2F sunPos = Metrics::PixelsToMeters(centerOfScreen);
 
-    _staticObj = {_world.CreateBody(),30.f, _noCollisionColor};
+    _staticObj = {_world.CreateBody(), Math::CircleF(sunPos, 30.f), _noCollisionColor};
     auto& body = _world.GetBody(_staticObj.BodyRef);
     body = PhysicsEngine::Body(sunPos, Math::Vec2F::Zero(), 100.f);
 
     auto sColRef = _world.CreateCircleCollider(_staticObj.BodyRef);
     auto& sCollider = _world.GetCollider(sColRef);
-    sCollider.SetIsTrigger(false);
+    sCollider.SetIsTrigger(true);
     _world.GetCircleCollider(sCollider.ShapeIdx()).SetRadius(
-            Metrics::PixelsToMeters(_staticObj.Radius));
+            Metrics::PixelsToMeters(_staticObj.Circle.Radius()));
 
-    _movingObj = {_world.CreateBody(), 20.f, _noCollisionColor};
+    _movingObj = {_world.CreateBody(), Math::CircleF(Math::Vec2F::Zero(), 20.f),_noCollisionColor};
     auto& body2 = _world.GetBody(_movingObj.BodyRef);
     body2 = PhysicsEngine::Body(Math::Vec2F::Zero(), Math::Vec2F::Zero(), 100.f);
 
@@ -35,10 +35,16 @@ void TriggerColliderSample::Init() noexcept
     auto& mCollider = _world.GetCollider(mColRef);
     mCollider.SetIsTrigger(true);
     _world.GetCircleCollider(mCollider.ShapeIdx()).SetRadius(
-            Metrics::PixelsToMeters(_movingObj.Radius));
+            Metrics::PixelsToMeters(_movingObj.Circle.Radius()));
 
-    _gameObjects.push_back(&_staticObj);
-    _gameObjects.push_back(&_movingObj);
+//    auto mColRef = _world.CreateRectangleCollider(_movingObj.BodyRef);
+//    auto& mCollider = _world.GetCollider(mColRef);
+//    mCollider.SetIsTrigger(true);
+//    _world.GetRectangleCollider(mCollider.ShapeIdx()).SetHalfSize(
+//            Metrics::PixelsToMeters(_movingObj.Radius));
+
+    _circleObjects.push_back(&_staticObj);
+    _circleObjects.push_back(&_movingObj);
 }
 
 void TriggerColliderSample::HandleInputs(SDL_Event event) noexcept
@@ -67,15 +73,27 @@ void TriggerColliderSample::Update() noexcept
 
     DrawableGeometry::Circle(
             Metrics::MetersToPixels(sOBody.Position()),
-            _staticObj.Radius,
+            _staticObj.Circle.Radius(),
             50,
             _staticObj.Color);
 
+//    DrawableGeometry::Circle(
+//            Metrics::MetersToPixels(sOBody.Position()),
+//            _staticObj.Radius / 2.f,
+//            50,
+//            {0, 255, 0, 0});
+
     DrawableGeometry::Circle(
             Metrics::MetersToPixels(mOBody.Position()),
-            _movingObj.Radius,
+            _movingObj.Circle.Radius(),
             50,
             _movingObj.Color);
+
+//    DrawableGeometry::Circle(
+//            Metrics::MetersToPixels(mOBody.Position()),
+//            _movingObj.Radius / 2.f,
+//            50,
+//            {0, 255, 0, 0});
 
 //    std::vector<Math::Vec2F> vertices = {mousePosF,
 //                                         mousePosF + Math::Vec2F(150, 150),
@@ -97,14 +115,16 @@ void TriggerColliderSample::OnTriggerEnter(PhysicsEngine::ColliderRef colliderRe
     auto& colliderA = _world.GetCollider(colliderRefA);
     auto& colliderB = _world.GetCollider(colliderRefB);
 
-    for (auto& gameObject : _gameObjects)
+    for (auto& circleObj : _circleObjects)
     {
-        if ((gameObject->BodyRef == colliderA.GetBodyRef() && colliderA.IsTrigger()) ||
-             gameObject->BodyRef == colliderB.GetBodyRef() && colliderB.IsTrigger())
+        if ((circleObj->BodyRef == colliderA.GetBodyRef() && colliderA.IsTrigger()) ||
+             circleObj->BodyRef == colliderB.GetBodyRef() && colliderB.IsTrigger())
         {
-            gameObject->Color = _collisionColor;
+            circleObj->Color = _collisionColor;
         }
     }
+
+    //TODO: For auto rect in rectobjects
 }
 
 void TriggerColliderSample::OnTriggerExit(PhysicsEngine::ColliderRef colliderRefA,
@@ -113,12 +133,12 @@ void TriggerColliderSample::OnTriggerExit(PhysicsEngine::ColliderRef colliderRef
     auto& colliderA = _world.GetCollider(colliderRefA);
     auto& colliderB = _world.GetCollider(colliderRefB);
 
-    for (auto& gameObject : _gameObjects)
+    for (auto& circleObj : _circleObjects)
     {
-        if ((gameObject->BodyRef == colliderA.GetBodyRef() && colliderA.IsTrigger()) ||
-            gameObject->BodyRef == colliderB.GetBodyRef() && colliderB.IsTrigger())
+        if ((circleObj->BodyRef == colliderA.GetBodyRef() && colliderA.IsTrigger()) ||
+             circleObj->BodyRef == colliderB.GetBodyRef() && colliderB.IsTrigger())
         {
-            gameObject->Color = _noCollisionColor;
+            circleObj->Color = _noCollisionColor;
         }
     }
 }

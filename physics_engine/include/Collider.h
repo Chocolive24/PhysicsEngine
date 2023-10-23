@@ -65,9 +65,22 @@ namespace PhysicsEngine
         [[nodiscard]] constexpr bool IsValid() const noexcept { return _radius > 0; };
     };
 
-    struct RectangleCollider
+    class RectangleCollider
     {
-        Math::Vec2F HalfSize{-1.f, -1.f};
+    private:
+        Math::Vec2F _halfSize{-1.f, -1.f};
+
+    public:
+        constexpr RectangleCollider() noexcept = default;
+        explicit constexpr RectangleCollider(Math::Vec2F halfSize) noexcept : _halfSize(halfSize) {};
+
+        [[nodiscard]] constexpr Math::Vec2F HalfSize() const noexcept { return _halfSize; }
+        constexpr void SetHalfSize(Math::Vec2F newHalfSize) noexcept { _halfSize = newHalfSize; }
+
+        [[nodiscard]] constexpr bool IsValid() const noexcept
+        {
+            return _halfSize.X > 0 && _halfSize.Y > 0;
+        };
     };
 
     struct ColliderPair
