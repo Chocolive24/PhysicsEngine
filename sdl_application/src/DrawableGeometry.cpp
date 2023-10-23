@@ -2,6 +2,7 @@
 // Created by Olivier on 18.10.2023.
 //
 
+#include <iostream>
 #include "DrawableGeometry.h"
 
 namespace DrawableGeometry
@@ -9,7 +10,7 @@ namespace DrawableGeometry
     std::vector<SDL_Vertex> Vertices;
     std::vector<int> Indices;
 
-    void AddVertex(Math::Vec2F pos, SDL_Color color, float u, float v) noexcept
+    void addVertex(Math::Vec2F pos, SDL_Color color, float u = 1.f, float v = 1.f) noexcept
     {
         SDL_Vertex vertex;
         vertex.position.x = pos.X;
@@ -30,7 +31,10 @@ namespace DrawableGeometry
         Indices.clear();
     }
 
-    void Circle(Math::Vec2F position, float radius, std::size_t segments, SDL_Color color) noexcept
+    void Circle(const Math::Vec2F centerPos,
+                const float radius,
+                const std::size_t segments,
+                const SDL_Color color) noexcept
     {
         const int indicesOffset = static_cast<int>(Vertices.size());
 
@@ -38,10 +42,10 @@ namespace DrawableGeometry
         for (int i = 0; i < segments; i++)
         {
             float angle = 2.0f * Math::Pi * static_cast<float>(i) / static_cast<float>(segments);
-            float x = position.X + radius * cos(angle);
-            float y = position.Y + radius * sin(angle);
+            float x = centerPos.X + radius * cos(angle);
+            float y = centerPos.Y + radius * sin(angle);
 
-            AddVertex(Math::Vec2F(x, y), color, 1, 1);
+            addVertex(Math::Vec2F(x, y), color, 1, 1);
 
             if (i == segments - 1) break;
 
@@ -54,4 +58,56 @@ namespace DrawableGeometry
         Indices.push_back(indicesOffset + static_cast<int>(segments) - 1);
         Indices.push_back(indicesOffset);  // Connect the last vertex to the center
     }
+
+    void Rectangle(const Math::Vec2F centerPos, const float width, const float height, const SDL_Color color) noexcept
+    {
+        const int indicesOffset = static_cast<int>(Vertices.size());
+
+        auto halfRatio = 1.f / 2.f;
+        auto halfWidth = width * halfRatio, halfHeight = height * halfRatio;
+
+        // Left-down corner.
+        addVertex(Math::Vec2F(centerPos.X - halfWidth, centerPos.Y - halfHeight), color);
+        // Left-up corner.
+        addVertex(Math::Vec2F(centerPos.X - halfWidth, centerPos.Y + halfHeight), color);
+        // Right-up corner.
+        addVertex(Math::Vec2F(centerPos.X + halfWidth, centerPos.Y + halfHeight), color);
+        // Right-down corner.
+        addVertex(Math::Vec2F(centerPos.X + halfWidth, centerPos.Y - halfHeight), color);
+
+        // First triangle.
+        Indices.push_back(indicesOffset);
+        Indices.push_back(indicesOffset + 1);
+        Indices.push_back(indicesOffset + 2);
+
+        // Second triangle.
+        Indices.push_back(indicesOffset);
+        Indices.push_back(indicesOffset + 2);
+        Indices.push_back(indicesOffset + 3);
+    }
+
+    void Polygon(std::vector<Math::Vec2F>& vertices, SDL_Color color) noexcept
+    {
+        if (vertices.size() < 3) return; // todo exeption
+
+        auto offset = Vertices.size();
+
+        for (const Math::Vec2F &v: vertices)
+        {
+            Vertices.push_back({{v.X, v.Y}, color, {1.0f, 1.0f}});
+        }
+
+        for (int i = 1; i < vertices.size() - 1; ++i)
+        {
+            Indices.push_back(offset);
+            Indices.push_back(offset + i);
+            Indices.push_back(offset + i + 1);
+        }
+
+        // Connect the last vertex to the first vertex to close the polygon.
+        Indices.push_back(offset);
+        Indices.push_back(offset + vertices.size() - 1);
+        Indices.push_back(offset + 1);
+    }
+
 }

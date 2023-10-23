@@ -6,7 +6,7 @@
 using namespace PhysicsEngine;
 using namespace Math;
 
-struct PairOfVec2FFixture : public ::testing::TestWithParam<std::tuple<Vec2F, Vec2F, float, Vec2F>>{};
+struct BodyAttributesFixture : public ::testing::TestWithParam<std::tuple<Vec2F, Vec2F, float, Vec2F>>{};
 
 struct Vec2FloatFixture : public ::testing::TestWithParam<Vec2F>{};
 
@@ -14,7 +14,7 @@ struct FloatFixture : public ::testing::TestWithParam<float>{};
 
 struct ArrayOfVec2FloatFixture : public ::testing::TestWithParam<std::array<Vec2F, 4>>{};
 
-INSTANTIATE_TEST_SUITE_P(Body, PairOfVec2FFixture, testing::Values(
+INSTANTIATE_TEST_SUITE_P(Body, BodyAttributesFixture, testing::Values(
         std::tuple{Vec2F::Zero(), Vec2F::Zero(), 0.f, Vec2F::Zero()},
         std::tuple{Vec2F(1000.24567f, -0.0000001), Vec2F(-56.3333f, 123.321f), 1987.f,
                    Vec2F(1234.45f, -98)}
@@ -57,7 +57,7 @@ TEST(Body, DefaultConstructor)
     EXPECT_FLOAT_EQ(b.Forces().Y, 0.f);
 }
 
-TEST_P(PairOfVec2FFixture, Constructor)
+TEST_P(BodyAttributesFixture, Constructor)
 {
     auto [pos, vel, mass, forces] = GetParam();
 

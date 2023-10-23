@@ -14,6 +14,25 @@ namespace PhysicsEngine
         _generationIndices.resize(preallocatedBodyCount, 0);
     }
 
+    void World::Update(const float deltaTime) noexcept
+    {
+        for (auto& body : _bodies)
+        {
+            if (!body.IsValid()) continue;
+
+            // a = F / m
+            Math::Vec2F acceleration = body.Forces() / body.Mass();
+
+            // Change velocity according to delta time.
+            body.SetVelocity(body.Velocity() + acceleration * deltaTime);
+
+            // Change position according to velocity and delta time.
+            body.SetPosition(body.Position() + body.Velocity() * deltaTime);
+
+            body.ResetForces();
+        }
+    }
+
     [[nodiscard]] BodyRef World::CreateBody() noexcept
     {
         auto it = std::find_if(_bodies.begin(), _bodies.end(),[](const Body& body)
@@ -59,28 +78,14 @@ namespace PhysicsEngine
         return _bodies[bodyRef.Index];
     }
 
-    void World::Update(const float deltaTime) noexcept
-    {
-        for (auto& body : _bodies)
-        {
-            if (!body.IsValid()) continue;
-
-            // a = F / m
-            Math::Vec2F acceleration = body.Forces() / body.Mass();
-
-            // Change velocity according to delta time.
-            body.SetVelocity(body.Velocity() + acceleration * deltaTime);
-
-            // Change position according to velocity and delta time.
-            body.SetPosition(body.Position() + body.Velocity() * deltaTime);
-
-            body.ResetForces();
-        }
-    }
-
     void World::Deinit() noexcept
     {
         _bodies.clear();
         _generationIndices.clear();
+    }
+
+    ColliderRef World::CreateCollider(BodyRef bodyRef) noexcept
+    {
+
     }
 }

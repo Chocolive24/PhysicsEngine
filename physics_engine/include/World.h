@@ -7,23 +7,13 @@
  */
 
 #include "Body.h"
+#include "Collider.h"
+#include "References.h"
 
 #include <vector>
 
 namespace PhysicsEngine
 {
-    /**
-     * @brief BodyRef is a struct used to reference a specific body.
-     * @attributes
-     * Index : The index of the body inside the world body vector.\n\n
-     * GenerationIdx : The index inside the world generation number vector.
-     */
-    struct BodyRef
-    {
-        std::size_t Index;
-        std::size_t GenerationIdx;
-    };
-
     class World
     {
     private:
@@ -41,6 +31,16 @@ namespace PhysicsEngine
          * @param preAllocatedBodyCount The number of bodies to pre-allocate in memory. Default value is 100.
          */
         void Init(int preAllocatedBodyCount = 100) noexcept;
+
+        /**
+         * @brief Update is a method that calculates the new velocities of all the world's valid bodies
+         * according to their acceleration (calculated with 'F / m = a'), and their new positions according
+         * to their new velocities.
+         * @param deltaTime The time elapsed between two consecutive frames.
+         */
+        void Update(float deltaTime) noexcept;
+
+        void Deinit() noexcept;
 
         /**
          * @brief CreateBody is a method that creates a body in the world and returns a BodyRef to this body.
@@ -62,20 +62,18 @@ namespace PhysicsEngine
         [[nodiscard]] Body& GetBody(BodyRef bodyRef);
 
         /**
-         * @brief Update is a method that calculates the new velocities of all the world's valid bodies
-         * according to their acceleration (calculated with 'F / m = a'), and their new positions according
-         * to their new velocities.
-         * @param deltaTime The time elapsed between two consecutive frames.
-         */
-        void Update(float deltaTime) noexcept;
-
-        /**
          * @brief AllocatedBodies is a method that gives the number of allocated bodies.
          * @return The number of allocated bodies.
          */
         [[nodiscard]] std::size_t AllocatedBodies() const noexcept { return _bodies.size(); }
 
-        void Deinit() noexcept;
+        [[nodiscard]] ColliderRef CreateCollider(BodyRef bodyRef) noexcept;
+
+        void DestroyCollider(ColliderRef colRef) noexcept;
+
+        [[nodiscard]] Collider& GetCollider(ColliderRef colRef);
+
+
     };
 }
 
