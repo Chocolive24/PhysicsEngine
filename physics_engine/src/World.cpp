@@ -19,6 +19,7 @@ namespace PhysicsEngine
         _collidersGenIndices.resize(preallocatedBodyCount, 0);
 
         _circleColliders.resize(preallocatedBodyCount, CircleCollider());
+        _rectangleColliders.resize(preallocatedBodyCount, RectangleCollider());
     }
 
     void World::Update(const float deltaTime) noexcept
@@ -147,12 +148,29 @@ namespace PhysicsEngine
 
             case Math::ShapeType::Rectangle:
             {
+                auto bodyAPos = bodyA.Position();
+                auto halfSizeA = GetRectangleCollider(colliderA.ShapeIdx()).HalfSize();
+                const Math::RectangleF rectA(bodyAPos - halfSizeA, bodyAPos + halfSizeA);
+
                 switch (colliderB.Shape())
                 {
                     case Math::ShapeType::Circle:
-                        break;
+                    {
+                        const Math::CircleF circleB(bodyB.Position(),
+                                                    GetCircleCollider(colliderB.ShapeIdx()).Radius());
+
+                        return Math::Intersect(rectA, circleB);
+                    }
+
                     case Math::ShapeType::Rectangle:
-                        break;
+                    {
+                        auto bodyBPos = bodyB.Position();
+                        auto halfSizeB = GetRectangleCollider(colliderB.ShapeIdx()).HalfSize();
+                        const Math::RectangleF rectB(bodyBPos - halfSizeB, bodyBPos + halfSizeB);
+
+                        return Math::Intersect(rectA, rectB);
+                    }
+
                     case Math::ShapeType::Polygon:
                         break;
                     case Math::ShapeType::None:
