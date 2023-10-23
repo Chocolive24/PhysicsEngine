@@ -5,54 +5,64 @@
 
 namespace PhysicsEngine
 {
-    enum class ColliderShape
-    {
-        Circle,
-        Rectangle,
-        Polygon,
-        NONE
-    };
-
     class Collider
     {
     private:
+        Math::ShapeType _shape{Math::ShapeType::None};
         ColliderRef _colliderRef{};
         int _shapeIdx{-1}; // index is the shape collider vector. vector<CircleCollider> _circles -> shapeIdx
         BodyRef _bodyRef{};
+
         float _restitution{-1.f};
         float _friction{-1.f};
         bool _isTrigger{false};
-        ColliderShape _shape{ColliderShape::NONE};
 
     public:
         constexpr Collider() noexcept = default;
-        constexpr Collider(ColliderRef colRef,
-                           int shapeIdx,
-                           BodyRef bodyRef,
-                           float restitution,
-                           float friction,
-                           bool isTrigger) noexcept
+        constexpr Collider(float restitution, float friction, bool isTrigger) noexcept
         {
-            _colliderRef = colRef;
-            _shapeIdx = shapeIdx;
-            _bodyRef = bodyRef;
             _restitution = restitution;
             _friction = friction;
             _isTrigger = isTrigger;
         };
 
+        [[nodiscard]] constexpr Math::ShapeType Shape() const noexcept { return _shape; }
+        constexpr void SetShape(Math::ShapeType newShape) noexcept { _shape = newShape; }
+
         [[nodiscard]] constexpr ColliderRef GetColliderRef() const noexcept { return _colliderRef; }
-        //constexpr void SetColliderRef(ColliderRef colRef) noexcept { _colliderRef = colRef; }
+        constexpr void SetColliderRef(ColliderRef colRef) noexcept { _colliderRef = colRef; }
+
         [[nodiscard]] constexpr int ShapeIdx() const noexcept { return _shapeIdx; }
-        [[nodiscard]] constexpr BodyRef BodyRef() const noexcept { return _bodyRef; }
+        constexpr void SetShapeIdx(int newShapeIdx) noexcept { _shapeIdx = newShapeIdx; }
+
+        [[nodiscard]] constexpr BodyRef GetBodyRef() const noexcept { return _bodyRef; }
+        constexpr void SetBodyRef(BodyRef newBodyRef) noexcept { _bodyRef = newBodyRef; }
+
         [[nodiscard]] constexpr float Restitution() const noexcept { return _restitution; }
+        constexpr void SetRestitution(float newRestitution) noexcept { _restitution = newRestitution; }
+
         [[nodiscard]] constexpr float Friction() const noexcept { return _friction; }
+        constexpr void SetFriction(float newFriction) noexcept { _friction = newFriction; }
+
         [[nodiscard]] constexpr bool IsTrigger() const noexcept { return _isTrigger; }
+        constexpr void SetIsTrigger(bool isTrigger) noexcept { _isTrigger = isTrigger; }
+
+        [[nodiscard]] constexpr bool IsValid() const noexcept { return _shape != Math::ShapeType::None; }
     };
 
-    struct CircleCollider
+    class CircleCollider
     {
-        float Radius{-1};
+    private:
+        float _radius{-1};
+
+    public:
+        constexpr CircleCollider() noexcept = default;
+        explicit constexpr CircleCollider(float radius) noexcept : _radius(radius) {};
+
+        [[nodiscard]] constexpr float Radius() const noexcept { return _radius; }
+        constexpr void SetRadius(float newRadius) noexcept { _radius = newRadius; }
+
+        [[nodiscard]] constexpr bool IsValid() const noexcept { return _radius > 0; };
     };
 
     struct RectangleCollider
@@ -62,8 +72,28 @@ namespace PhysicsEngine
 
     struct ColliderPair
     {
-        Collider ColliderA;
-        Collider ColliderB;
+        ColliderRef ColliderA;
+        ColliderRef ColliderB;
+
+        bool operator==(const ColliderPair& other) const noexcept
+        {
+            return ColliderA == other.ColliderA && ColliderB == other.ColliderB ||
+                   ColliderA == other.ColliderB && ColliderB == other.ColliderA;
+        }
+
+        bool operator<(const ColliderPair& other) const noexcept
+        {
+            return ColliderA < other.ColliderA || (ColliderA == other.ColliderA && ColliderB < other.ColliderB);
+        }
+    };
+
+    struct ColliderHash
+    {
+        std::size_t operator()(const ColliderPair& pair) const noexcept
+        {
+            return pair.ColliderA.Index + pair.ColliderB.Index +
+            pair.ColliderA.GenerationIdx + pair.ColliderB.GenerationIdx;
+        }
     };
 }
 

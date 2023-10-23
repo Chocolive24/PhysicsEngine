@@ -5,17 +5,15 @@
  */
 
 //TODO: Refactor code :
-    //TODO: cast operator uniquePtr et sharedPtr
-    //TODO: class samples.
     //TODO: linker ImGUI
 //TODO: Colliders struct
 //TODO: Contact Listener
 //TODO: Pres sega saturne.
 //TODO: Pres taff perso<3
 
-//TODO: APP_SDL (aka window actuelle)
-    //TODO: va faire la loop while(!quit) et les inputs
-    // TODO: va recevoir des datas a draw et render
+// TODO: balancer tout le main dans une classe Application
+
+//TODO: les tests des classes colliders
 
 #include "UniquePtr.h"
 #include "PlanetSystemSample.h"

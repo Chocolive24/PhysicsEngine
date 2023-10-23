@@ -1,13 +1,14 @@
 #pragma once
 
-#include <vector>
 #include "Vec2.h"
+
+#include <vector>
 
 namespace Math
 {
     enum class ShapeType
     {
-        Circle, Rectangle, Polygon
+        Circle, Rectangle, Polygon, None
     };
 
     template <typename T>
@@ -41,6 +42,12 @@ namespace Math
         {
             return (_center - point).SquareLength() <= _radius * _radius;
         }
+
+		[[nodiscard]] constexpr Circle<T> operator+(const Vec2<T>& vec) const noexcept
+		{
+			return Circle<T>(_center + vec, _radius);
+		}
+
     };
 
     using CircleF = Circle<float>;
@@ -90,6 +97,11 @@ namespace Math
         {
             return _maxBound - _minBound;
         }
+
+		[[nodiscard]] constexpr Rectangle<T> operator+(const Vec2<T>& vec) const noexcept
+	    {
+		    return Rectangle<T>(_minBound + vec, _maxBound + vec);
+	    }
     };
 
     using RectangleF = Rectangle<float>;
@@ -103,7 +115,7 @@ namespace Math
          * @brief Construct a new Polygon object
          * @param vertices the vertices of the polygon
          */
-        constexpr Polygon(std::vector<Vec2<T>> vertices) noexcept : _vertices(vertices) {}
+        constexpr explicit Polygon(std::vector<Vec2<T>> vertices) noexcept : _vertices(vertices) {}
 
     private:
         std::vector<Vec2<T>> _vertices;
@@ -142,6 +154,18 @@ namespace Math
 
             return maxBound - minBound;
         }
+		
+		[[nodiscard]] constexpr Polygon<T> operator+(const Vec2<T>& vec) const noexcept
+	    {
+		    std::vector<Vec2<T>> vertices = _vertices;
+
+		    for (auto& vertex : vertices)
+		    {
+			    vertex += vec;
+		    }
+
+		    return Polygon<T>(vertices);
+	    }
     };
 
     using PolygonF = Polygon<float>;

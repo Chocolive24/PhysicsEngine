@@ -18,7 +18,13 @@ namespace PhysicsEngine
     {
     private:
         std::vector<Body> _bodies{};
-        std::vector<std::size_t> _generationIndices{};
+        std::vector<std::size_t> _bodiesGenIndices{};
+
+        std::vector<Collider> _colliders{};
+        std::vector<std::size_t> _collidersGenIndices{};
+        std::vector<CircleCollider> _circleColliders{};
+        std::vector<CircleCollider> _rectangleColliders{};
+        std::vector<CircleCollider> _polygonColliders{};
 
         static constexpr float _bodyAllocationResizeFactor = 2.f;
 
@@ -67,13 +73,11 @@ namespace PhysicsEngine
          */
         [[nodiscard]] std::size_t AllocatedBodies() const noexcept { return _bodies.size(); }
 
-        [[nodiscard]] ColliderRef CreateCollider(BodyRef bodyRef) noexcept;
-
+        [[nodiscard]] Collider& GetCollider(ColliderRef colliderRef);
         void DestroyCollider(ColliderRef colRef) noexcept;
 
-        [[nodiscard]] Collider& GetCollider(ColliderRef colRef);
-
-
+        [[nodiscard]] ColliderRef CreateCircleCollider(BodyRef bodyRef) noexcept;
+        [[nodiscard]] CircleCollider& GetCircleCollider(int shapeIndex);
     };
 }
 

@@ -84,6 +84,59 @@ TEST(World, CreateAndDestroyBody)
     EXPECT_THROW(nullBodyRef =  world.GetBody(bodyRef2), std::runtime_error);
 }
 
+TEST(World, CreateAndDestroyCollider)
+{
+    World world;
+    world.Init(5);
+
+    auto bodyRef = world.CreateBody();
+    auto& body = world.GetBody(bodyRef);
+    body = Body(Vec2F::One(), Vec2F::One(), 10.f);
+
+    auto colRef = world.CreateCircleCollider(bodyRef);
+    auto& collider = world.GetCollider(colRef);
+
+    EXPECT_EQ(colRef.Index, 0);
+    EXPECT_EQ(colRef.GenerationIdx, 0);
+    EXPECT_TRUE(world.GetCollider(colRef).IsValid());
+
+    EXPECT_TRUE(world.GetCircleCollider(collider.ShapeIdx()).IsValid());
+
+    world.DestroyCollider(colRef);
+
+    bodyRef = world.CreateBody();
+    auto& newBody = world.GetBody(bodyRef);
+    newBody = Body(Vec2F::One(), Vec2F::One(), 2.f);
+
+    colRef = world.CreateCircleCollider(bodyRef);
+    auto& newCollider = world.GetCollider(colRef);
+
+    EXPECT_EQ(colRef.Index, 0);
+    EXPECT_EQ(colRef.GenerationIdx, 1);
+    EXPECT_TRUE(world.GetCollider(colRef).IsValid());
+
+    EXPECT_TRUE(world.GetCircleCollider(newCollider.ShapeIdx()).IsValid());
+
+    auto bodyRef2 = world.CreateBody();
+    auto& body2 = world.GetBody(bodyRef2);
+    body2 = Body(Vec2F::One(), Vec2F::One(), 50.f);
+
+    auto colRef2 = world.CreateCircleCollider(bodyRef2);
+    auto& collider2 = world.GetCollider(colRef2);
+
+    EXPECT_EQ(colRef2.Index, 1);
+    EXPECT_EQ(colRef2.GenerationIdx, 0);
+    EXPECT_TRUE(world.GetCollider(colRef2).IsValid());
+
+    EXPECT_TRUE(world.GetCircleCollider(collider2.ShapeIdx()).IsValid());
+
+    world.DestroyCollider(colRef2);
+
+    Collider nullCollider;
+
+    EXPECT_THROW(nullCollider =  world.GetCollider(colRef2), std::runtime_error);
+}
+
 TEST_P(ArrayOfBody, Update)
 {
     auto bodies = GetParam();

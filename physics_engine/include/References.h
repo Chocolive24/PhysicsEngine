@@ -28,5 +28,15 @@ namespace PhysicsEngine
         std::size_t GenerationIdx;
 
         constexpr ColliderRef& operator=(const ColliderRef& colRef) noexcept = default;
+
+        constexpr bool operator==(const ColliderRef& other) const noexcept
+        {
+            return Index == other.Index && GenerationIdx == other.GenerationIdx;
+        }
+
+        constexpr bool operator<(const ColliderRef& other) const noexcept
+        {
+            return Index < other.Index || (Index == other.Index && GenerationIdx < other.GenerationIdx);
+        }
     };
 }
