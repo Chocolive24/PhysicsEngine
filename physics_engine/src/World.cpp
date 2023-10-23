@@ -2,6 +2,8 @@
  * @author Olivier
  */
 
+
+#include <iostream>
 #include "World.h"
 
 namespace PhysicsEngine
@@ -36,6 +38,113 @@ namespace PhysicsEngine
 
             body.ResetForces();
         }
+
+        if (_contactListener)
+        {
+            updateCollisions();
+        }
+    }
+
+    void World::updateCollisions() noexcept
+    {
+        std::unordered_set<ColliderPair, ColliderHash> newColliderPairs;
+
+        for (auto& colliderA : _colliders)
+        {
+            if (!colliderA.IsValid()) continue;
+
+            for (auto& colliderB : _colliders)
+            {
+                if (!colliderB.IsValid()) continue;
+                if (colliderB.GetColliderRef() == colliderA.GetColliderRef()) continue;
+                if (colliderB.GetBodyRef() == colliderA.GetBodyRef()) continue;
+
+                if (collide(colliderA, colliderB))
+                {
+                    newColliderPairs.insert(ColliderPair{colliderA.GetColliderRef(),
+                                                         colliderB.GetColliderRef()});
+                }
+            }
+        }
+
+        for (auto& colliderPair : newColliderPairs)
+        {
+            Collider& colliderA = GetCollider(colliderPair.ColliderA);
+            Collider& colliderB = GetCollider(colliderPair.ColliderB);
+
+            if (!colliderA.IsTrigger() && !colliderB.IsTrigger())
+            {
+                continue;
+            }
+
+            // If there was no collision in the previous frame -> OnTriggerEnter.
+            if (_colliderPairs.find(colliderPair) == _colliderPairs.end())
+            {
+                _contactListener->OnTriggerEnter(
+                        colliderPair.ColliderA,
+                        colliderPair.ColliderB);
+            }
+        }
+
+        for (auto& colliderPair : _colliderPairs)
+        {
+            Collider& colliderA = GetCollider(colliderPair.ColliderA);
+            Collider& colliderB = GetCollider(colliderPair.ColliderB);
+
+            if (!colliderA.IsTrigger() && !colliderB.IsTrigger())
+            {
+                continue;
+            }
+
+            // If there is no collision in this frame -> OnTriggerExit.
+            if (newColliderPairs.find(colliderPair) == newColliderPairs.end())
+            {
+                _contactListener->OnTriggerExit(
+                        colliderPair.ColliderA,
+                        colliderPair.ColliderB);
+            }
+        }
+
+        _colliderPairs = newColliderPairs;
+    }
+
+    bool World::collide(Collider colliderA, Collider colliderB) noexcept
+    {
+        const auto& bodyA = GetBody(colliderA.GetBodyRef());
+        const auto& bodyB = GetBody(colliderB.GetBodyRef());
+
+        switch (colliderA.Shape())
+        {
+            case Math::ShapeType::Circle:
+            {
+                const Math::CircleF circleA(bodyA.Position(),
+                                            GetCircleCollider(colliderA.ShapeIdx()).Radius());
+                switch (colliderB.Shape())
+                {
+                    case Math::ShapeType::Circle:
+                    {
+                        const Math::CircleF circleB(bodyB.Position(),
+                                                    GetCircleCollider(colliderB.ShapeIdx()).Radius());
+
+                        return Math::Intersect(circleA, circleB);
+                    }
+
+                    case Math::ShapeType::Rectangle:
+                        break;
+                    case Math::ShapeType::Polygon:
+                        break;
+                    case Math::ShapeType::None:
+                        break;
+                }
+            }
+
+            case Math::ShapeType::Rectangle:
+                break;
+            case Math::ShapeType::Polygon:
+                break;
+            case Math::ShapeType::None:
+                break;
+        }
     }
 
     void World::Deinit() noexcept
@@ -63,7 +172,7 @@ namespace PhysicsEngine
 
         // No body with negative mass found.
         std::size_t previousSize = _bodies.size();
-        auto newSize = static_cast<std::size_t>(static_cast<float>(previousSize) * _bodyAllocationResizeFactor);
+        auto newSize = static_cast<std::size_t>(static_cast<float>(previousSize) * _bodyAllocResizeFactor);
 
         _bodies.resize(newSize, Body());
         _bodiesGenIndices.resize(newSize, 0);
@@ -120,7 +229,7 @@ namespace PhysicsEngine
         {
             // No collider with none shape found.
             std::size_t previousSize = _colliders.size();
-            auto newSize = static_cast<std::size_t>(static_cast<float>(previousSize) * _bodyAllocationResizeFactor);
+            auto newSize = static_cast<std::size_t>(static_cast<float>(previousSize) * _bodyAllocResizeFactor);
 
             _colliders.resize(newSize, Collider());
             _collidersGenIndices.resize(newSize, 0);
@@ -154,7 +263,7 @@ namespace PhysicsEngine
         {
             // No collider with none shape found.
             std::size_t previousSize = _circleColliders.size();
-            auto newSize = static_cast<std::size_t>(static_cast<float>(previousSize) * _bodyAllocationResizeFactor);
+            auto newSize = static_cast<std::size_t>(static_cast<float>(previousSize) * _bodyAllocResizeFactor);
 
             _circleColliders.resize(newSize, CircleCollider());
 
@@ -177,10 +286,10 @@ namespace PhysicsEngine
                 _circleColliders[collider.ShapeIdx()] = CircleCollider();
                 break;
             case Math::ShapeType::Rectangle:
-                //_circleColliders[collider.ShapeIdx()] = CircleCollider();
+                //_rectangleColliders[collider.ShapeIdx()] = RectangleCollider();
                 break;
             case Math::ShapeType::Polygon:
-                //_circleColliders[collider.ShapeIdx()] = CircleCollider();
+                //_polygonColliders[collider.ShapeIdx()] = PolygonCollider();
                 break;
             case Math::ShapeType::None:
                 return;

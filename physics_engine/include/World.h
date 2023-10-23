@@ -8,9 +8,11 @@
 
 #include "Body.h"
 #include "Collider.h"
+#include "ContactListener.h"
 #include "References.h"
 
 #include <vector>
+#include <unordered_set>
 
 namespace PhysicsEngine
 {
@@ -20,16 +22,25 @@ namespace PhysicsEngine
         std::vector<Body> _bodies{};
         std::vector<std::size_t> _bodiesGenIndices{};
 
+        ContactListener* _contactListener = nullptr;
+
         std::vector<Collider> _colliders{};
         std::vector<std::size_t> _collidersGenIndices{};
+
         std::vector<CircleCollider> _circleColliders{};
         std::vector<CircleCollider> _rectangleColliders{};
         std::vector<CircleCollider> _polygonColliders{};
 
-        static constexpr float _bodyAllocationResizeFactor = 2.f;
+        std::unordered_set<ColliderPair, ColliderHash> _colliderPairs{};
+
+        static constexpr float _bodyAllocResizeFactor = 2.f;
+
+        void updateCollisions() noexcept;
+        [[nodiscard]] bool collide(Collider colA, Collider colB) noexcept;
 
     public:
         constexpr World() noexcept = default;
+        //explicit World(ContactListener& contactListener) : _contactListener(&contactListener) {};
 
         /**
          * @brief Init is a method that pre-allocates memory for the desired number of bodies by creating invalid
@@ -47,6 +58,8 @@ namespace PhysicsEngine
         void Update(float deltaTime) noexcept;
 
         void Deinit() noexcept;
+
+        void SetContactListener(ContactListener* contactListener) noexcept { _contactListener = contactListener; }
 
         /**
          * @brief CreateBody is a method that creates a body in the world and returns a BodyRef to this body.

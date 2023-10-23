@@ -204,3 +204,13 @@ TEST_P(PairOfColliderPairFixture, IsEqualOperator)
               colPair1.ColliderA == colPair2.ColliderA && colPair1.ColliderB == colPair2.ColliderB
               || colPair1.ColliderA == colPair2.ColliderB && colPair1.ColliderB == colPair2.ColliderA);
 }
+
+TEST_P(PairOfColliderPairFixture, IsLowerOperator)
+{
+    auto [colPair1, colPair2] = GetParam();
+
+    bool isLower = (colPair1.ColliderA < colPair2.ColliderA)
+                   || (colPair1.ColliderA == colPair2.ColliderA && colPair1.ColliderB < colPair2.ColliderB);
+
+    EXPECT_EQ(colPair1 < colPair2, isLower);
+}

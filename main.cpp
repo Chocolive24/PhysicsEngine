@@ -15,6 +15,9 @@
 
 //TODO: les tests des classes colliders
 
+//TODO: CreateBody(Vec2F pos, vel, mass) -> modifie direct dans le fonction le body.
+// pour éviter de chopper la ref puis la modif.
+
 #include "UniquePtr.h"
 #include "PlanetSystemSample.h"
 #include "TriggerColliderSample.h"

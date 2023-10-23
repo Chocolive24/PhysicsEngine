@@ -91,8 +91,10 @@ namespace PhysicsEngine
     {
         std::size_t operator()(const ColliderPair& pair) const noexcept
         {
-            return pair.ColliderA.Index + pair.ColliderB.Index +
-            pair.ColliderA.GenerationIdx + pair.ColliderB.GenerationIdx;
+            const std::size_t hash1 = std::hash<int>{}(static_cast<int>(pair.ColliderA.Index));
+            const std::size_t hash2 = std::hash<int>{}(static_cast<int>(pair.ColliderB.Index));
+
+            return hash1 + hash2;
         }
     };
 }

@@ -14,6 +14,11 @@ namespace PhysicsEngine
     {
         std::size_t Index;
         std::size_t GenerationIdx;
+
+        constexpr bool operator==(const BodyRef& other) const noexcept
+        {
+            return Index == other.Index && GenerationIdx == other.GenerationIdx;
+        }
     };
 
     /**
