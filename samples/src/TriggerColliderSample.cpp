@@ -5,6 +5,8 @@
 #include "TriggerColliderSample.h"
 #include "Metrics.h"
 #include "DrawableGeometry.h"
+#include "Window.h"
+#include "Random.h"
 
 #include <iostream>
 
@@ -14,39 +16,48 @@ void TriggerColliderSample::Init() noexcept
 
     _world.SetContactListener(this);
 
-    constexpr Math::Vec2F centerOfScreen(Window::WindowWidth / 2.f, Window::WindowHeight / 2.f);
-    constexpr Math::Vec2F sunPos = Metrics::PixelsToMeters(centerOfScreen);
+    _circleObjects.resize(CircleNbr, CircleObject());
+    _rectangleObjects.resize(RectangleNbr, RectangleObject());
 
-//    _staticObj = {_world.CreateBody(), Math::RectangleF (sunPos,
-//                  Math::Vec2F(sunPos.X + 50, sunPos.Y + 50)), _noCollisionColor};
-//    auto& body = _world.GetBody(_staticObj.BodyRef);
-//    body = PhysicsEngine::Body(sunPos, Math::Vec2F::Zero(), 100.f);
+    std::size_t index = 0;
+
+    for (auto& circle : _circleObjects)
+    {
+        Math::Vec2F rndScreenPos(Math::Random::Range(100.f, Window::WindowWidth - 100.f),
+                                 Math::Random::Range(100.f, Window::WindowHeight - 100.f));
+
+        // Circle object.
+        circle.BodyRef = _world.CreateBody();
+        circle.Circle = Math::CircleF(rndScreenPos, Math::Random::Range(15.f, 30.f));
+        circle.Color = _noCollisionColor;
+
+        // Body.
+        auto& body = _world.GetBody(circle.BodyRef);
+        body = PhysicsEngine::Body(
+                Metrics::PixelsToMeters(circle.Circle.Center()),
+                Math::Vec2F::Zero(),
+                1.f);
+
+        // Collider.
+        auto colRef = _world.CreateCircleCollider(circle.BodyRef);
+        auto& collider = _world.GetCollider(colRef);
+        collider.SetIsTrigger(true);
+        _world.GetCircleCollider(collider.ShapeIdx()).SetRadius(
+                Metrics::PixelsToMeters(circle.Circle.Radius()));
+
+        _circleObjects[index] = circle;
+        index++;
+    }
+
+//    _movingObj = {_world.CreateBody(), Math::RectangleF(Math::Vec2F::Zero(), Math::Vec2F(50, 50)),_noCollisionColor};
+//    auto& body2 = _world.GetBody(_movingObj.BodyRef);
+//    body2 = PhysicsEngine::Body(Math::Vec2F::Zero(), Math::Vec2F::Zero(), 100.f);
 //
-//    auto sColRef = _world.CreateRectangleCollider(_staticObj.BodyRef);
-//    auto& sCollider = _world.GetCollider(sColRef);
-//    sCollider.SetIsTrigger(true);
-//    _world.GetRectangleCollider(sCollider.ShapeIdx()).SetHalfSize(
-//            Metrics::PixelsToMeters((_staticObj.Rect.MaxBound() - _staticObj.Rect.MinBound()) / 2.f));
-
-    _staticObj = {_world.CreateBody(), Math::CircleF(sunPos, 30.f), _noCollisionColor};
-    auto& body = _world.GetBody(_staticObj.BodyRef);
-    body = PhysicsEngine::Body(sunPos, Math::Vec2F::Zero(), 100.f);
-
-    auto sColRef = _world.CreateCircleCollider(_staticObj.BodyRef);
-    auto& sCollider = _world.GetCollider(sColRef);
-    sCollider.SetIsTrigger(true);
-    _world.GetCircleCollider(sCollider.ShapeIdx()).SetRadius(
-            Metrics::PixelsToMeters(_staticObj.Circle.Radius()));
-
-    _movingObj = {_world.CreateBody(), Math::RectangleF(Math::Vec2F::Zero(), Math::Vec2F(50, 50)),_noCollisionColor};
-    auto& body2 = _world.GetBody(_movingObj.BodyRef);
-    body2 = PhysicsEngine::Body(Math::Vec2F::Zero(), Math::Vec2F::Zero(), 100.f);
-
-    auto mColRef = _world.CreateRectangleCollider(_movingObj.BodyRef);
-    auto& mCollider = _world.GetCollider(mColRef);
-    mCollider.SetIsTrigger(true);
-    _world.GetRectangleCollider(mCollider.ShapeIdx()).SetHalfSize(
-            Metrics::PixelsToMeters((_movingObj.Rect.MaxBound() - _movingObj.Rect.MinBound()) / 2.f));
+//    auto mColRef = _world.CreateRectangleCollider(_movingObj.BodyRef);
+//    auto& mCollider = _world.GetCollider(mColRef);
+//    mCollider.SetIsTrigger(true);
+//    _world.GetRectangleCollider(mCollider.ShapeIdx()).SetHalfSize(
+//            Metrics::PixelsToMeters((_movingObj.Rect.MaxBound() - _movingObj.Rect.MinBound()) / 2.f));
 
 //    auto mColRef = _world.CreateRectangleCollider(_movingObj.BodyRef);
 //    auto& mCollider = _world.GetCollider(mColRef);
@@ -54,9 +65,9 @@ void TriggerColliderSample::Init() noexcept
 //    _world.GetRectangleCollider(mCollider.ShapeIdx()).SetHalfSize(
 //            Metrics::PixelsToMeters(_movingObj.Radius));
 
-    _circleObjects.push_back(&_staticObj);
+    //_circleObjects.push_back(&_staticObj);
     //_rectangleObjects.push_back(&_staticObj);
-    _rectangleObjects.push_back(&_movingObj);
+    //_rectangleObjects.push_back(&_movingObj);
 }
 
 void TriggerColliderSample::HandleInputs(SDL_Event event) noexcept
@@ -71,23 +82,21 @@ void TriggerColliderSample::Update() noexcept
 {
     _timer.Tick();
 
-    auto& sOBody = _world.GetBody(_staticObj.BodyRef);
-    auto& mOBody = _world.GetBody(_movingObj.BodyRef);
-
     Math::Vec2I mousePosition;
     SDL_GetMouseState(&mousePosition.X, &mousePosition.Y);
 
     auto mousePosF = static_cast<Math::Vec2F>(mousePosition);
 
-    mOBody.SetPosition(Metrics::PixelsToMeters(mousePosF));
-
     _world.Update(_timer.DeltaTime());
 
-    DrawableGeometry::Circle(
-            Metrics::MetersToPixels(sOBody.Position()),
-            _staticObj.Circle.Radius(),
-            50,
-            _staticObj.Color);
+    for (auto& circle : _circleObjects)
+    {
+        DrawableGeometry::Circle(
+                Metrics::MetersToPixels(_world.GetBody(circle.BodyRef).Position()),
+                circle.Circle.Radius(),
+                50,
+                circle.Color);
+    }
 
 //    DrawableGeometry::Rectangle(
 //            Metrics::MetersToPixels(sOBody.Position()),
@@ -101,13 +110,13 @@ void TriggerColliderSample::Update() noexcept
 //            50,
 //            {0, 255, 0, 0});
 
-    auto dimension = _movingObj.Rect.MaxBound() - _movingObj.Rect.MinBound();
-
-    DrawableGeometry::Rectangle(
-            Metrics::MetersToPixels(mOBody.Position()),
-            dimension.X,
-            dimension.Y,
-            _movingObj.Color);
+//    auto dimension = _movingObj.Rect.MaxBound() - _movingObj.Rect.MinBound();
+//
+//    DrawableGeometry::Rectangle(
+//            Metrics::MetersToPixels(mOBody.Position()),
+//            dimension.X,
+//            dimension.Y,
+//            _movingObj.Color);
 
 //    DrawableGeometry::Circle(
 //            Metrics::MetersToPixels(mOBody.Position()),
@@ -137,25 +146,22 @@ void TriggerColliderSample::OnTriggerEnter(PhysicsEngine::ColliderRef colliderRe
 
     for (auto& circleObj : _circleObjects)
     {
-        if ((circleObj->BodyRef == colliderA.GetBodyRef() && colliderA.IsTrigger()) ||
-            circleObj->BodyRef == colliderB.GetBodyRef() && colliderB.IsTrigger())
+        if ((circleObj.BodyRef == colliderA.GetBodyRef() && colliderA.IsTrigger()) ||
+            circleObj.BodyRef == colliderB.GetBodyRef() && colliderB.IsTrigger())
         {
-            circleObj->Color = _collisionColor;
+            circleObj.Color = _collisionColor;
         }
     }
 
     for (auto& rectObj : _rectangleObjects)
     {
-        if ((rectObj->BodyRef == colliderA.GetBodyRef() && colliderA.IsTrigger()) ||
-             rectObj->BodyRef == colliderB.GetBodyRef() && colliderB.IsTrigger())
+        if ((rectObj.BodyRef == colliderA.GetBodyRef() && colliderA.IsTrigger()) ||
+             rectObj.BodyRef == colliderB.GetBodyRef() && colliderB.IsTrigger())
         {
-            rectObj->Color = _collisionColor;
-
-            std::cout << "yo";
+            rectObj.Color = _collisionColor;
         }
     }
 
-    //TODO: For auto rect in rectobjects
 }
 
 void TriggerColliderSample::OnTriggerExit(PhysicsEngine::ColliderRef colliderRefA,
@@ -166,19 +172,19 @@ void TriggerColliderSample::OnTriggerExit(PhysicsEngine::ColliderRef colliderRef
 
     for (auto& circleObj : _circleObjects)
     {
-        if ((circleObj->BodyRef == colliderA.GetBodyRef() && colliderA.IsTrigger()) ||
-            circleObj->BodyRef == colliderB.GetBodyRef() && colliderB.IsTrigger())
+        if ((circleObj.BodyRef == colliderA.GetBodyRef() && colliderA.IsTrigger()) ||
+            circleObj.BodyRef == colliderB.GetBodyRef() && colliderB.IsTrigger())
         {
-            circleObj->Color = _noCollisionColor;
+            circleObj.Color = _noCollisionColor;
         }
     }
 
     for (auto& rectObj : _rectangleObjects)
     {
-        if ((rectObj->BodyRef == colliderA.GetBodyRef() && colliderA.IsTrigger()) ||
-            rectObj->BodyRef == colliderB.GetBodyRef() && colliderB.IsTrigger())
+        if ((rectObj.BodyRef == colliderA.GetBodyRef() && colliderA.IsTrigger()) ||
+            rectObj.BodyRef == colliderB.GetBodyRef() && colliderB.IsTrigger())
         {
-            rectObj->Color = _noCollisionColor;
+            rectObj.Color = _noCollisionColor;
         }
     }
 }

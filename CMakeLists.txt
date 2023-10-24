@@ -6,35 +6,41 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(SDL2 REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 
+# Create the Math library
+file(GLOB_RECURSE MATH_SRC_FILES libs/math/include/*.h libs/math/src/*.cpp)
+add_library(Math ${MATH_SRC_FILES})
+set_target_properties(Math PROPERTIES LINKER_LANGUAGE CXX)
+target_include_directories(Math PUBLIC libs/math/include/)
+
+# Create the PhysicsEngineCommon library with Math as a dependency
 file(GLOB_RECURSE PHYSICS_SRC_FILES physics_engine/include/*.h physics_engine/src/*.cpp)
 add_library(PhysicsEngineCommon ${PHYSICS_SRC_FILES})
 set_target_properties(PhysicsEngineCommon PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(PhysicsEngineCommon PUBLIC physics_engine/include/)
-target_include_directories(PhysicsEngineCommon PUBLIC libs/math/include/)
+target_link_libraries(PhysicsEngineCommon PUBLIC Math)
 
-
+# Create the SDL_AppCommon library with Math as a dependency
 file(GLOB_RECURSE SDL_APP_SRC_FILES sdl_application/include/*.h sdl_application/src/*.cpp)
 add_library(SDL_AppCommon ${SDL_APP_SRC_FILES})
 set_target_properties(SDL_AppCommon PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(SDL_AppCommon PUBLIC sdl_application/include/)
-target_include_directories(SDL_AppCommon PUBLIC libs/math/include/)
-target_link_libraries(SDL_AppCommon PUBLIC SDL2::SDL2)
+target_link_libraries(SDL_AppCommon PUBLIC SDL2::SDL2 Math)
 
+# Create the Common library with Math as a dependency
 file(GLOB_RECURSE COMMON_SRC_FILES common/include/*.h common/src/*.cpp)
 add_library(Common ${COMMON_SRC_FILES})
 set_target_properties(Common PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(Common PUBLIC common/include/)
-target_include_directories(Common PUBLIC libs/math/include/)
+target_link_libraries(Common PUBLIC Math)
 
+# Create the Samples library with dependencies on PhysicsEngineCommon, SDL_AppCommon, Common, and Math
 file(GLOB_RECURSE SAMPLES_SRC_FILES samples/include/*.h samples/src/*.cpp)
 add_library(Samples ${SAMPLES_SRC_FILES})
 set_target_properties(Samples PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(Samples PUBLIC samples/include/)
-target_include_directories(Samples PUBLIC libs/math/include/)
-target_link_libraries(Samples PUBLIC PhysicsEngineCommon)
-target_link_libraries(Samples PUBLIC SDL_AppCommon)
-target_link_libraries(Samples PUBLIC Common)
+target_link_libraries(Samples PUBLIC PhysicsEngineCommon SDL_AppCommon Common Math)
 
+# Create the PhysicsEngine executable with the Samples library as a dependency
 add_executable(PhysicsEngine main.cpp)
 target_link_libraries(PhysicsEngine PRIVATE Samples)
 
