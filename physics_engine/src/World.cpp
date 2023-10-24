@@ -42,11 +42,11 @@ namespace PhysicsEngine
 
         if (_contactListener)
         {
-            updateCollisions();
+            updateCollisionDetection();
         }
     }
 
-    void World::updateCollisions() noexcept
+    void World::updateCollisionDetection() noexcept
     {
         std::unordered_set<ColliderPair, ColliderHash> newColliderPairs;
 
@@ -60,7 +60,7 @@ namespace PhysicsEngine
                 if (colliderB.GetColliderRef() == colliderA.GetColliderRef()) continue;
                 if (colliderB.GetBodyRef() == colliderA.GetBodyRef()) continue;
 
-                if (collide(colliderA, colliderB))
+                if (detectCollision(colliderA, colliderB))
                 {
                     newColliderPairs.insert(ColliderPair{colliderA.GetColliderRef(),
                                                          colliderB.GetColliderRef()});
@@ -81,9 +81,12 @@ namespace PhysicsEngine
             // If there was no collision in the previous frame -> OnTriggerEnter.
             if (_colliderPairs.find(colliderPair) == _colliderPairs.end())
             {
-                _contactListener->OnTriggerEnter(
-                        colliderPair.ColliderA,
-                        colliderPair.ColliderB);
+                _contactListener->OnTriggerEnter(colliderPair.ColliderA,colliderPair.ColliderB);
+            }
+            // If there was a collision in the previous frame and there is always a collision -> OnTriggerStay.
+            else
+            {
+                _contactListener->OnTriggerStay(colliderPair.ColliderA, colliderPair.ColliderB);
             }
         }
 
@@ -109,23 +112,23 @@ namespace PhysicsEngine
         _colliderPairs = newColliderPairs;
     }
 
-    bool World::collide(Collider colliderA, Collider colliderB) noexcept
+    bool World::detectCollision(Collider colA, Collider colB) noexcept
     {
-        const auto& bodyA = GetBody(colliderA.GetBodyRef());
-        const auto& bodyB = GetBody(colliderB.GetBodyRef());
+        const auto& bodyA = GetBody(colA.GetBodyRef());
+        const auto& bodyB = GetBody(colB.GetBodyRef());
 
-        switch (colliderA.Shape())
+        switch (colA.Shape())
         {
             case Math::ShapeType::Circle:
             {
                 const Math::CircleF circleA(bodyA.Position(),
-                                            GetCircleCollider(colliderA.ShapeIdx()).Radius());
-                switch (colliderB.Shape())
+                                            GetCircleCollider(colA.ShapeIdx()).Radius());
+                switch (colB.Shape())
                 {
                     case Math::ShapeType::Circle:
                     {
                         const Math::CircleF circleB(bodyB.Position(),
-                                                    GetCircleCollider(colliderB.ShapeIdx()).Radius());
+                                                    GetCircleCollider(colB.ShapeIdx()).Radius());
 
                         return Math::Intersect(circleA, circleB);
                     }
@@ -133,31 +136,30 @@ namespace PhysicsEngine
                     case Math::ShapeType::Rectangle:
                     {
                         auto bodyBPos = bodyB.Position();
-                        auto halfSize = GetRectangleCollider(colliderB.ShapeIdx()).HalfSize();
+                        auto halfSize = GetRectangleCollider(colB.ShapeIdx()).HalfSize();
                         const Math::RectangleF rectB(bodyBPos - halfSize, bodyBPos + halfSize);
 
                         return Math::Intersect(circleA, rectB);
                     }
 
                     case Math::ShapeType::Polygon:
-                        break;
                     case Math::ShapeType::None:
-                        break;
+                        return false;
                 }
             }
 
             case Math::ShapeType::Rectangle:
             {
                 auto bodyAPos = bodyA.Position();
-                auto halfSizeA = GetRectangleCollider(colliderA.ShapeIdx()).HalfSize();
+                auto halfSizeA = GetRectangleCollider(colA.ShapeIdx()).HalfSize();
                 const Math::RectangleF rectA(bodyAPos - halfSizeA, bodyAPos + halfSizeA);
 
-                switch (colliderB.Shape())
+                switch (colB.Shape())
                 {
                     case Math::ShapeType::Circle:
                     {
                         const Math::CircleF circleB(bodyB.Position(),
-                                                    GetCircleCollider(colliderB.ShapeIdx()).Radius());
+                                                    GetCircleCollider(colB.ShapeIdx()).Radius());
 
                         return Math::Intersect(rectA, circleB);
                     }
@@ -165,23 +167,21 @@ namespace PhysicsEngine
                     case Math::ShapeType::Rectangle:
                     {
                         auto bodyBPos = bodyB.Position();
-                        auto halfSizeB = GetRectangleCollider(colliderB.ShapeIdx()).HalfSize();
+                        auto halfSizeB = GetRectangleCollider(colB.ShapeIdx()).HalfSize();
                         const Math::RectangleF rectB(bodyBPos - halfSizeB, bodyBPos + halfSizeB);
 
                         return Math::Intersect(rectA, rectB);
                     }
 
                     case Math::ShapeType::Polygon:
-                        break;
                     case Math::ShapeType::None:
-                        break;
+                        return false;
                 }
             }
-                break;
+
             case Math::ShapeType::Polygon:
-                break;
             case Math::ShapeType::None:
-                break;
+                return false;
         }
     }
 

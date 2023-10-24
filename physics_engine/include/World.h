@@ -34,12 +34,11 @@ namespace PhysicsEngine
 
         static constexpr float _bodyAllocResizeFactor = 2.f;
 
-        void updateCollisions() noexcept;
-        [[nodiscard]] bool collide(Collider colA, Collider colB) noexcept;
+        void updateCollisionDetection() noexcept;
+        [[nodiscard]] bool detectCollision(Collider colA, Collider colB) noexcept;
 
     public:
         constexpr World() noexcept = default;
-        //explicit World(ContactListener& contactListener) : _contactListener(&contactListener) {};
 
         /**
          * @brief Init is a method that pre-allocates memory for the desired number of bodies by creating invalid

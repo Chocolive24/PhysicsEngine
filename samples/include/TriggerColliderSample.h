@@ -3,35 +3,41 @@
 #include "Sample.h"
 #include "ContactListener.h"
 
-struct CircleObject
+struct GameObject
 {
     PhysicsEngine::BodyRef BodyRef{};
-    Math::CircleF Circle{Math::Vec2F::Zero(), 0.f};
+    PhysicsEngine::ColliderRef ColRef{};
     SDL_Color Color{};
 };
 
-struct RectangleObject
+struct CircleObject : public GameObject
 {
-    PhysicsEngine::BodyRef BodyRef{};
+    Math::CircleF Circle{Math::Vec2F::Zero(), 0.f};
+};
+
+struct RectangleObject : GameObject
+{
     Math::RectangleF Rect{Math::Vec2F::Zero(), Math::Vec2F::Zero()};
-    SDL_Color Color{};
 };
 
 class TriggerColliderSample : public Sample, public PhysicsEngine::ContactListener
 {
 private:
-    CircleObject _staticObj{};
-    //RectangleObject _staticObj{{}, {Math::Vec2F::Zero(), Math::Vec2F::Zero()}};
-    RectangleObject _movingObj{};
+    static constexpr int _circleNumber = 10;
+    static constexpr int _rectangleNbr = 10;
 
-    static constexpr int CircleNbr = 10;
-    static constexpr int RectangleNbr = 10;
+    static constexpr SDL_Color _noCollisionColor = {255, 0, 0, 255};
+    static constexpr SDL_Color _collisionColor = {0, 255, 0, 255};
+
+    static constexpr float _objectAllocResizeFactor = 2.f;
 
     std::vector<CircleObject> _circleObjects{};
     std::vector<RectangleObject> _rectangleObjects{};
 
-    static constexpr SDL_Color _noCollisionColor = {255, 0, 0, 255};
-    static constexpr SDL_Color _collisionColor = {0, 255, 0, 255};
+    void addCircle(Math::Vec2F centerPos, Math::Vec2F rndVelocity) noexcept;
+    void addRectangle(Math::Vec2F minBound, Math::Vec2F maxBound, Math::Vec2F rndVelocity) noexcept;
+
+    void maintainObjectsInWindow() noexcept;
 
 public:
     explicit TriggerColliderSample() noexcept = default;
@@ -43,6 +49,9 @@ public:
 
     void OnTriggerEnter(PhysicsEngine::ColliderRef colliderRefA,
                         PhysicsEngine::ColliderRef colliderRefB) noexcept override;
+
+    void OnTriggerStay(PhysicsEngine::ColliderRef colliderRefA,
+                       PhysicsEngine::ColliderRef colliderRefB) noexcept override;
 
     void OnTriggerExit(PhysicsEngine::ColliderRef colliderRefA,
                        PhysicsEngine::ColliderRef colliderRefB) noexcept override;
