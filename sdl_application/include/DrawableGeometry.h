@@ -51,5 +51,5 @@ namespace DrawableGeometry
      * @param vertices The vertices of the polygon.
      * @param color The color of the polygon.
      */
-    void Polygon(std::vector<Math::Vec2F>& vertices, SDL_Color color) noexcept;
+    void Polygon(Math::Vec2F centerPos, std::vector<Math::Vec2F>& vertices, SDL_Color color) noexcept;
 }

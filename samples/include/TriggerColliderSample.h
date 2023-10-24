@@ -20,11 +20,17 @@ struct RectangleObject : GameObject
     Math::RectangleF Rect{Math::Vec2F::Zero(), Math::Vec2F::Zero()};
 };
 
+struct PolygonObject : GameObject
+{
+    Math::PolygonF Polygon{{Math::Vec2F::Zero()}};
+};
+
 class TriggerColliderSample : public Sample, public PhysicsEngine::ContactListener
 {
 private:
     static constexpr int _circleNumber = 10;
     static constexpr int _rectangleNbr = 10;
+    static constexpr int _polygonNbr = 0;
 
     static constexpr SDL_Color _noCollisionColor = {255, 0, 0, 255};
     static constexpr SDL_Color _collisionColor = {0, 255, 0, 255};
@@ -33,9 +39,11 @@ private:
 
     std::vector<CircleObject> _circleObjects{};
     std::vector<RectangleObject> _rectangleObjects{};
+    std::vector<PolygonObject> _polygonObjects{};
 
     void addCircle(Math::Vec2F centerPos, Math::Vec2F rndVelocity) noexcept;
     void addRectangle(Math::Vec2F minBound, Math::Vec2F maxBound, Math::Vec2F rndVelocity) noexcept;
+    void addPolygon(std::vector<Math::Vec2F>& vertices, Math::Vec2F rndVelocity) noexcept;
 
     void maintainObjectsInWindow() noexcept;
 

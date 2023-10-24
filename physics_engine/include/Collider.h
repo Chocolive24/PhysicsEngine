@@ -7,6 +7,8 @@
  * @author Olivier Pachoud
  */
 
+#include <utility>
+
 #include "References.h"
 #include "Shape.h"
 
@@ -202,6 +204,48 @@ namespace PhysicsEngine
         [[nodiscard]] constexpr bool IsValid() const noexcept
         {
             return _halfSize.X > 0 && _halfSize.Y > 0;
+        };
+    };
+
+    /**
+    * @class PolygonCollider is a class that represents a polygon-shaped collider.
+    */
+    class PolygonCollider
+    {
+    private:
+        std::vector<Math::Vec2F> _vertices{};
+
+    public:
+        PolygonCollider() noexcept = default;
+        explicit PolygonCollider(std::vector<Math::Vec2F>& vertices) noexcept : _vertices(std::move(vertices)) {};
+
+        /**
+         * @brief Vertices is a method that gives the vertices of the polygon collider.
+         * @return The vertices of the polygon collider.
+         */
+        [[nodiscard]] std::vector<Math::Vec2F> Vertices() const noexcept { return _vertices; }
+
+        /**
+         * @brief VerticesCount is a method that gives the number of vertices of the polygon collider.
+         * @return The number of vertices of the polygon collider.
+         */
+        [[nodiscard]] constexpr std::size_t VerticesCount() const noexcept { return _vertices.size(); }
+
+        /**
+        * @brief SetVertices is a method that replaces the current vertices of the polygon collider
+        * with the new vertices given in parameter.
+        * @param newVertices The new vertices for the polygon collider.
+        */
+        void SetVertices(std::vector<Math::Vec2F> newVertices) noexcept { _vertices = std::move(newVertices); }
+
+        /**
+         * @brief IsValid is a method that checks if the polygon collider is valid
+         * (aka if it has a at least 3 vertices).
+         * @return True if the polygon collider is valid.
+         */
+        [[nodiscard]] constexpr bool IsValid() const noexcept
+        {
+            return _vertices.size() > 2;
         };
     };
 

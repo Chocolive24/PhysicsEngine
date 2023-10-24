@@ -24,6 +24,10 @@ public:
      * @brief WindowWidth is the size of the window's width in pixels.
      */
     static constexpr int WindowWidth = 880;
+
+    /**
+     * @brief WindowHeight is the size of the window's width in pixels.
+     */
     static constexpr int WindowHeight = 680;
 
     void Init() noexcept;

@@ -33,6 +33,7 @@ namespace PhysicsEngine
 
         std::vector<CircleCollider> _circleColliders{};
         std::vector<RectangleCollider> _rectangleColliders{};
+        std::vector<PolygonCollider> _polygonColliders{};
 
         std::unordered_set<ColliderPair, ColliderHash> _colliderPairs{};
 
@@ -131,7 +132,7 @@ namespace PhysicsEngine
         /**
          * @brief CreateRectangleCollider is a method that creates a rectangle collider in the world and returns a
          * collider reference to this collider.
-         * @note The half-size of the circle collider is set to (-1, -1) by default.
+         * @note The half-size of the rectangle collider is set to (-1, -1) by default.
          * @return A collider reference to the collider in the world (see ColliderRef).
          */
         [[nodiscard]] ColliderRef CreateRectangleCollider(BodyRef bodyRef) noexcept;
@@ -145,6 +146,25 @@ namespace PhysicsEngine
         [[nodiscard]] RectangleCollider& GetRectangleCollider(int shapeIdx) noexcept
         {
             return _rectangleColliders[shapeIdx];
+        }
+
+        /**
+         * @brief CreatePolygonCollider is a method that creates a polygon collider in the world and returns a
+         * collider reference to this collider.
+         * @note There is no vertices by default.
+         * @return A collider reference to the collider in the world (see ColliderRef).
+         */
+        [[nodiscard]] ColliderRef CreatePolygonCollider(BodyRef bodyRef) noexcept;
+
+        /**
+         * @brief GetPolygonCollider is a method that gives the polygon collider corresponding to the shape index
+         * given in parameter.
+         * @param shapeIdx The shape index to the polygon collider to get.
+         * @return The polygon collider corresponding to the shape index.
+         */
+        [[nodiscard]] PolygonCollider& GetPolygonCollider(int shapeIdx) noexcept
+        {
+            return _polygonColliders[shapeIdx];
         }
     };
 }

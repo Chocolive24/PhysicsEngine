@@ -20,6 +20,7 @@ namespace PhysicsEngine
 
         _circleColliders.resize(preallocatedBodyCount, CircleCollider());
         _rectangleColliders.resize(preallocatedBodyCount, RectangleCollider());
+        _polygonColliders.resize(preallocatedBodyCount, PolygonCollider());
     }
 
     void World::Update(const float deltaTime) noexcept
@@ -143,6 +144,15 @@ namespace PhysicsEngine
                     }
 
                     case Math::ShapeType::Polygon:
+                    {
+                        const auto vertices = GetPolygonCollider(
+                                colB.ShapeIdx()).Vertices();
+
+                        const Math::PolygonF polygonB(vertices);
+
+                        return Math::Intersect(circleA, polygonB);
+                    }
+
                     case Math::ShapeType::None:
                         return false;
                 }
@@ -174,12 +184,60 @@ namespace PhysicsEngine
                     }
 
                     case Math::ShapeType::Polygon:
+                    {
+                        const auto vertices = GetPolygonCollider(
+                                colB.ShapeIdx()).Vertices();
+
+                        const Math::PolygonF polygonB(vertices);
+
+                        return Math::Intersect(rectA, polygonB);
+                    }
                     case Math::ShapeType::None:
                         return false;
                 }
             }
 
             case Math::ShapeType::Polygon:
+            {
+                const auto vertices = GetPolygonCollider(
+                        colA.ShapeIdx()).Vertices();
+
+                const Math::PolygonF polygonA(vertices);
+
+                switch (colB.Shape())
+                {
+                    case Math::ShapeType::Circle:
+                    {
+                        const Math::CircleF circleB(bodyB.Position(),
+                                                    GetCircleCollider(colB.ShapeIdx()).Radius());
+
+                        return Math::Intersect(polygonA, circleB);
+                    }
+
+                    case Math::ShapeType::Rectangle:
+                    {
+                        auto bodyBPos = bodyB.Position();
+                        auto halfSizeB = GetRectangleCollider(colB.ShapeIdx()).HalfSize();
+                        const Math::RectangleF rectB(bodyBPos - halfSizeB, bodyBPos + halfSizeB);
+
+                        return Math::Intersect(polygonA, rectB);
+                    }
+
+                    case Math::ShapeType::Polygon:
+                    {
+                        const auto verticesB = GetPolygonCollider(
+                                colB.ShapeIdx()).Vertices();
+
+                        const Math::PolygonF polygonB(verticesB);
+
+                        return Math::Intersect(polygonA, polygonB);
+                    }
+
+                    case Math::ShapeType::None:
+                        return false;
+                }
+            }
+
             case Math::ShapeType::None:
                 return false;
         }
@@ -383,6 +441,77 @@ namespace PhysicsEngine
         return colRef;
     }
 
+    ColliderRef World::CreatePolygonCollider(BodyRef bodyRef) noexcept
+    {
+        std::size_t colliderIdx;
+
+        auto it = std::find_if(
+                _colliders.begin(),
+                _colliders.end(),
+                [](const Collider& collider)
+                {
+                    return !collider.IsValid();
+                });
+
+        if (it != _colliders.end())
+        {
+            // Found an invalid collider.
+            colliderIdx = std::distance(_colliders.begin(), it);
+        }
+        else
+        {
+            // No collider with none shape found.
+            std::size_t previousSize = _colliders.size();
+            auto newSize = static_cast<std::size_t>(static_cast<float>(previousSize) * _bodyAllocResizeFactor);
+
+            _colliders.resize(newSize, Collider());
+            _collidersGenIndices.resize(newSize, 0);
+
+            colliderIdx = previousSize;
+        }
+
+        auto& collider = _colliders[colliderIdx];
+
+        collider.SetShape(Math::ShapeType::Polygon);
+        collider.SetBodyRef(bodyRef);
+
+        ColliderRef colRef = {colliderIdx, _collidersGenIndices[colliderIdx]};
+        collider.SetColliderRef(colRef);
+
+        std::size_t polygonColIdx;
+
+        auto polygonColIt = std::find_if(
+                _polygonColliders.begin(),
+                _polygonColliders.end(),
+                [](const PolygonCollider& rectCol)
+                {
+                    return !rectCol.IsValid();
+                });
+
+        if (polygonColIt != _polygonColliders.end())
+        {
+            polygonColIdx = std::distance(_polygonColliders.begin(), polygonColIt);
+        }
+        else
+        {
+            // No collider with none shape found.
+            std::size_t previousSize = _polygonColliders.size();
+            auto newSize = static_cast<std::size_t>(static_cast<float>(previousSize) * _bodyAllocResizeFactor);
+
+            _polygonColliders.resize(newSize, PolygonCollider());
+
+            polygonColIdx = previousSize;
+        }
+
+        std::vector<Math::Vec2F> vertices;
+        vertices.resize(3, Math::Vec2F());
+
+        _polygonColliders[polygonColIdx].SetVertices(vertices);
+        collider.SetShapeIdx(static_cast<int>(polygonColIdx));
+
+        return colRef;
+    }
+
     void World::DestroyCollider(ColliderRef colRef) noexcept
     {
         auto& collider = _colliders[colRef.Index];
@@ -396,7 +525,7 @@ namespace PhysicsEngine
                 _rectangleColliders[collider.ShapeIdx()] = RectangleCollider();
                 break;
             case Math::ShapeType::Polygon:
-                //_polygonColliders[collider.ShapeIdx()] = PolygonCollider();
+                _polygonColliders[collider.ShapeIdx()] = PolygonCollider();
                 break;
             case Math::ShapeType::None:
                 return;

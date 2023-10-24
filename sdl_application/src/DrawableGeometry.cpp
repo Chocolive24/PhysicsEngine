@@ -86,28 +86,29 @@ namespace DrawableGeometry
         Indices.push_back(indicesOffset + 3);
     }
 
-    void Polygon(std::vector<Math::Vec2F>& vertices, SDL_Color color) noexcept
+    void Polygon(Math::Vec2F centerPos, std::vector<Math::Vec2F>& vertices, SDL_Color color) noexcept
     {
-        if (vertices.size() < 3) return; // todo exeption
+        if (vertices.size() < 3) return;
 
-        auto offset = Vertices.size();
+        const int indicesOffset = static_cast<int>(Vertices.size());
 
-        for (const Math::Vec2F &v: vertices)
+        for (const Math::Vec2F& v : vertices)
         {
-            Vertices.push_back({{v.X, v.Y}, color, {1.0f, 1.0f}});
+            // Update the vertices based on the provided center position
+            Math::Vec2F updatedVertex = centerPos + v;
+            Vertices.push_back({{updatedVertex.X, updatedVertex.Y}, color, {1.0f, 1.0f}});
         }
 
         for (int i = 1; i < vertices.size() - 1; ++i)
         {
-            Indices.push_back(offset);
-            Indices.push_back(offset + i);
-            Indices.push_back(offset + i + 1);
+            Indices.push_back(indicesOffset);
+            Indices.push_back(indicesOffset + i);
+            Indices.push_back(indicesOffset + i + 1);
         }
 
         // Connect the last vertex to the first vertex to close the polygon.
-        Indices.push_back(offset);
-        Indices.push_back(offset + vertices.size() - 1);
-        Indices.push_back(offset + 1);
+        Indices.push_back(indicesOffset);
+        Indices.push_back(indicesOffset + static_cast<int>(vertices.size()) - 1);
+        Indices.push_back(indicesOffset + 1);
     }
-
 }

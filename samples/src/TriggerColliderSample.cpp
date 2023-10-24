@@ -18,11 +18,15 @@ void TriggerColliderSample::Init() noexcept
 
     _circleObjects.resize(_circleNumber, CircleObject());
     _rectangleObjects.resize(_rectangleNbr, RectangleObject());
+    _polygonObjects.resize(_polygonNbr, PolygonObject());
+
+    const auto windowSizeInMeters = Metrics::PixelsToMeters(
+            Math::Vec2F(Window::WindowWidth,Window::WindowHeight));
 
     for (auto& circle : _circleObjects)
     {
-        Math::Vec2F rndScreenPos(Math::Random::Range(100.f, Window::WindowWidth - 100.f),
-                                 Math::Random::Range(100.f, Window::WindowHeight - 100.f));
+        Math::Vec2F rndScreenPos(Math::Random::Range(1.f, windowSizeInMeters.X - 1.f),
+                                 Math::Random::Range(-1.f, windowSizeInMeters.Y + 1.f));
 
         Math::Vec2F rndVelocity(Math::Random::Range(-2.f, 2.f),
                                 Math::Random::Range(-2.f, 2.f));
@@ -32,15 +36,24 @@ void TriggerColliderSample::Init() noexcept
 
     for (auto& rect : _rectangleObjects)
     {
-        Math::Vec2F rndScreenPos(Math::Random::Range(100.f, Window::WindowWidth - 100.f),
-                                 Math::Random::Range(100.f, Window::WindowHeight - 100.f));
+        Math::Vec2F rndScreenPos(Math::Random::Range(1.f, windowSizeInMeters.X - 1.f),
+                                 Math::Random::Range(-1.f, windowSizeInMeters.Y + 1.f));
 
         Math::Vec2F rndVelocity(Math::Random::Range(-2.f, 2.f),
                                 Math::Random::Range(-2.f, 2.f));
 
-        float rndSize = Math::Random::Range(30.f, 50.f);
+        float rndSize = Math::Random::Range(0.3f, 0.5f);
 
         addRectangle(rndScreenPos, rndScreenPos + Math::Vec2F(rndSize, -rndSize), rndVelocity);
+    }
+
+    for (auto& poly : _polygonObjects)
+    {
+        std::vector<Math::Vec2F> vertices = {
+                Math::Vec2F(0, -0.2), Math::Vec2F(2, -0.2), Math::Vec2F(1.5, -2)
+        };
+
+        addPolygon(vertices, Math::Vec2F(1, -1));
     }
 }
 
@@ -58,6 +71,8 @@ void TriggerColliderSample::Update() noexcept
 
     auto mousePosF = static_cast<Math::Vec2F>(mousePosition);
 
+    auto mM = Metrics::PixelsToMeters(mousePosF);
+
     maintainObjectsInWindow();
 
     _world.Update(_timer.DeltaTime());
@@ -66,19 +81,33 @@ void TriggerColliderSample::Update() noexcept
     {
         DrawableGeometry::Circle(
                 Metrics::MetersToPixels(_world.GetBody(circle.BodyRef).Position()),
-                circle.Circle.Radius(),
+                Metrics::MetersToPixels(circle.Circle.Radius()),
                 50,
                 circle.Color);
     }
 
     for (auto& rect : _rectangleObjects)
     {
-        auto dimension = rect.Rect.MaxBound() - rect.Rect.MinBound();
+        auto dimension = Metrics::MetersToPixels(rect.Rect.MaxBound() - rect.Rect.MinBound());
 
         DrawableGeometry::Rectangle(Metrics::MetersToPixels(_world.GetBody(rect.BodyRef).Position()),
                                     dimension.X,
                                     dimension.Y,
                                     rect.Color);
+    }
+
+    for (auto& poly : _polygonObjects)
+    {
+        const auto centerPos = Metrics::MetersToPixels(_world.GetBody(poly.BodyRef).Position());
+
+        std::vector<Math::Vec2F> verticesInPixels;
+
+        for (auto& vertex : poly.Polygon.Vertices())
+        {
+            verticesInPixels.push_back(Metrics::MetersToPixels(vertex));
+        }
+
+        DrawableGeometry::Polygon(centerPos, verticesInPixels, poly.Color);
     }
 }
 
@@ -110,6 +139,15 @@ void TriggerColliderSample::OnTriggerEnter(PhysicsEngine::ColliderRef colliderRe
             rectObj.Color = _collisionColor;
         }
     }
+
+    for (auto& polyObj : _polygonObjects)
+    {
+        if ((polyObj.ColRef == colliderRefA && colliderA.IsTrigger()) ||
+             polyObj.ColRef == colliderRefB && colliderB.IsTrigger())
+        {
+            polyObj.Color = _collisionColor;
+        }
+    }
 }
 
 void TriggerColliderSample::OnTriggerStay(PhysicsEngine::ColliderRef colliderRefA,
@@ -135,6 +173,15 @@ void TriggerColliderSample::OnTriggerStay(PhysicsEngine::ColliderRef colliderRef
             rectObj.Color = _collisionColor;
         }
     }
+
+    for (auto& polyObj : _polygonObjects)
+    {
+        if ((polyObj.ColRef == colliderRefA && colliderA.IsTrigger()) ||
+            polyObj.ColRef == colliderRefB && colliderB.IsTrigger())
+        {
+            polyObj.Color = _collisionColor;
+        }
+    }
 }
 
 void TriggerColliderSample::OnTriggerExit(PhysicsEngine::ColliderRef colliderRefA,
@@ -158,6 +205,15 @@ void TriggerColliderSample::OnTriggerExit(PhysicsEngine::ColliderRef colliderRef
              rectObj.ColRef == colliderRefB && colliderB.IsTrigger())
         {
             rectObj.Color = _noCollisionColor;
+        }
+    }
+
+    for (auto& polyObj : _polygonObjects)
+    {
+        if ((polyObj.ColRef == colliderRefA && colliderA.IsTrigger()) ||
+            polyObj.ColRef == colliderRefB && colliderB.IsTrigger())
+        {
+            polyObj.Color = _collisionColor;
         }
     }
 }
@@ -191,22 +247,18 @@ void TriggerColliderSample::addCircle(Math::Vec2F centerPos, Math::Vec2F rndVelo
 
     // Circle object.
     circle.BodyRef = _world.CreateBody();
-    circle.Circle = Math::CircleF(centerPos, Math::Random::Range(15.f, 30.f));
+    circle.Circle = Math::CircleF(centerPos, Math::Random::Range(0.15f, 0.3f));
     circle.Color = _noCollisionColor;
 
     // Body.
     auto& body = _world.GetBody(circle.BodyRef);
-    body = PhysicsEngine::Body(
-            Metrics::PixelsToMeters(circle.Circle.Center()),
-            rndVelocity,
-            1.f);
+    body = PhysicsEngine::Body(circle.Circle.Center(),rndVelocity,1.f);
 
     // Collider.
     circle.ColRef = _world.CreateCircleCollider(circle.BodyRef);
     auto& collider = _world.GetCollider(circle.ColRef);
     collider.SetIsTrigger(true);
-    _world.GetCircleCollider(collider.ShapeIdx()).SetRadius(
-            Metrics::PixelsToMeters(circle.Circle.Radius()));
+    _world.GetCircleCollider(collider.ShapeIdx()).SetRadius(circle.Circle.Radius());
 }
 
 void TriggerColliderSample::addRectangle(Math::Vec2F minBound, Math::Vec2F maxBound, Math::Vec2F rndVelocity) noexcept
@@ -243,9 +295,7 @@ void TriggerColliderSample::addRectangle(Math::Vec2F minBound, Math::Vec2F maxBo
 
     // Body.
     auto& body = _world.GetBody(rect.BodyRef);
-    body = PhysicsEngine::Body(Metrics::PixelsToMeters(rect.Rect.Center()),
-                               rndVelocity,
-                               1.f);
+    body = PhysicsEngine::Body(rect.Rect.Center(),rndVelocity,1.f);
 
     // Collider.
     rect.ColRef = _world.CreateRectangleCollider(rect.BodyRef);
@@ -254,26 +304,81 @@ void TriggerColliderSample::addRectangle(Math::Vec2F minBound, Math::Vec2F maxBo
 
     auto halfSize = rect.Rect.Size() / 2.f;
 
-    _world.GetRectangleCollider(collider.ShapeIdx()).SetHalfSize(
-            Metrics::PixelsToMeters(halfSize));
+    _world.GetRectangleCollider(collider.ShapeIdx()).SetHalfSize(halfSize);
+}
+
+void TriggerColliderSample::addPolygon(std::vector<Math::Vec2F>& vertices, Math::Vec2F rndVelocity) noexcept
+{
+    auto it = std::find_if(
+            _polygonObjects.begin(),
+            _polygonObjects.end(),
+            [](const PolygonObject& polyObj)
+            {
+                return polyObj.Polygon.VerticesCount() < 3;
+            });
+
+    std::size_t index = -1;
+
+    if (it != _polygonObjects.end())
+    {
+        index = std::distance(_polygonObjects.begin(), it);
+    }
+    else
+    {
+        std::size_t previousSize = _polygonObjects.size();
+        auto newSize = static_cast<std::size_t>(static_cast<float>(previousSize) * _objectAllocResizeFactor);
+
+        _polygonObjects.resize(newSize, PolygonObject());
+
+        index = previousSize;
+    }
+    auto& polygon = _polygonObjects[index];
+
+    // Rectangle object.
+    polygon.BodyRef = _world.CreateBody();
+    polygon.Polygon = Math::PolygonF(vertices);
+    polygon.Color = _noCollisionColor;
+
+    // Body.
+    auto& body = _world.GetBody(polygon.BodyRef);
+    body = PhysicsEngine::Body(Metrics::PixelsToMeters(polygon.Polygon.Center()),
+                               rndVelocity,
+                               1.f);
+
+    // Collider.
+    polygon.ColRef = _world.CreatePolygonCollider(polygon.BodyRef);
+    auto& collider = _world.GetCollider(polygon.ColRef);
+    collider.SetIsTrigger(true);
+
+    std::vector<Math::Vec2F> verticesInMeters;
+
+    for (auto& vertex : polygon.Polygon.Vertices())
+    {
+        verticesInMeters.push_back(Metrics::PixelsToMeters(vertex));
+    }
+
+    _world.GetPolygonCollider(collider.ShapeIdx()).SetVertices(verticesInMeters);
 }
 
 void TriggerColliderSample::maintainObjectsInWindow() noexcept
 {
+    const auto windowSizeInMeters = Metrics::PixelsToMeters(
+            Math::Vec2F(Window::WindowWidth,Window::WindowHeight));
+
     for (auto& circle : _circleObjects)
     {
         auto radius = circle.Circle.Radius();
 
         auto& body = _world.GetBody(circle.BodyRef);
-        auto posInPixels = Metrics::MetersToPixels(body.Position());
+        auto pos = body.Position();
         auto velocity = body.Velocity();
 
-        if (posInPixels.X + radius >= Window::WindowWidth || posInPixels.X - radius <= 0)
+        if (pos.X + radius >= windowSizeInMeters.X || pos.X - radius <= 0)
         {
             body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
         }
 
-        if (posInPixels.Y + radius >= Window::WindowHeight || posInPixels.Y - radius <= 0)
+        if (pos.Y - radius <= windowSizeInMeters.Y || pos.Y + radius >= 0)
         {
             body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
         }
@@ -284,17 +389,41 @@ void TriggerColliderSample::maintainObjectsInWindow() noexcept
         const auto halfSize = rect.Rect.Size() / 2.f;
 
         auto& body = _world.GetBody(rect.BodyRef);
-        auto posInPixels = Metrics::MetersToPixels(body.Position());
+        const auto pos = body.Position();
         auto velocity = body.Velocity();
 
-        if (posInPixels.X + halfSize.X >= Window::WindowWidth || posInPixels.X - halfSize.X <= 0)
+        if (pos.X + halfSize.X >= windowSizeInMeters.X || pos.X - halfSize.X <= 0)
         {
             body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
         }
 
-        if (posInPixels.Y - halfSize.Y >= Window::WindowHeight || posInPixels.Y + halfSize.Y <= 0)
+        if (pos.Y + halfSize.Y <= windowSizeInMeters.Y || pos.Y - halfSize.Y >= 0)
         {
             body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
+        }
+    }
+
+    for (auto& poly : _polygonObjects)
+    {
+        auto& body = _world.GetBody(poly.BodyRef);
+        const auto pos = body.Position();
+        auto velocity = body.Velocity();
+
+        for (auto& vertex : poly.Polygon.Vertices())
+        {
+            Math::Vec2F updatedVertex = pos + vertex;
+
+            auto vertexPosInPixels = Metrics::MetersToPixels(updatedVertex);
+
+            if (vertexPosInPixels.X >= Window::WindowWidth || vertexPosInPixels.X <= 0)
+            {
+                body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
+            }
+
+            if (vertexPosInPixels.Y >= Window::WindowHeight || vertexPosInPixels.Y <= 0)
+            {
+                body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
+            }
         }
     }
 }

@@ -304,6 +304,61 @@ TEST(World, CreateAndDestroyRectCollider)
     EXPECT_THROW(nullCollider =  world.GetCollider(colRef2), std::runtime_error);
 }
 
+TEST(World, CreateAndDestroyPolygonCollider)
+{
+    World world;
+    world.Init(5);
+
+    auto bodyRef = world.CreateBody();
+    auto& body = world.GetBody(bodyRef);
+    body = Body(Vec2F::One(), Vec2F::One(), 10.f);
+
+    auto colRef = world.CreatePolygonCollider(bodyRef);
+    auto& collider = world.GetCollider(colRef);
+
+    EXPECT_EQ(colRef.Index, 0);
+    EXPECT_EQ(colRef.GenerationIdx, 0);
+    EXPECT_TRUE(world.GetCollider(colRef).IsValid());
+
+    EXPECT_TRUE(world.GetPolygonCollider(collider.ShapeIdx()).IsValid());
+
+    world.DestroyCollider(colRef);
+
+    bodyRef = world.CreateBody();
+    auto& newBody = world.GetBody(bodyRef);
+    newBody = Body(Vec2F::One(), Vec2F::One(), 2.f);
+
+    colRef = world.CreatePolygonCollider(bodyRef);
+    auto& newCollider = world.GetCollider(colRef);
+
+    EXPECT_EQ(colRef.Index, 0);
+    EXPECT_EQ(colRef.GenerationIdx, 1);
+    EXPECT_TRUE(world.GetCollider(colRef).IsValid());
+
+    EXPECT_EQ(world.GetPolygonCollider(newCollider.ShapeIdx()).VerticesCount(), 3);
+
+    EXPECT_TRUE(world.GetPolygonCollider(newCollider.ShapeIdx()).IsValid());
+
+    auto bodyRef2 = world.CreateBody();
+    auto& body2 = world.GetBody(bodyRef2);
+    body2 = Body(Vec2F::One(), Vec2F::One(), 50.f);
+
+    auto colRef2 = world.CreatePolygonCollider(bodyRef2);
+    auto& collider2 = world.GetCollider(colRef2);
+
+    EXPECT_EQ(colRef2.Index, 1);
+    EXPECT_EQ(colRef2.GenerationIdx, 0);
+    EXPECT_TRUE(world.GetCollider(colRef2).IsValid());
+
+    EXPECT_TRUE(world.GetPolygonCollider(collider2.ShapeIdx()).IsValid());
+
+    world.DestroyCollider(colRef2);
+
+    Collider nullCollider;
+
+    EXPECT_THROW(nullCollider =  world.GetCollider(colRef2), std::runtime_error);
+}
+
 TEST(World, UpdateCollisionDetectionCircle)
 {
     CircleF c1(Vec2F::Zero(), 0.5f);
@@ -461,6 +516,77 @@ TEST(World, UpdateCollisionDetectionCircleAndRect)
 
     // Third Update, circle stop collide :
     world.GetBody(bodyRef).SetPosition(Math::Vec2F(10.f, 10.f));
+
+    world.Update(0.1f);
+
+    EXPECT_FALSE(testContactListener.Enter);
+    EXPECT_FALSE(testContactListener.Stay);
+    EXPECT_TRUE(testContactListener.Exit);
+}
+
+TEST(World, UpdateCollisionDetectionPolygon)
+{
+    std::vector<Vec2F> v1 = {
+            Vec2F::Zero(),
+            Vec2F(1.f, 0.f),
+            Vec2F(0.5f, 0.3f),
+            Vec2F(0.7f, 0.5f),
+            Vec2F(0.9f, 0.7f)
+    };
+
+    std::vector<Vec2F> v2 = {
+            Vec2F(0.1f, 0.1f),
+            Vec2F(0.8f, 0.1f),
+            Vec2F(0.4f, 0.25f),
+            Vec2F(0.6f, 0.6f),
+            Vec2F(0.8f, 0.5f)
+    };
+
+    PolygonF p1(v1);
+    PolygonF p2(v2);
+
+    World world;
+    world.Init(2);
+
+    TestContactListener testContactListener;
+    world.SetContactListener(&testContactListener);
+
+    float deltaTime = 0.1f;
+
+    auto bodyRef = world.CreateBody();
+    auto& body = world.GetBody(bodyRef);
+    body = Body(p1.Center(), Vec2F::Zero(), 1);
+
+    auto c1ColRef = world.CreatePolygonCollider(bodyRef);
+    auto& collider = world.GetCollider(c1ColRef);
+    collider.SetIsTrigger(true);
+    world.GetPolygonCollider(collider.ShapeIdx()).SetVertices(p1.Vertices());
+
+    auto bodyRef2 = world.CreateBody();
+    auto& body2 = world.GetBody(bodyRef2);
+    body2 = Body(p2.Center(), Vec2F::Zero(), 1);
+
+    auto c2ColRef = world.CreatePolygonCollider(bodyRef2);
+    auto& collider2 = world.GetCollider(c2ColRef);
+    collider2.SetIsTrigger(true);
+    world.GetPolygonCollider(collider2.ShapeIdx()).SetVertices(p2.Vertices());
+
+    // First Update, circle collide :
+    world.Update(0.1f);
+
+    EXPECT_TRUE(testContactListener.Enter);
+    EXPECT_FALSE(testContactListener.Stay);
+    EXPECT_FALSE(testContactListener.Exit);
+
+    // Second Update, circle always collide :
+    world.Update(0.1f);
+
+    EXPECT_FALSE(testContactListener.Enter);
+    EXPECT_TRUE(testContactListener.Stay);
+    EXPECT_FALSE(testContactListener.Exit);
+
+    // Third Update, circle stop collide :
+    world.GetBody(bodyRef).SetPosition(Math::Vec2F(100.f, 100.f));
 
     world.Update(0.1f);
 

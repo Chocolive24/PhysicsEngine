@@ -36,10 +36,10 @@ namespace Metrics
      * @param pixels The position in pixels that you want to convert to meters.
      * @return The converted position in meters of the input 'pixels'.
      */
-    template<typename T>
+    template <typename T>
     [[nodiscard]] constexpr Math::Vec2<T> PixelsToMeters(const Math::Vec2<T> pixelPos) noexcept
     {
-        return Math::Vec2<T>(pixelPos.X * PixelsToMetersRatio, pixelPos.Y * PixelsToMetersRatio * -1.f);
+        return Math::Vec2<T>(pixelPos.X * PixelsToMetersRatio, -pixelPos.Y * PixelsToMetersRatio);
     }
 
     /**
@@ -60,9 +60,9 @@ namespace Metrics
      * @param pixels The position in pixels that you want to convert to meters.
      * @return The converted position in meters of the input 'pixels'.
      */
-    template<typename T>
+    template <typename T>
     [[nodiscard]] constexpr Math::Vec2<T> MetersToPixels(const Math::Vec2<T> meterPos) noexcept
     {
-        return Math::Vec2<T>(meterPos.X * MetersToPixelsRatio, meterPos.Y * MetersToPixelsRatio * -1.f);
+        return Math::Vec2<T>(meterPos.X * MetersToPixelsRatio, -meterPos.Y * MetersToPixelsRatio);
     }
 }
