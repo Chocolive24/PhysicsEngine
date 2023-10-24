@@ -1,5 +1,10 @@
 #pragma once
 
+/**
+ * @headerfile ContactListener.h
+ * This header file defines the reference types of the PhysicsEngine.
+ */
+
 #include <cstddef>
 
 namespace PhysicsEngine

@@ -17,6 +17,8 @@ struct FloatFixture : public ::testing::TestWithParam<float> {};
 
 struct PairOfRefFixture : public ::testing::TestWithParam<std::pair<ColliderRef, ColliderRef>> {};
 
+struct ColliderPairFixture : public ::testing::TestWithParam<ColliderPair> {};
+
 struct PairOfColliderPairFixture : public ::testing::TestWithParam<std::pair<ColliderPair, ColliderPair>> {};
 
 INSTANTIATE_TEST_SUITE_P(Collider, ColliderAttributesFixture, testing::Values(
@@ -57,6 +59,16 @@ INSTANTIATE_TEST_SUITE_P(Collider, PairOfRefFixture, testing::Values(
         std::pair{ ColliderRef{1, 5}, ColliderRef{2, 3}},
         std::pair{ ColliderRef{1, 1}, ColliderRef{1, 1}},
         std::pair{ ColliderRef{50, 34}, ColliderRef{98, 100}}
+));
+
+INSTANTIATE_TEST_SUITE_P(Collider, ColliderPairFixture, testing::Values(
+        ColliderPair{
+                ColliderRef{0, 0},
+                ColliderRef{0, 0}},
+       ColliderPair{
+                ColliderRef{10, 20},
+                ColliderRef{80, 30}}
+
 ));
 
 INSTANTIATE_TEST_SUITE_P(Collider, PairOfColliderPairFixture, testing::Values(
@@ -213,4 +225,20 @@ TEST_P(PairOfColliderPairFixture, IsLowerOperator)
                    || (colPair1.ColliderA == colPair2.ColliderA && colPair1.ColliderB < colPair2.ColliderB);
 
     EXPECT_EQ(colPair1 < colPair2, isLower);
+}
+
+TEST_P(ColliderPairFixture, HashOperator)
+{
+    auto colPair = GetParam();
+
+    ColliderHash colliderHash;
+
+    std::size_t h = colliderHash(colPair);
+
+    const std::size_t hash1 = std::hash<int>{}(static_cast<int>(colPair.ColliderA.Index));
+    const std::size_t hash2 = std::hash<int>{}(static_cast<int>(colPair.ColliderB.Index));
+
+    const auto hashExpected = hash1 + hash2;
+
+    EXPECT_EQ(h, hashExpected);
 }
