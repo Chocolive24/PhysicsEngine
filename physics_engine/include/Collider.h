@@ -7,10 +7,12 @@
  * @author Olivier Pachoud
  */
 
-#include <utility>
 
 #include "References.h"
 #include "Shape.h"
+
+#include <variant>
+#include <utility>
 
 namespace PhysicsEngine
 {
@@ -20,14 +22,15 @@ namespace PhysicsEngine
     class Collider
     {
     private:
-        Math::ShapeType _shape{Math::ShapeType::None};
-        ColliderRef _colliderRef{};
-        int _shapeIdx{-1};
+        std::variant<Math::CircleF, Math::RectangleF, Math::PolygonF> _shape{
+            Math::CircleF(Math::Vec2F::Zero(), 0.f)};
         BodyRef _bodyRef{};
+        int _shapeIdx{-1};
 
         float _restitution{-1.f};
         float _friction{-1.f};
         bool _isTrigger{false};
+        bool _enabled{false};
 
     public:
         constexpr Collider() noexcept = default;
@@ -42,27 +45,29 @@ namespace PhysicsEngine
          * @brief Shape is a method that gives the mathematical shape of the collider.
          * @return The mathematical shape of the collider.
          */
-        [[nodiscard]] constexpr Math::ShapeType Shape() const noexcept { return _shape; }
+        [[nodiscard]] std::variant<Math::CircleF, Math::RectangleF, Math::PolygonF> Shape()
+        const noexcept { return _shape; }
 
         /**
          * @brief SetShape is a method that replaces the current mathematical shape of the collider
-         * with the new mathematical shape given in parameter.
-         * @param newShape The new mathematical shape for the collider.
+         * with a circle shape given in parameter.
+         * @param circle The new mathematical shape for the collider.
          */
-        constexpr void SetShape(Math::ShapeType newShape) noexcept { _shape = newShape; }
+        constexpr void SetShape(Math::CircleF circle) noexcept { _shape = circle; }
 
         /**
-         * @brief GetColliderRef is a method that gives the collider reference of the collider in the world.
-         * @return The collider reference of the collider in the world.
+         * @brief SetShape is a method that replaces the current mathematical shape of the collider
+         * with rectangle shape given in parameter.
+         * @param rectangle The new mathematical shape for the collider.
          */
-        [[nodiscard]] constexpr ColliderRef GetColliderRef() const noexcept { return _colliderRef; }
+        constexpr void SetShape(Math::RectangleF rectangle) noexcept { _shape = rectangle; }
 
         /**
-         * @brief SetColliderRef is a method that replaces the current collider reference of the collider
-         * with the new collider reference given in parameter.
-         * @param newColRef The new collider reference for the collider.
+         * @brief SetShape is a method that replaces the current mathematical shape of the collider
+         * with a polygon shape given in parameter.
+         * @param polygon The new mathematical shape for the collider.
          */
-        constexpr void SetColliderRef(ColliderRef newColRef) noexcept { _colliderRef = newColRef; }
+        void SetShape(Math::PolygonF polygon) noexcept { _shape = polygon; }
 
         /**
          * @brief ShapeIdx is a method that gives the index of the shape of the collider in the world.
@@ -128,13 +133,20 @@ namespace PhysicsEngine
         * with the trigger state given in parameter.
         * @param isTrigger The new trigger state for the collider.
         */
-        constexpr void SetIsTrigger(bool isTrigger) noexcept { _isTrigger = isTrigger; }
+        constexpr void SetIsTrigger(const bool isTrigger) noexcept { _isTrigger = isTrigger; }
 
         /**
-         * @brief IsValid is a method that checks if the collider is valid (aka if it has a mathematical shape).
+         * @brief Enabled is a method that checks if the collider is valid (aka if it has a mathematical shape).
          * @return True if the collider is valid.
          */
-        [[nodiscard]] constexpr bool IsValid() const noexcept { return _shape != Math::ShapeType::None; }
+        [[nodiscard]] constexpr bool Enabled() const noexcept { return _enabled; }
+
+        /**
+        * @brief SetEnabled is a method that replaces the current enabled state of the collider with the new enabled
+        * state given in parameter.
+        * @param enabled Whether the collider is enabled or not.
+        */
+        constexpr void SetEnabled(const bool enabled) noexcept { _enabled = enabled; }
     };
 
     /**
@@ -163,7 +175,7 @@ namespace PhysicsEngine
         constexpr void SetRadius(float newRadius) noexcept { _radius = newRadius; }
 
         /**
-         * @brief IsValid is a method that checks if the circle collider is valid
+         * @brief Enabled is a method that checks if the circle collider is valid
          * (aka if it has a radius greater than 0).
          * @return True if the circle collider is valid.
          */
@@ -197,7 +209,7 @@ namespace PhysicsEngine
 
 
         /**
-         * @brief IsValid is a method that checks if the rectangle collider is valid
+         * @brief Enabled is a method that checks if the rectangle collider is valid
          * (aka if it has a half-width and a half-height greater than 0).
          * @return True if the rectangle collider is valid.
          */
@@ -239,7 +251,7 @@ namespace PhysicsEngine
         void SetVertices(std::vector<Math::Vec2F> newVertices) noexcept { _vertices = std::move(newVertices); }
 
         /**
-         * @brief IsValid is a method that checks if the polygon collider is valid
+         * @brief Enabled is a method that checks if the polygon collider is valid
          * (aka if it has a at least 3 vertices).
          * @return True if the polygon collider is valid.
          */

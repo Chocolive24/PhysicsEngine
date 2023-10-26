@@ -59,12 +59,12 @@ namespace DrawableGeometry
         Indices.push_back(indicesOffset);  // Connect the last vertex to the center
     }
 
-    void Rectangle(const Math::Vec2F centerPos, const float width, const float height, const SDL_Color color) noexcept
+    void Rectangle(const Math::Vec2F centerPos, const Math::Vec2F size, const SDL_Color color) noexcept
     {
         const int indicesOffset = static_cast<int>(Vertices.size());
 
         auto halfRatio = 1.f / 2.f;
-        auto halfWidth = width * halfRatio, halfHeight = height * halfRatio;
+        auto halfWidth = size.X * halfRatio, halfHeight = size.Y * halfRatio;
 
         // Left-down corner.
         addVertex(Math::Vec2F(centerPos.X - halfWidth, centerPos.Y - halfHeight), color);

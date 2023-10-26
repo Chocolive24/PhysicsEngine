@@ -44,7 +44,7 @@ namespace DrawableGeometry
      * @param height The height of the rectangle.
      * @param color The color of the rectangle.
      */
-    void Rectangle(Math::Vec2F centerPos, float width, float height, SDL_Color color) noexcept;
+    void Rectangle(Math::Vec2F centerPos, Math::Vec2F size, SDL_Color color) noexcept;
 
     /**
      * @brief Polygon is a method that creates vertices and indices to form a polygon.

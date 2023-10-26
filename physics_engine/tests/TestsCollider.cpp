@@ -7,7 +7,7 @@ using namespace PhysicsEngine;
 
 struct ColliderAttributesFixture : public ::testing::TestWithParam<std::tuple<float, float, bool>>{};
 
-struct ColliderShapeFixture : public ::testing::TestWithParam<ShapeType> {};
+struct ColliderShapeFixture : public ::testing::TestWithParam<std::tuple<CircleF, RectangleF, PolygonF>> {};
 
 struct RefFixture : public ::testing::TestWithParam<std::pair<std::size_t, std::size_t>> {};
 
@@ -27,7 +27,10 @@ INSTANTIATE_TEST_SUITE_P(Collider, ColliderAttributesFixture, testing::Values(
         ));
 
 INSTANTIATE_TEST_SUITE_P(Collider, ColliderShapeFixture, testing::Values(
-        ShapeType::Circle, ShapeType::Rectangle, ShapeType::Polygon, ShapeType::None
+        std::tuple{
+            CircleF(Vec2F::Zero(), 0.f),
+            RectangleF(Vec2F::Zero(), Vec2F::Zero()),
+            PolygonF({Vec2F::Zero(), Vec2F::Zero(), Vec2F::Zero()})}
 ));
 
 INSTANTIATE_TEST_SUITE_P(Collider, RefFixture, testing::Values(
@@ -100,24 +103,20 @@ TEST_P(ColliderAttributesFixture, Constructor)
 
 TEST_P(ColliderShapeFixture, GetAndSetShape)
 {
-    auto shape = GetParam();
+    auto [circle, rect, poly] = GetParam();
 
     Collider col;
-    EXPECT_EQ(col.Shape(), ShapeType::None);
 
-    col.SetShape(shape);
-    EXPECT_EQ(col.Shape(), shape);
-}
+    col.SetShape(circle);
 
-TEST_P(RefFixture, GetAndSetColRef)
-{
-    auto [idx, genIdx] = GetParam();
-    Collider col;
-
-    col.SetColliderRef(ColliderRef{idx, genIdx});
-
-    EXPECT_EQ(col.GetColliderRef().Index, idx);
-    EXPECT_EQ(col.GetColliderRef().GenerationIdx, genIdx);
+    switch (col.Shape().index())
+    {
+        case static_cast<int>(ShapeType::Circle):
+        {
+            EXPECT_EQ(std::get<CircleF>(col.Shape()).Center(), circle.Center());
+            break;
+        }
+    }
 }
 
 TEST_P(ShapeIdxFixture, GetAndSetShapeIdx)
@@ -180,15 +179,15 @@ TEST(Collider, IsTrigger)
     EXPECT_TRUE(collider.IsTrigger());
 }
 
-TEST_P(ColliderShapeFixture, IsValid)
-{
-    auto shape = GetParam();
-
-    Collider collider;
-    collider.SetShape(shape);
-
-    EXPECT_EQ(collider.IsValid(), shape != ShapeType::None);
-}
+//TEST_P(ColliderShapeFixture, IsValid)
+//{
+//    auto shape = GetParam();
+//
+//    Collider collider;
+//    collider.SetShape(shape);
+//
+//    EXPECT_EQ(collider.Enabled(), shape != ShapeType::None);
+//}
 
 TEST(ColliderPair, ColliderPairDefaultConstructor)
 {

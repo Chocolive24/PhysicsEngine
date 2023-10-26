@@ -12,29 +12,35 @@
  */
 namespace Math::Random
 {
-    template <class T>
-    [[nodiscard]] T Range(T min, T max) noexcept
+    [[nodiscard]] inline float Range(float min, float max) noexcept
     {
         if (min > max)
         {
-            T temp = min;
+            float temp = min;
             min = max;
             max = temp;
         }
 
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::uniform_real_distribution<T> dis(min, max);
+        std::uniform_real_distribution<float> dis(min, max);
 
         return dis(gen);
     }
 
-    template <>
-    [[nodiscard]] int Range(int min, int max) noexcept;
+    [[nodiscard]] inline int Range(int min, int max) noexcept
+    {
+        if (min > max)
+        {
+            int temp = min;
+            min = max;
+            max = temp;
+        }
 
-    template <>
-    [[nodiscard]] unsigned int Range(unsigned int min, unsigned int max) noexcept;
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<int> dis(min, max);
 
-    template <>
-    [[nodiscard]] long Range(long min, long max) noexcept;
+        return dis(gen);
+    }
 }

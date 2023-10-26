@@ -164,9 +164,13 @@ TEST_P(CircleFloatTestFixture, CircleFloatConstructor)
 {
     auto [center, radius] = GetParam();
     CircleF circle(center, radius);
+    CircleF circle2(radius);
 
     EXPECT_EQ(circle.Center(), center);
     EXPECT_EQ(circle.Radius(), Abs(radius));
+
+    EXPECT_EQ(circle2.Center(), Vec2F(0.f, 0.f));
+    EXPECT_EQ(circle2.Radius(), Abs(radius));
 }
 
 TEST_P(CircleFloatTestFixtureWithVec2F, CircleFloatContains)
@@ -193,9 +197,13 @@ TEST_P(CircleIntegerTestFixture, CircleIntegerConstructor)
 {
     auto [center, radius] = GetParam();
     CircleI circle(center, radius);
+    CircleI circle2(radius);
 
     EXPECT_EQ(circle.Center(), center);
     EXPECT_EQ(circle.Radius(), Abs(radius));
+
+    EXPECT_EQ(circle2.Center(), Vec2I(0, 0));
+    EXPECT_EQ(circle2.Radius(), Abs(radius));
 }
 
 TEST_P(CircleIntegerTestFixtureWithVec2I, CircleIntegerContains)
@@ -222,9 +230,13 @@ TEST_P(RectangleFloatTestFixture, RectangleFloatConstructor)
 {
     auto [minBound, maxBound] = GetParam();
     RectangleF rectangle(minBound, maxBound);
+    RectangleF rectangleFromCenter = RectangleF::FromCenter((minBound + maxBound) / 2, maxBound - minBound);
 
     EXPECT_EQ(rectangle.MinBound(), minBound);
     EXPECT_EQ(rectangle.MaxBound(), maxBound);
+
+    EXPECT_EQ(rectangleFromCenter.MinBound(), (minBound + maxBound) / 2 - (maxBound - minBound) / 2);
+    EXPECT_EQ(rectangleFromCenter.MaxBound(), (minBound + maxBound) / 2 + (maxBound - minBound) / 2);
 
     EXPECT_EQ(rectangle.Center(), (minBound + maxBound) / 2);
     EXPECT_EQ(rectangle.Size(), maxBound - minBound);
@@ -298,9 +310,13 @@ TEST_P(RectangleIntegerTestFixture, RectangleIntegerConstructor)
 {
     auto [minBound, maxBound] = GetParam();
     RectangleI rectangle(minBound, maxBound);
+    RectangleI rectangleFromCenter = RectangleI::FromCenter((minBound + maxBound) / 2, maxBound - minBound);
 
     EXPECT_EQ(rectangle.MinBound(), minBound);
     EXPECT_EQ(rectangle.MaxBound(), maxBound);
+
+    EXPECT_EQ(rectangleFromCenter.MinBound(), (minBound + maxBound) / 2 - (maxBound - minBound) / 2);
+    EXPECT_EQ(rectangleFromCenter.MaxBound(), (minBound + maxBound) / 2 + (maxBound - minBound) / 2);
 
     EXPECT_EQ(rectangle.Center(), (minBound + maxBound) / 2);
     EXPECT_EQ(rectangle.Size(), maxBound - minBound);

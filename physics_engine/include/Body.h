@@ -83,7 +83,7 @@ namespace PhysicsEngine
         constexpr void ResetForces() noexcept { _forces = Math::Vec2F::Zero(); }
 
         /**
-         * @brief IsValid is a method that checks if the body is valid (aka if it has a mass greater than 0).
+         * @brief Enabled is a method that checks if the body is valid (aka if it has a mass greater than 0).
          * @return True if the body is valid.
          */
         [[nodiscard]] constexpr bool IsValid() const noexcept { return _mass > 0; }

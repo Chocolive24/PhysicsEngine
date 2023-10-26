@@ -17,10 +17,15 @@ namespace Math
     public:
         /**
          * @brief Construct a new Circle object
-         * @param center _center of the circle, also the position of the circle
-         * @param radius _radius of the circle, if negative, it will be converted to its positive value
+         * @param center Center of the circle, also the position of the circle
+         * @param radius Radius of the circle, if negative, it will be converted to its positive value
          */
         constexpr Circle(Vec2<T> center, T radius) noexcept : _center(center), _radius(Math::Abs(radius)) {}
+        /**
+         * @brief Construct a new Circle object with a center in (0, 0)
+         * @param radius Radius of the circle, if negative, it will be converted to its positive value
+         */
+        constexpr explicit Circle(T radius) noexcept : _center(Vec2<T>::Zero()), _radius(Math::Abs(radius)) {}
 
     private:
         Vec2<T> _center = Vec2<T>::Zero();
@@ -102,6 +107,11 @@ namespace Math
 	    {
 		    return Rectangle<T>(_minBound + vec, _maxBound + vec);
 	    }
+
+        [[nodiscard]] static constexpr Rectangle<T> FromCenter(Math::Vec2<T> center, Math::Vec2<T> size) noexcept
+        {
+            return Rectangle<T>(center - size / 2, center + size / 2);
+        }
     };
 
     using RectangleF = Rectangle<float>;
@@ -302,57 +312,50 @@ namespace Math
         return true;
     }
 
+    template<typename T>
+    Vec2<T> ClosestPointOnSegment(const Vec2<T> &A, const Vec2<T> &B, const Vec2<T> &P)
+    {
+        const Vec2<T> AB = B - A;
+        const T t = ((P - A).X * AB.X + (P - A).Y * AB.Y) / AB.SquareLength();
+        if (t <= 0)
+        {
+            return A;
+        } else if (t >= 1)
+        {
+            return B;
+        } else
+        {
+            return A + t * AB;
+        }
+    }
+
     template <typename T>
     [[nodiscard]] constexpr bool Intersect(const Polygon<T> polygon, const Circle<T> circle) noexcept
     {
         const auto center = circle.Center();
         const auto radius = circle.Radius();
 
-        // Check if any of the edges of the polygon is a separating axis
-        for (int i = 0, j = polygon.VerticesCount() - 1; i < polygon.VerticesCount(); j = i++)
+        for (const auto &vertex: polygon.Vertices())
         {
-            const auto edge = polygon.Vertices()[i] - polygon.Vertices()[j];
-            const auto normal = Vec2<T>(-edge.Y, edge.X);
-
-            const auto startProjection1 = polygon.Vertices()[0].Dot(normal);
-            const auto startProjection2 = center.Dot(normal);
-
-            Vec2<T> projection1 = Vec2<T>(startProjection1, startProjection1);
-            Vec2<T> projection2 = Vec2<T>(startProjection2, startProjection2);
-
-            for (const auto& vertex : polygon.Vertices())
+            if (circle.Contains(vertex))
             {
-                const auto projection = vertex.Dot(normal);
-
-                projection1 = Vec2<T>(Math::Min(projection1.X, projection), Math::Max(projection1.Y, projection));
+                return true;
             }
-
-            const auto projection = center.Dot(normal);
-
-            projection2 = Vec2<T>(Math::Min(projection2.X, projection), Math::Max(projection2.Y, projection));
-
-            if (projection1.Y < projection2.X || projection2.Y < projection1.X) return false;
         }
 
-        // Check if any of the vertices of the polygon is inside the circle
-        for (const auto& vertex : polygon.Vertices())
-        {
-            if (circle.Contains(vertex)) return true;
-        }
-
-        // Check if any of the edges of the polygon intersects the circle
         for (int i = 0, j = polygon.VerticesCount() - 1; i < polygon.VerticesCount(); j = i++)
         {
-            const auto edge = polygon.Vertices()[i] - polygon.Vertices()[j];
-            const auto normal = Vec2<T>(-edge.Y, edge.X);
+            const auto p1 = polygon.Vertices()[i];
+            const auto p2 = polygon.Vertices()[j];
 
-            const auto startProjection = polygon.Vertices()[0].Dot(normal);
+            // Calculate the closest point on the edge to the circle's center.
+            Vec2<T> closest = ClosestPointOnSegment(p1, p2, center);
 
-            const auto projection = center.Dot(normal);
-
-            const auto distance = Math::Abs(projection - startProjection);
-
-            if (distance <= radius) return true;
+            // Check if the closest point is within the circle's radius.
+            if (Math::Vec2F(center - closest).SquareLength() <= radius * radius)
+            {
+                return true;
+            }
         }
 
         return false;

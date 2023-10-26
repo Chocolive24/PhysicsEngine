@@ -31,16 +31,12 @@ namespace PhysicsEngine
         std::vector<Collider> _colliders{};
         std::vector<std::size_t> _collidersGenIndices{};
 
-        std::vector<CircleCollider> _circleColliders{};
-        std::vector<RectangleCollider> _rectangleColliders{};
-        std::vector<PolygonCollider> _polygonColliders{};
-
         std::unordered_set<ColliderPair, ColliderHash> _colliderPairs{};
 
         static constexpr float _bodyAllocResizeFactor = 2.f;
 
-        void updateCollisionDetection() noexcept;
-        [[nodiscard]] bool detectCollision(Collider colA, Collider colB) noexcept;
+        void resolveNarrowPhase() noexcept;
+        [[nodiscard]] bool detectOverlap(const Collider& colA, const Collider& colB) noexcept;
 
     public:
         constexpr World() noexcept = default;
@@ -93,10 +89,10 @@ namespace PhysicsEngine
         [[nodiscard]] Body& GetBody(BodyRef bodyRef);
 
         /**
-         * @brief AllocatedBodies is a method that gives the number of allocated bodies.
+         * @brief GetBodyCount is a method that gives the number of allocated bodies.
          * @return The number of allocated bodies.
          */
-        [[nodiscard]] std::size_t AllocatedBodies() const noexcept { return _bodies.size(); }
+        [[nodiscard]] std::size_t GetBodyCount() const noexcept { return _bodies.size(); }
 
         /**
          * @brief GetCollider is a method that gives the collider corresponding to the collider reference
@@ -114,58 +110,11 @@ namespace PhysicsEngine
         void DestroyCollider(ColliderRef colRef) noexcept;
 
         /**
-         * @brief CreateCircleCollider is a method that creates a circle collider in the world and returns a
+         * @brief CreateCollider is a method that creates a collider in the world and returns a
          * collider reference to this collider.
-         * @note The radius of the circle collider is set to -1 by default.
          * @return A collider reference to the collider in the world (see ColliderRef).
          */
-        [[nodiscard]] ColliderRef CreateCircleCollider(BodyRef bodyRef) noexcept;
-
-        /**
-         * @brief GetCircleCollider is a method that gives the circle collider corresponding to the shape index
-         * given in parameter.
-         * @param shapeIdx The shape index to the circle collider to get.
-         * @return The circle collider corresponding to the shape index.
-         */
-        [[nodiscard]] CircleCollider& GetCircleCollider(int shapeIdx) noexcept { return _circleColliders[shapeIdx]; }
-
-        /**
-         * @brief CreateRectangleCollider is a method that creates a rectangle collider in the world and returns a
-         * collider reference to this collider.
-         * @note The half-size of the rectangle collider is set to (-1, -1) by default.
-         * @return A collider reference to the collider in the world (see ColliderRef).
-         */
-        [[nodiscard]] ColliderRef CreateRectangleCollider(BodyRef bodyRef) noexcept;
-
-        /**
-         * @brief GetRectangleCollider is a method that gives the rectangle collider corresponding to the shape index
-         * given in parameter.
-         * @param shapeIdx The shape index to the rectangle collider to get.
-         * @return The rectangle collider corresponding to the shape index.
-         */
-        [[nodiscard]] RectangleCollider& GetRectangleCollider(int shapeIdx) noexcept
-        {
-            return _rectangleColliders[shapeIdx];
-        }
-
-        /**
-         * @brief CreatePolygonCollider is a method that creates a polygon collider in the world and returns a
-         * collider reference to this collider.
-         * @note There is no vertices by default.
-         * @return A collider reference to the collider in the world (see ColliderRef).
-         */
-        [[nodiscard]] ColliderRef CreatePolygonCollider(BodyRef bodyRef) noexcept;
-
-        /**
-         * @brief GetPolygonCollider is a method that gives the polygon collider corresponding to the shape index
-         * given in parameter.
-         * @param shapeIdx The shape index to the polygon collider to get.
-         * @return The polygon collider corresponding to the shape index.
-         */
-        [[nodiscard]] PolygonCollider& GetPolygonCollider(int shapeIdx) noexcept
-        {
-            return _polygonColliders[shapeIdx];
-        }
+        [[nodiscard]] ColliderRef CreateCollider(BodyRef bodyRef) noexcept;
     };
 }
 
