@@ -149,6 +149,5 @@ void PlanetSystemSample::drawCelestialBodies() noexcept
 void PlanetSystemSample::Deinit() noexcept
 {
     Sample::Deinit();
-
     _planets.clear();
 }

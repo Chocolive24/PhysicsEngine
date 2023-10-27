@@ -1,7 +1,9 @@
 #pragma once
 
 /**
- * @headerfile Window is a class that creates a graphical window for the program.
+ * @headerfile Window.h
+ * This file defines the Window class that creates a graphical window for the program.
+ * 
  * @author Oliver Pachoud
  */
 
@@ -20,6 +22,11 @@ private:
     SDL_Renderer* _renderer{};
 
 public:
+    /**
+     * @brief BackgroundColor is color the color of the background of the window, which is black.
+     */
+    static constexpr SDL_Color BackgroundColor{0, 0, 0, 255};
+
     /**
      * @brief WindowWidth is the size of the window's width in pixels.
      */

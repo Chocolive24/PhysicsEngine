@@ -1,8 +1,10 @@
 #pragma once
 
 /**
- * @headerfile UniquePtr class is a naive implementation of the std::unique_ptr standard library class.
- * @author Olivier
+ * @headerfile UniquePtr.h
+ * This file defines the UniquePtr class which is a naive implementation of the std::unique_ptr standard library class.
+ *
+ * @author Olivier Pachoud
  */
 
 #include <algorithm>
@@ -18,33 +20,28 @@ public:
 
     constexpr explicit UniquePtr(T *ptr) noexcept: _ptr(ptr) {};
 
-    constexpr UniquePtr(const UniquePtr<T> &other) noexcept = delete;
+    constexpr UniquePtr(const UniquePtr<T>& other) noexcept = delete;
 
-    constexpr UniquePtr(UniquePtr<T> &&other) noexcept
+    constexpr UniquePtr(UniquePtr<T>&& other) noexcept
     {
         std::swap(_ptr, other._ptr);
     }
 
     ~UniquePtr() noexcept { delete _ptr; }
 
-    constexpr UniquePtr &operator=(const UniquePtr<T> &other) const noexcept = delete;
+    constexpr UniquePtr& operator=(const UniquePtr<T>& other) const noexcept = delete;
 
-    constexpr UniquePtr &operator=(UniquePtr<T> &&other) noexcept
+    constexpr UniquePtr& operator=(UniquePtr<T>&& other) noexcept
     {
         std::swap(_ptr, other._ptr);
         return *this;
     }
 
-    [[nodiscard]] constexpr T &operator*() const noexcept { return *_ptr; }
-    [[nodiscard]] constexpr T *operator->() const noexcept { return _ptr; }
+    [[nodiscard]] constexpr T& operator*() const noexcept { return *_ptr; }
+    [[nodiscard]] constexpr T* operator->() const noexcept { return _ptr; }
 
-    /**
-     * @brief Implicit conversion operator to convert a UniquePtr to a UniquePtr of a different type.
-     * @param The target type of the conversion.
-     * @return A UniquePtr of the specified target type.
-     */
     template<typename U>
-    explicit constexpr operator UniquePtr<U>() const noexcept
+    explicit constexpr operator UniquePtr<U>() noexcept
     {
         auto ptrToCast = _ptr;
         _ptr = nullptr;
@@ -52,10 +49,20 @@ public:
         return UniquePtr<U>(ptrToCast);
     }
 
+    /**
+     * @brief MakeUnique is a method that creates a unique pointer of the type of the value in parameter.
+     * @param value The value to point with the unique pointer.
+     * @return The unique pointer object that points the value.
+     */
     [[nodiscard]] static constexpr UniquePtr<T> MakeUnique(T value) noexcept
     {
         return UniquePtr<T>(new T(value));
     }
 
-    [[nodiscard]] constexpr T *Get() const noexcept { return _ptr; }
+    /**
+     * @brief Get is a method that gives the pointer inside the unique pointer object.
+     * @param value The value to point with the unique pointer.
+     * @return The pointer inside the unique pointer object.
+     */
+    [[nodiscard]] constexpr T* Get() const noexcept { return _ptr; }
 };

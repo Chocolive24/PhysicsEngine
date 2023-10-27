@@ -9,18 +9,18 @@ void Window::Init() noexcept
     {
         std::cerr << "Failed to initialize the SDL2 library Error :" <<  " " << SDL_GetError() << "\n";
         Deinit();
-        exit(1);
     }
 
     _window = SDL_CreateWindow("SDL2 Window",
                                SDL_WINDOWPOS_CENTERED,
                                SDL_WINDOWPOS_CENTERED,
-                               WindowWidth, WindowHeight,
+                               WindowWidth,
+                               WindowHeight,
                                SDL_WINDOW_RESIZABLE);
 
     if (!_window)
     {
-        std::cerr << "Failed to create  Error :" <<  " " << SDL_GetError() << "\n";
+        std::cerr << "Failed to create window! Error :" << " " << SDL_GetError() << "\n";
         Deinit();
         exit(1);
     }

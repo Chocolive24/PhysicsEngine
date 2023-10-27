@@ -11,8 +11,6 @@ struct ColliderShapeFixture : public ::testing::TestWithParam<std::tuple<CircleF
 
 struct RefFixture : public ::testing::TestWithParam<std::pair<std::size_t, std::size_t>> {};
 
-struct ShapeIdxFixture : public ::testing::TestWithParam<int> {};
-
 struct FloatFixture : public ::testing::TestWithParam<float> {};
 
 struct PairOfRefFixture : public ::testing::TestWithParam<std::pair<ColliderRef, ColliderRef>> {};
@@ -37,10 +35,6 @@ INSTANTIATE_TEST_SUITE_P(Collider, RefFixture, testing::Values(
         std::pair{0, 0},
         std::pair{ 5, 10},
         std::pair{ 3, 25}
-));
-
-INSTANTIATE_TEST_SUITE_P(Collider, ShapeIdxFixture, testing::Values(
-        0, 1, 2, 5, 10, 1000
 ));
 
 INSTANTIATE_TEST_SUITE_P(Collider, FloatFixture, testing::Values(
@@ -119,20 +113,6 @@ TEST_P(ColliderShapeFixture, GetAndSetShape)
     }
 }
 
-TEST_P(ShapeIdxFixture, GetAndSetShapeIdx)
-{
-    auto shapeIdx = GetParam();
-
-    Collider collider;
-
-    EXPECT_EQ(collider.ShapeIdx(), -1);
-
-    collider.SetShapeIdx(shapeIdx);
-
-    // Check if the SetShapeIdx function correctly sets the shape index.
-    EXPECT_EQ(collider.ShapeIdx(), shapeIdx);
-}
-
 TEST_P(RefFixture, GetAndSetBodyRef)
 {
     auto [idx, genIdx] = GetParam();
@@ -178,16 +158,6 @@ TEST(Collider, IsTrigger)
 
     EXPECT_TRUE(collider.IsTrigger());
 }
-
-//TEST_P(ColliderShapeFixture, IsValid)
-//{
-//    auto shape = GetParam();
-//
-//    Collider collider;
-//    collider.SetShape(shape);
-//
-//    EXPECT_EQ(collider.Enabled(), shape != ShapeType::None);
-//}
 
 TEST(ColliderPair, ColliderPairDefaultConstructor)
 {

@@ -1,7 +1,9 @@
 #pragma once
 
 /**
- * @headerfile A Timer class using the <chrono> standard library.
+ * @headerfile Timer.h
+ * This file defines the Timer class which is a naive timer using the <chrono> standard library.
+ *
  * @author Olivier
  */
 

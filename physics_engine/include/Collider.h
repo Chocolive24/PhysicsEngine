@@ -25,7 +25,6 @@ namespace PhysicsEngine
         std::variant<Math::CircleF, Math::RectangleF, Math::PolygonF> _shape{
             Math::CircleF(Math::Vec2F::Zero(), 0.f)};
         BodyRef _bodyRef{};
-        int _shapeIdx{-1};
 
         float _restitution{-1.f};
         float _friction{-1.f};
@@ -68,19 +67,6 @@ namespace PhysicsEngine
          * @param polygon The new mathematical shape for the collider.
          */
         void SetShape(Math::PolygonF polygon) noexcept { _shape = polygon; }
-
-        /**
-         * @brief ShapeIdx is a method that gives the index of the shape of the collider in the world.
-         * @return The index of the shape of the collider in the world.
-         */
-        [[nodiscard]] constexpr int ShapeIdx() const noexcept { return _shapeIdx; }
-
-        /**
-         * @brief SetShapeIdx is a method that replaces the current index of the shape of the collider
-         * with the new shape index given in parameter.
-         * @param newShapeIdx The new shape index for the collider.
-         */
-        constexpr void SetShapeIdx(int newShapeIdx) noexcept { _shapeIdx = newShapeIdx; }
 
         /**
          * @brief GetBodyRef is a method that gives the body reference of the collider in the world.

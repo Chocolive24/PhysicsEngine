@@ -48,6 +48,26 @@ TEST_P(FloatFixture, UniquePtrArrowOperator)
     EXPECT_EQ(ptr->value, value);
 }
 
+TEST_P(FloatFixture, UniquePtrCast)
+{
+    auto value = GetParam();
+
+    UniquePtr<float> uniquePtr = UniquePtr<float>::MakeUnique(value);
+
+    EXPECT_FLOAT_EQ(*uniquePtr, value);
+    EXPECT_FLOAT_EQ(*(uniquePtr.Get()), value);
+}
+
+TEST_P(FloatFixture, UniquePtrMakeUnique)
+{
+    auto value = GetParam();
+
+    UniquePtr<float> uniquePtr = UniquePtr<float>::MakeUnique(value);
+
+    EXPECT_FLOAT_EQ(*uniquePtr, value);
+    EXPECT_FLOAT_EQ(*(uniquePtr.Get()), value);
+}
+
 TEST_P(FloatFixture, SharedPtrConstructorAndDereference)
 {
     auto value = GetParam();
@@ -138,4 +158,16 @@ TEST_P(FloatFixture, SharedPtrArrowOperator)
     SharedPtr<TestStruct> ptr2(ptr);
     EXPECT_EQ(ptr2->value, value);
     EXPECT_EQ(ptr2->value, ptr->value);
+}
+
+TEST_P(FloatFixture, SharedPtrMakeShared)
+{
+    auto value = GetParam();
+
+    SharedPtr<float> sharedPtr = SharedPtr<float>::MakeShared(value);
+
+    EXPECT_FLOAT_EQ(*sharedPtr, value);
+    EXPECT_FLOAT_EQ(*(sharedPtr.Get()), value);
+
+    EXPECT_EQ(sharedPtr.SharedCount(), 1);
 }

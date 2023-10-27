@@ -2,8 +2,9 @@
 
 /**
  * @headerfile ContactListener.h
- * This header file defines the ContactListener class in the PhysicsEngine namespace,
- * which is an interface for handling collider collision events.
+ * This header file defines the ContactListener class in which is an interface for handling collider collision events.
+ *
+ * @author Olivier Pachoud
  */
 
 #include "Collider.h"

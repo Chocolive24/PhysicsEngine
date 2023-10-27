@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "DrawableGeometry.h"
+#include "Shape.h"
 
 namespace DrawableGeometry
 {
@@ -63,8 +64,7 @@ namespace DrawableGeometry
     {
         const int indicesOffset = static_cast<int>(Vertices.size());
 
-        auto halfRatio = 1.f / 2.f;
-        auto halfWidth = size.X * halfRatio, halfHeight = size.Y * halfRatio;
+        auto halfWidth = size.X * 0.5f, halfHeight = size.Y * 0.5f;
 
         // Left-down corner.
         addVertex(Math::Vec2F(centerPos.X - halfWidth, centerPos.Y - halfHeight), color);
@@ -86,7 +86,7 @@ namespace DrawableGeometry
         Indices.push_back(indicesOffset + 3);
     }
 
-    void Polygon(Math::Vec2F centerPos, std::vector<Math::Vec2F>& vertices, SDL_Color color) noexcept
+    void Polygon(const Math::Vec2F centerPos, const std::vector<Math::Vec2F>& vertices, const SDL_Color color) noexcept
     {
         if (vertices.size() < 3) return;
 
@@ -110,5 +110,34 @@ namespace DrawableGeometry
         Indices.push_back(indicesOffset);
         Indices.push_back(indicesOffset + static_cast<int>(vertices.size()) - 1);
         Indices.push_back(indicesOffset + 1);
+    }
+
+    void Line(Math::Vec2F startPoint, Math::Vec2F endPoint, float thickness, SDL_Color color) noexcept
+    {
+        const int indicesOffset = static_cast<int>(Vertices.size());
+
+        const auto lineVector = endPoint - startPoint;
+        const auto lineDirection = lineVector.Normalized();
+        const auto vPerp = Math::Vec2F(lineDirection.Y, -lineDirection.X);
+
+        const auto p0 = startPoint + vPerp * (thickness * 0.5f);
+        const auto p1 = startPoint - vPerp * (thickness * 0.5f);
+        const auto p2 = endPoint + vPerp * (thickness * 0.5f);
+        const auto p3 = endPoint - vPerp * (thickness * 0.5f);
+
+        addVertex(p0, color);
+        addVertex(p1, color);
+        addVertex(p2, color);
+        addVertex(p3, color);
+
+        // First triangle.
+        Indices.push_back(indicesOffset);
+        Indices.push_back(indicesOffset + 1);
+        Indices.push_back(indicesOffset + 2);
+
+        // Second triangle.
+        Indices.push_back(indicesOffset);
+        Indices.push_back(indicesOffset + 2);
+        Indices.push_back(indicesOffset + 3);
     }
 }

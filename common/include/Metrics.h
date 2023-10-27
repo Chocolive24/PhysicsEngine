@@ -1,7 +1,9 @@
 #pragma once
 
 /**
- * @headerfile A collection of metrics.
+ * @headerfile Metrics.h
+ * This file defines a collection of metrics.
+ *
  * @author Olivier
  */
 

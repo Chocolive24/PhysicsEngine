@@ -4,37 +4,33 @@
  * @author Olivier Pachoud
  */
 
-// TODO: balancer tout le main dans une classe Application
+//TODO: interface allocator
+//TODO: linear, proxy et free line allocator
+// TODO: QUad tree
 
-//TODO: les tests des classes colliders Circle, REctangle, Polygon
+// TODO: balancer tout le main dans une classe Application -> SampleManager dans sample directory
 
 //TODO: CreateBody(Vec2F pos, vel, mass) -> modifie direct dans le fonction le body.
 // pour éviter de chopper la ref puis la modif.
 
 //TODO: TOUT COMMENTER
 
-#include "UniquePtr.h"
-#include "PlanetSystemSample.h"
-#include "TriggerColliderSample.h"
+#include "SampleManager.h"
 #include "DrawableGeometry.h"
 
 int main()
 {
     Window window{};
-
     window.Init();
-
-    UniquePtr<Sample> currentSample;
 
     SDL_Event event;
     bool quit = false;
 
-    constexpr SDL_Color backgroundColor{0, 0, 0, 255};
+    SampleManager sampleManager;
+    sampleManager.Init();
 
     while(!quit)
     {
-        bool isCurrentSampleNull = currentSample.Get() == nullptr;
-
         while(SDL_PollEvent(&event))
         {
             switch (event.type) 
@@ -42,41 +38,21 @@ int main()
                 case SDL_QUIT:
                     quit = true;
                     break;
-                case SDL_KEYDOWN:
-                    switch(event.key.keysym.scancode)
-                    {
-                        case SDL_SCANCODE_1:
-                            currentSample = UniquePtr<Sample>(new PlanetSystemSample);
-                            currentSample->Init();
-                            break;
-                        case SDL_SCANCODE_2:
-                            currentSample = UniquePtr<Sample>(new TriggerColliderSample);
-                            currentSample->Init();
-                            break;
-                        default:
-                            break;
-                    }
             }
 
-            if (!isCurrentSampleNull)
-            {
-                currentSample->HandleInputs(event);
-            }
+            sampleManager.HandleInputs(event);
         }
 
         DrawableGeometry::ClearGeometry();
         SDL_RenderClear(window.Renderer());
 
         SDL_SetRenderDrawColor(window.Renderer(),
-                               backgroundColor.r,
-                               backgroundColor.g,
-                               backgroundColor.b,
-                               backgroundColor.a);
+                               Window::BackgroundColor.r,
+                               Window::BackgroundColor.g,
+                               Window::BackgroundColor.b,
+                               Window::BackgroundColor.a);
 
-        if(!isCurrentSampleNull)
-        {
-            currentSample->Update();
-        }
+        sampleManager.Update();
 
         SDL_RenderGeometry(window.Renderer(),
                            nullptr,

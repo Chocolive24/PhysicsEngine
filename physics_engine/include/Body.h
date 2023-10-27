@@ -1,8 +1,10 @@
 #pragma once
 
 /**
- * @headerfile Body is a class that represents a physical body with attributes such as position, velocity, mass
+ * @headerfile Body.h
+ * This file defines the Body class that represents a physical body with attributes such as position, velocity, mass
  * and forces applied to it.
+ *
  * @author Olivier Pachoud
  */
 

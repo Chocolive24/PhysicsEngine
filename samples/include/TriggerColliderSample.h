@@ -13,9 +13,9 @@ struct GameObject
 class TriggerColliderSample : public Sample, public PhysicsEngine::ContactListener
 {
 private:
-    static constexpr int _circleCount = 10;
-    static constexpr int _rectangleCount = 10;
-    static constexpr int _polygonCount = 0;
+    static constexpr int _circleCount = 1;
+    static constexpr int _rectangleCount = 1;
+    static constexpr int _polygonCount = 1;
     static constexpr int _totalObjectCount = _circleCount + _rectangleCount + _polygonCount;
 
     static constexpr SDL_Color _noCollisionColor = {255, 0, 0, 255};
@@ -25,7 +25,7 @@ private:
 
     void addCircle(Math::Vec2F centerPos, Math::Vec2F rndVelocity) noexcept;
     void addRectangle(Math::Vec2F minBound, Math::Vec2F maxBound, Math::Vec2F rndVelocity) noexcept;
-    //void addPolygon(std::vector<Math::Vec2F>& vertices, Math::Vec2F rndVelocity) noexcept;
+    void addPolygon(Math::Vec2F centerPos, const std::vector<Math::Vec2F>& vertices, Math::Vec2F rndVelocity) noexcept;
 
     void maintainObjectsInWindow() noexcept;
 

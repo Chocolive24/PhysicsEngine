@@ -1,7 +1,9 @@
 #pragma once
 
 /**
- * @headerfile SharedPtr class is a naive implementation of the std::shared_ptr standard library class.
+ * @headerfile SharedPtr.h
+ * This file defines the SharedPtr class which is a naive implementation of the std::shared_ptr standard library class.
+ *
  * @author Olivier
  */
 
@@ -81,7 +83,7 @@ public:
         return SharedPtr<U>(ptrToCast);
     }
 
-    [[nodiscard]] constexpr SharedPtr<T> MakeShared(T value) const noexcept
+    [[nodiscard]] static constexpr SharedPtr<T> MakeShared(T value) noexcept
     {
         return SharedPtr<T>(new T(value));
     }

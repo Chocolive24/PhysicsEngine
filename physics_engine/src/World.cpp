@@ -239,6 +239,8 @@ namespace PhysicsEngine
     {
         _bodies.clear();
         _bodiesGenIndices.clear();
+        _colliders.clear();
+        _collidersGenIndices.clear();
     }
 
     [[nodiscard]] BodyRef World::CreateBody() noexcept

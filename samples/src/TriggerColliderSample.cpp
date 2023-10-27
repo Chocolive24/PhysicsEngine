@@ -48,11 +48,17 @@ void TriggerColliderSample::Init() noexcept
 
     for (std::size_t i = 0; i < _polygonCount; i++)
     {
+        Math::Vec2F rndScreenPos(Math::Random::Range(1.f, windowSizeInMeters.X - 1.f),
+                                 Math::Random::Range(-1.f, windowSizeInMeters.Y + 1.f));
+
+        Math::Vec2F rndVelocity(Math::Random::Range(-2.f, 2.f),
+                                Math::Random::Range(-2.f, 2.f));
+
         std::vector<Math::Vec2F> vertices = {
-                Math::Vec2F(0, -0.2), Math::Vec2F(2, -0.2), Math::Vec2F(1.5, -2)
+                Math::Vec2F(-0.3, -0.3), Math::Vec2F(0, 0.3), Math::Vec2F(0.3, -0.3)
         };
 
-        //addPolygon(vertices, Math::Vec2F(1, -1));
+        addPolygon(rndScreenPos, vertices, rndVelocity);
     }
 }
 
@@ -69,12 +75,11 @@ void TriggerColliderSample::Update() noexcept
     SDL_GetMouseState(&mousePosition.X, &mousePosition.Y);
 
     auto mousePosF = static_cast<Math::Vec2F>(mousePosition);
-
     auto mM = Metrics::PixelsToMeters(mousePosF);
 
     maintainObjectsInWindow();
 
-    _world.GetBody(_gameObjects[0].BodyRef).SetPosition(mM);
+    _world.GetBody(_gameObjects[_circleCount + _rectangleCount].BodyRef).SetPosition(mM);
 
     _world.Update(_timer.DeltaTime());
 
@@ -85,38 +90,53 @@ void TriggerColliderSample::Update() noexcept
         switch (colShape.index())
         {
             case static_cast<int>(Math::ShapeType::Circle):
+            {
                 DrawableGeometry::Circle(
                         Metrics::MetersToPixels(_world.GetBody(object.BodyRef).Position()),
                         Metrics::MetersToPixels(std::get<Math::CircleF>(colShape).Radius()),
                         50,
                         object.CollisionNbr > 0 ? _collisionColor : _noCollisionColor);
                 break;
+            } // Case circle.
+
             case static_cast<int>(Math::ShapeType::Rectangle):
+            {
                 DrawableGeometry::Rectangle(
                         Metrics::MetersToPixels(_world.GetBody(object.BodyRef).Position()),
                         Metrics::MetersToPixels(std::get<Math::RectangleF>(colShape).Size()),
                         object.CollisionNbr > 0 ? _collisionColor : _noCollisionColor);
-        }
-    }
+                break;
+            } // Case rectangle.
 
-//    for (auto& poly : _polygonObjects)
-//    {
-//        const auto centerPos = Metrics::MetersToPixels(_world.GetBody(poly.BodyRef).Position());
-//
-//        std::vector<Math::Vec2F> verticesInPixels;
-//
-//        for (auto& vertex : poly.Polygon.Vertices())
-//        {
-//            verticesInPixels.push_back(Metrics::MetersToPixels(vertex));
-//        }
-//
-//        DrawableGeometry::Polygon(centerPos, verticesInPixels, poly.Color);
-//    }
+            case static_cast<int>(Math::ShapeType::Polygon):
+            {
+                const auto poly = std::get<Math::PolygonF>(colShape);
+                const auto verticesInMeters = poly.Vertices();
+
+                // Convert vertices position from meters to pixels.
+                std::vector<Math::Vec2F> _verticesInPixels;
+                _verticesInPixels.reserve(verticesInMeters.size());
+
+                for (auto& vertex : verticesInMeters)
+                {
+                    _verticesInPixels.push_back(Metrics::MetersToPixels(vertex));
+                }
+
+                DrawableGeometry::Polygon(
+                        Metrics::MetersToPixels(_world.GetBody(object.BodyRef).Position()),
+                        _verticesInPixels,
+                        object.CollisionNbr > 0 ? _collisionColor : _noCollisionColor);
+
+                break;
+            } // Case polygon.
+        } // Switch case.
+    } // For gameObjects range.
 }
 
 void TriggerColliderSample::Deinit() noexcept
 {
     Sample::Deinit();
+    _gameObjects.clear();
 }
 
 void TriggerColliderSample::OnTriggerEnter(PhysicsEngine::ColliderRef colliderRefA,
@@ -188,51 +208,26 @@ void TriggerColliderSample::addRectangle(Math::Vec2F centerPos, Math::Vec2F size
 
     _gameObjects.push_back(rect);
 }
-//
-//void TriggerColliderSample::addPolygon(std::vector<Math::Vec2F>& vertices, Math::Vec2F rndVelocity) noexcept
-//{
-//    auto it = std::find_if(
-//            _polygonObjects.begin(),
-//            _polygonObjects.end(),
-//            [](const PolygonObject& polyObj)
-//            {
-//                return polyObj.Polygon.VerticesCount() < 3;
-//            });
-//
-//    std::size_t index = -1;
-//
-//    if (it != _polygonObjects.end())
-//    {
-//        index = std::distance(_polygonObjects.begin(), it);
-//    }
-//
-//    auto& polygon = _polygonObjects[index];
-//
-//    // Rectangle object.
-//    polygon.BodyRef = _world.CreateBody();
-//    polygon.Polygon = Math::PolygonF(vertices);
-//    polygon.Color = _noCollisionColor;
-//
-//    // Body.
-//    auto& body = _world.GetBody(polygon.BodyRef);
-//    body = PhysicsEngine::Body(Metrics::PixelsToMeters(polygon.Polygon.Center()),
-//                               rndVelocity,
-//                               1.f);
-//
-//    // Collider.
-//    polygon.ColRef = _world.CreateCollider(polygon.BodyRef);
-//    auto& collider = _world.GetCollider(polygon.ColRef);
-//    collider.SetIsTrigger(true);
-//
-//    std::vector<Math::Vec2F> verticesInMeters;
-//
-//    for (auto& vertex : polygon.Polygon.Vertices())
-//    {
-//        verticesInMeters.push_back(Metrics::PixelsToMeters(vertex));
-//    }
-//
-//    //_world.GetPolygonCollider(collider.ShapeIdx()).SetVertices(verticesInMeters);
-//}
+
+void TriggerColliderSample::addPolygon(Math::Vec2F centerPos,
+                                       const std::vector<Math::Vec2F>& vertices,
+                                       Math::Vec2F rndVelocity) noexcept
+{
+    GameObject polygon;
+
+    // Body.
+    polygon.BodyRef = _world.CreateBody();
+    auto& body = _world.GetBody(polygon.BodyRef);
+    body = PhysicsEngine::Body(centerPos,rndVelocity,1.f);
+
+    // Collider.
+    polygon.ColRef = _world.CreateCollider(polygon.BodyRef);
+    auto& collider = _world.GetCollider(polygon.ColRef);
+    collider.SetIsTrigger(true);
+    collider.SetShape(Math::PolygonF(vertices));
+
+    _gameObjects.push_back(polygon);
+}
 
 void TriggerColliderSample::maintainObjectsInWindow() noexcept
 {
@@ -253,15 +248,17 @@ void TriggerColliderSample::maintainObjectsInWindow() noexcept
 
                 const auto radius = std::get<Math::CircleF>(colShape).Radius();
 
-                if (pos.X + radius >= windowSizeInMeters.X || pos.X - radius <= 0) {
+                if (pos.X + radius >= windowSizeInMeters.X || pos.X - radius <= 0)
+                {
                     body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
                 }
 
-                if (pos.Y - radius <= windowSizeInMeters.Y || pos.Y + radius >= 0) {
+                if (pos.Y - radius <= windowSizeInMeters.Y || pos.Y + radius >= 0)
+                {
                     body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
                 }
                 break;
-            } // Circle case.
+            } // Case circle.
 
             case static_cast<int>(Math::ShapeType::Rectangle):
             {
@@ -271,38 +268,38 @@ void TriggerColliderSample::maintainObjectsInWindow() noexcept
                 const auto pos = body.Position();
                 const auto velocity = body.Velocity();
 
-                if (pos.X + halfSize.X >= windowSizeInMeters.X || pos.X - halfSize.X <= 0) {
+                if (pos.X + halfSize.X >= windowSizeInMeters.X || pos.X - halfSize.X <= 0)
+                {
                     body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
                 }
 
-                if (pos.Y - halfSize.Y <= windowSizeInMeters.Y || pos.Y + halfSize.Y >= 0) {
+                if (pos.Y - halfSize.Y <= windowSizeInMeters.Y || pos.Y + halfSize.Y >= 0)
+                {
                     body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
                 }
                 break;
-            } // Rectangle case.
-        } // switch case.
+            } // Case Rectangle.
 
-//    for (auto& poly : _polygonObjects)
-//    {
-//        auto& body = _world.GetBody(poly.BodyRef);
-//        const auto pos = body.Position();
-//        auto velocity = body.Velocity();
-//
-//        for (auto& vertex : poly.Polygon.Vertices())
-//        {
-//            Math::Vec2F updatedVertex = pos + vertex;
-//
-//            auto vertexPosInPixels = Metrics::MetersToPixels(updatedVertex);
-//
-//            if (vertexPosInPixels.X >= Window::WindowWidth || vertexPosInPixels.X <= 0)
-//            {
-//                body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
-//            }
-//
-//            if (vertexPosInPixels.Y >= Window::WindowHeight || vertexPosInPixels.Y <= 0)
-//            {
-//                body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
-//            }
-//        }
+            case static_cast<int>(Math::ShapeType::Polygon):
+            {
+                const auto& vertices = std::get<Math::PolygonF>(colShape).Vertices();
+                auto& body = _world.GetBody(object.BodyRef);
+                const auto pos = body.Position();
+                const auto velocity = body.Velocity();
+
+                for (auto& vertex : vertices)
+                {
+                    if (pos.X + vertex.X >= windowSizeInMeters.X || pos.X - vertex.X  <= 0)
+                    {
+                        body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
+                    }
+
+                    if (pos.Y - vertex.Y <= windowSizeInMeters.Y || pos.Y + vertex.Y >= 0)
+                    {
+                        body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
+                    }
+                }
+            } // Case polygon.
+        } // Switch case.
     } // For range.
 }
