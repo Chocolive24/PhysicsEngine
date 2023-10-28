@@ -17,6 +17,8 @@ namespace PhysicsEngine
 
         _colliders.resize(preallocatedBodyCount, Collider());
         _collidersGenIndices.resize(preallocatedBodyCount, 0);
+
+        _quadTree.Init();
     }
 
     void World::Update(const float deltaTime) noexcept
@@ -39,7 +41,70 @@ namespace PhysicsEngine
 
         if (_contactListener)
         {
+            resolveBroadPhase();
             resolveNarrowPhase();
+        }
+    }
+
+    void World::resolveBroadPhase() noexcept
+    {
+        // Sets the minimum and maximum collision zone limits of the world rectangle to floating maximum and
+        // lowest values.
+        Math::Vec2F worldMinBound(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+        Math::Vec2F worldMaxBound(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
+
+        // Adjust the size of the collision zone in the world rectangle to the most distant bodies.
+        for (const auto& collider : _colliders)
+        {
+            if (!collider.Enabled()) continue;
+
+            const auto colCenter = GetBody(collider.GetBodyRef()).Position();
+
+            if (worldMinBound.X > colCenter.X)
+            {
+                worldMinBound.X = colCenter.X;
+            }
+
+            if (worldMaxBound.X < colCenter.X)
+            {
+                worldMaxBound.X = colCenter.X;
+            }
+
+            if (worldMinBound.Y > colCenter.Y)
+            {
+                worldMinBound.Y = colCenter.Y;
+            }
+
+            if (worldMaxBound.Y < colCenter.Y)
+            {
+                worldMaxBound.Y = colCenter.Y;
+            }
+        }
+
+        // Set the first rectangle of the quad-tree to calculated collision area rectangle.
+        _quadTree.SetRootNodeRectangle(Math::RectangleF(worldMinBound, worldMaxBound));
+
+        for (std::size_t i = 0; i < _colliders.size(); i++)
+        {
+            const ColliderRef& colRef = {i, _collidersGenIndices[i]};
+            const auto& collider = GetCollider(colRef);
+
+            if (!collider.Enabled()) continue;
+
+            const auto colShape = collider.Shape();
+
+            switch (colShape.index())
+            {
+                case static_cast<int>(Math::ShapeType::Circle):
+                {
+                    const auto circle = std::get<Math::CircleF>(colShape);
+                    const auto radius = circle.Radius();
+                    const auto simplifiedCircle = Math::RectangleF::FromCenter(
+                            circle.Center(),Math::Vec2F(radius, radius));
+
+                    _quadTree.InsertInRoot(simplifiedCircle, colRef);
+                }
+            }
         }
     }
 

@@ -103,14 +103,19 @@ namespace Math
             return _maxBound - _minBound;
         }
 
+        [[nodiscard]] constexpr Vec2<T> HalfSize() const noexcept
+        {
+            return (_maxBound - _minBound) / 2;
+        }
+
 		[[nodiscard]] constexpr Rectangle<T> operator+(const Vec2<T>& vec) const noexcept
 	    {
 		    return Rectangle<T>(_minBound + vec, _maxBound + vec);
 	    }
 
-        [[nodiscard]] static constexpr Rectangle<T> FromCenter(Math::Vec2<T> center, Math::Vec2<T> size) noexcept
+        [[nodiscard]] static constexpr Rectangle<T> FromCenter(Math::Vec2<T> center, Math::Vec2<T> halfSize) noexcept
         {
-            return Rectangle<T>(center - size / 2, center + size / 2);
+            return Rectangle<T>(center - halfSize, center + halfSize);
         }
     };
 

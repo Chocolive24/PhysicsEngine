@@ -9,6 +9,7 @@
 #include "Body.h"
 #include "Collider.h"
 #include "ContactListener.h"
+#include "QuadTree.h"
 #include "References.h"
 
 #include <vector>
@@ -33,13 +34,16 @@ namespace PhysicsEngine
 
         std::unordered_set<ColliderPair, ColliderHash> _colliderPairs{};
 
+        QuadTree _quadTree;
+
         static constexpr float _bodyAllocResizeFactor = 2.f;
 
+        void resolveBroadPhase() noexcept;
         void resolveNarrowPhase() noexcept;
         [[nodiscard]] bool detectOverlap(const Collider& colA, const Collider& colB) noexcept;
 
     public:
-        constexpr World() noexcept = default;
+        World() noexcept = default;
 
         /**
          * @brief Init is a method that pre-allocates memory for the desired number of bodies by creating invalid

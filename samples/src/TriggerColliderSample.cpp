@@ -79,7 +79,7 @@ void TriggerColliderSample::Update() noexcept
 
     maintainObjectsInWindow();
 
-    _world.GetBody(_gameObjects[_circleCount + _rectangleCount].BodyRef).SetPosition(mM);
+    //_world.GetBody(_gameObjects[_circleCount + _rectangleCount].BodyRef).SetPosition(mM);
 
     _world.Update(_timer.DeltaTime());
 
