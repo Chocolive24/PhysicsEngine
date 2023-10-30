@@ -53,12 +53,12 @@ void PhysicsEngine::QuadTree::InsertInNode(QuadNode& node,
 
             std::vector<SimplifiedCollider> remainingColliders;
 
-            for (const auto& col : node.Colliders)
+            for (const auto &col: node.Colliders)
             {
                 int boundInterestCount = 0;
-                QuadNode* intersectNode = nullptr;
+                QuadNode *intersectNode = nullptr;
 
-                for (const auto& child : node.Children)
+                for (const auto &child: node.Children)
                 {
                     if (Math::Intersect(child->Boundary, col.Rectangle))
                     {
@@ -69,8 +69,7 @@ void PhysicsEngine::QuadTree::InsertInNode(QuadNode& node,
 
                 if (boundInterestCount == 1)
                 {
-                    depth++;
-                    InsertInNode(*intersectNode, col.Rectangle, col.ColRef, depth);
+                    InsertInNode(*intersectNode, col.Rectangle, col.ColRef, depth + 1);
                 }
                 else
                 {
@@ -81,6 +80,34 @@ void PhysicsEngine::QuadTree::InsertInNode(QuadNode& node,
             node.Colliders.clear();
             node.Colliders = std::move(remainingColliders);
             std::cout << node.Colliders.size() << "\n";
+        }
+    }
+
+    // If the node has children.
+    else
+    {
+        int boundInterestCount = 0;
+        QuadNode* intersectNode = nullptr;
+
+        for (const auto& child : node.Children)
+        {
+            if (Math::Intersect(child->Boundary, simplifiedShape))
+            {
+                boundInterestCount++;
+                intersectNode = child;
+            }
+        }
+
+        if (boundInterestCount == 1)
+        {
+            depth++;
+            InsertInNode(*intersectNode, simplifiedShape, colliderRef, depth);
+        }
+        else
+        {
+            // Add the simplified collider to the node.
+            SimplifiedCollider simplifiedCollider = {colliderRef, simplifiedShape};
+            node.Colliders.push_back(simplifiedCollider);
         }
     }
 }
