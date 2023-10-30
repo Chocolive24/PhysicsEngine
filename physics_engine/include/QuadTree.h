@@ -8,7 +8,7 @@ namespace PhysicsEngine
 {
     /**
      * @struct SimplifiedCollider is a struct that stores the data of a collider in a simplified way (aka it stores
-     * is collider reference in the world and its shape in rectangle).
+     * its collider reference in the world and its shape in a rectangle form).
      */
     struct SimplifiedCollider
     {
@@ -18,11 +18,16 @@ namespace PhysicsEngine
 
     struct QuadNode
     {
-        Math::RectangleF Boundary{Math::Vec2F::Zero(), Math::Vec2F::Zero()};
-        std::array<QuadNode*, 4> Children{};
-        std::vector<SimplifiedCollider> Colliders{};
-
+        /**
+         * @brief MaxColliderNbr is the maximum number of colliders that can be considered in a quad-tree zone.
+         */
         static constexpr int MaxColliderNbr = 10;
+
+        static constexpr int BoundaryDivisionCount = 4;
+
+        Math::RectangleF Boundary{Math::Vec2F::Zero(), Math::Vec2F::Zero()};
+        std::array<QuadNode*, BoundaryDivisionCount> Children{};
+        std::vector<SimplifiedCollider> Colliders{};
 
         constexpr QuadNode() noexcept = default;
         explicit QuadNode(Math::RectangleF boundary) noexcept : Boundary(boundary) {};
@@ -32,9 +37,9 @@ namespace PhysicsEngine
     {
     private:
         std::vector<QuadNode> _nodes;
-        static constexpr int _maxDepth = 5;
-
         std::vector<ColliderPair> _possiblePairs;
+
+        static constexpr int _maxDepth = 5;
 
         void insertInNode(QuadNode& node,
                           Math::RectangleF simplifiedShape,
@@ -47,7 +52,7 @@ namespace PhysicsEngine
         QuadTree() noexcept = default;
 
         void Init() noexcept;
-        void InsertInRoot(Math::RectangleF simplifiedShape, ColliderRef colliderRef) noexcept;
+        void Insert(Math::RectangleF simplifiedShape, ColliderRef colliderRef) noexcept;
 
         void CalculatePossiblePairs() noexcept;
         void Clear() noexcept;
@@ -60,5 +65,7 @@ namespace PhysicsEngine
         };
 
         [[nodiscard]] const std::vector<ColliderPair>& PossiblePairs() const noexcept { return _possiblePairs; }
+
+        [[nodiscard]] constexpr int MaxDepth() noexcept { return _maxDepth; }
     };
 }

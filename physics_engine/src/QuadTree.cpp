@@ -7,7 +7,7 @@
 
 void PhysicsEngine::QuadTree::Init() noexcept
 {
-    _nodes.resize(Math::Pow(4, _maxDepth), QuadNode());
+    _nodes.resize(Math::Pow(QuadNode::BoundaryDivisionCount, _maxDepth), QuadNode());
 
     for(auto& node : _nodes)
     {
@@ -15,7 +15,7 @@ void PhysicsEngine::QuadTree::Init() noexcept
     }
 }
 
-void PhysicsEngine::QuadTree::InsertInRoot(Math::RectangleF simplifiedShape, const ColliderRef colliderRef) noexcept
+void PhysicsEngine::QuadTree::Insert(Math::RectangleF simplifiedShape, ColliderRef colliderRef) noexcept
 {
     insertInNode(_nodes[0], simplifiedShape, colliderRef, 0);
 }

@@ -81,12 +81,6 @@ void TriggerColliderSample::onHandleInputs(SDL_Event event) noexcept
 
 void TriggerColliderSample::onUpdate() noexcept
 {
-    Math::Vec2I mousePosition;
-    SDL_GetMouseState(&mousePosition.X, &mousePosition.Y);
-
-    auto mousePosF = static_cast<Math::Vec2F>(mousePosition);
-    auto mM = Metrics::PixelsToMeters(mousePosF);
-
     maintainObjectsInWindow();
 }
 
@@ -151,6 +145,12 @@ void TriggerColliderSample::onDeinit() noexcept
 
 void TriggerColliderSample::drawQuadNode(const PhysicsEngine::QuadNode& node) const noexcept
 {
+    const auto center = Metrics::MetersToPixels(node.Boundary.Center());
+    auto size = Metrics::MetersToPixels(node.Boundary.Size());
+    size.Y = -size.Y;
+    constexpr SDL_Color boundaryColor{255, 255, 255, 255};
+    DrawableGeometry::EmptyRectangle(center, size, boundaryColor);
+
     if (node.Children[0] != nullptr)
     {
         for (const auto& child : node.Children)
@@ -158,12 +158,6 @@ void TriggerColliderSample::drawQuadNode(const PhysicsEngine::QuadNode& node) co
             drawQuadNode(*child);
         }
     }
-
-    const auto center = Metrics::MetersToPixels(node.Boundary.Center());
-    auto size = Metrics::MetersToPixels(node.Boundary.Size());
-    size.Y = -size.Y;
-    constexpr SDL_Color boundaryColor{255, 255, 255, 255};
-    DrawableGeometry::EmptyRectangle(center, size, boundaryColor);
 }
 
 void TriggerColliderSample::OnTriggerEnter(PhysicsEngine::ColliderRef colliderRefA,

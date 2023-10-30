@@ -54,7 +54,6 @@ void PlanetSystemSample::onHandleInputs(const SDL_Event event) noexcept
 
 void PlanetSystemSample::onUpdate() noexcept
 {
-
     if (_mustCreatePlanet)
     {
         Math::Vec2I mousePosition;
@@ -135,6 +134,8 @@ void PlanetSystemSample::calculatePlanetMovements() noexcept
         Math::Vec2F r = sunBody.Position() - planetBody.Position();
 
         float distance = r.Length();
+
+        if (distance <= 0.01) continue;
 
         float forceMagnitude = G * (planetBody.Mass() * sunBody.Mass() / (distance * distance));
         Math::Vec2F a = forceMagnitude * r.Normalized();

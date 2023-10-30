@@ -105,7 +105,7 @@ namespace PhysicsEngine
                             GetBody(collider.GetBodyRef()).Position(),
                             Math::Vec2F(radius, radius));
 
-                    _quadTree.InsertInRoot(simplifiedCircle, colliderRef);
+                    _quadTree.Insert(simplifiedCircle, colliderRef);
                     break;
                 } // Case circle.
 
@@ -114,7 +114,7 @@ namespace PhysicsEngine
                     const auto rect = std::get<Math::RectangleF>(colShape) +
                             GetBody(collider.GetBodyRef()).Position();
 
-                    _quadTree.InsertInRoot(rect, colliderRef);
+                    _quadTree.Insert(rect, colliderRef);
                     break;
                 } // Case rectangle.
 
@@ -152,7 +152,7 @@ namespace PhysicsEngine
 
                     Math::RectangleF simplifiedPoly(minVertex, maxVertex);
 
-                    _quadTree.InsertInRoot(simplifiedPoly, colliderRef);
+                    _quadTree.Insert(simplifiedPoly, colliderRef);
                     break;
                 } // Case polygon.
             } // Switch collider shape index.
