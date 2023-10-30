@@ -14,8 +14,8 @@ class TriggerColliderSample : public Sample, public PhysicsEngine::ContactListen
 {
 private:
     static constexpr int _circleCount = 100;
-    static constexpr int _rectangleCount = 0;
-    static constexpr int _polygonCount = 0;
+    static constexpr int _rectangleCount = 100;
+    static constexpr int _polygonCount = 100;
     static constexpr int _totalObjectCount = _circleCount + _rectangleCount + _polygonCount;
 
     static constexpr SDL_Color _noCollisionColor = {255, 0, 0, 255};

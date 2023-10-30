@@ -28,11 +28,6 @@ void TriggerColliderSample::onInit() noexcept
                                 Math::Random::Range(-2.f, 2.f));
 
         addCircle(rndScreenPos, rndVelocity);
-
-        if (_gameObjects[i].CollisionNbr != 0)
-        {
-            std::cout << i << " : " << _gameObjects[i].CollisionNbr << "\n";
-        }
     }
 
     for (std::size_t i = 0; i < _rectangleCount; i++)
@@ -43,8 +38,8 @@ void TriggerColliderSample::onInit() noexcept
         Math::Vec2F rndVelocity(Math::Random::Range(-2.f, 2.f),
                                 Math::Random::Range(-2.f, 2.f));
 
-        const auto rndSize = Math::Vec2F(Math::Random::Range(0.3f, 0.5f),
-                                         Math::Random::Range(0.3f, 0.5f));
+        const auto rndSize = Math::Vec2F(Math::Random::Range(0.2, 0.35f),
+                                         Math::Random::Range(0.2, 0.35f));
 
         addRectangle(rndScreenPos, rndSize, rndVelocity);
     }
@@ -58,7 +53,7 @@ void TriggerColliderSample::onInit() noexcept
                                 Math::Random::Range(-2.f, 2.f));
 
         std::vector<Math::Vec2F> vertices = {
-                Math::Vec2F(-0.3, -0.3), Math::Vec2F(0, 0.3), Math::Vec2F(0.3, -0.3)
+                Math::Vec2F(-0.2, -0.2), Math::Vec2F(0, 0.2), Math::Vec2F(0.2, -0.2)
         };
 
         addPolygon(rndScreenPos, vertices, rndVelocity);
@@ -263,15 +258,30 @@ void TriggerColliderSample::maintainObjectsInWindow() noexcept
 
                 const auto radius = std::get<Math::CircleF>(colShape).Radius();
 
-                if (pos.X + radius >= windowSizeInMeters.X || pos.X - radius <= 0)
+                if (pos.X + radius >= windowSizeInMeters.X)
                 {
+                    body.SetPosition(Math::Vec2F(windowSizeInMeters.X - radius, pos.Y));
                     body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
                 }
 
-                if (pos.Y - radius <= windowSizeInMeters.Y || pos.Y + radius >= 0)
+                if (pos.X - radius <= 0)
                 {
+                    body.SetPosition(Math::Vec2F(0 + radius, pos.Y));
+                    body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
+                }
+
+                if (pos.Y - radius <= windowSizeInMeters.Y)
+                {
+                    body.SetPosition(Math::Vec2F(pos.X, windowSizeInMeters.Y + radius));
                     body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
                 }
+
+                if (pos.Y + radius >= 0)
+                {
+                    body.SetPosition(Math::Vec2F(pos.X, 0 - radius));
+                    body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
+                }
+
                 break;
             } // Case circle.
 
@@ -283,15 +293,30 @@ void TriggerColliderSample::maintainObjectsInWindow() noexcept
                 const auto pos = body.Position();
                 const auto velocity = body.Velocity();
 
-                if (pos.X + halfSize.X >= windowSizeInMeters.X || pos.X - halfSize.X <= 0)
+                if (pos.X + halfSize.X >= windowSizeInMeters.X)
                 {
+                    body.SetPosition(Math::Vec2F(windowSizeInMeters.X - halfSize.X, pos.Y));
                     body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
                 }
 
-                if (pos.Y - halfSize.Y <= windowSizeInMeters.Y || pos.Y + halfSize.Y >= 0)
+                if (pos.X - halfSize.X <= 0)
                 {
+                    body.SetPosition(Math::Vec2F(0 + halfSize.X, pos.Y));
+                    body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
+                }
+
+                if (pos.Y - halfSize.Y <= windowSizeInMeters.Y)
+                {
+                    body.SetPosition(Math::Vec2F(pos.X, windowSizeInMeters.Y + halfSize.Y));
                     body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
                 }
+
+                if (pos.Y + halfSize.Y >= 0)
+                {
+                    body.SetPosition(Math::Vec2F(pos.X, 0 - halfSize.Y));
+                    body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
+                }
+
                 break;
             } // Case Rectangle.
 
@@ -304,13 +329,27 @@ void TriggerColliderSample::maintainObjectsInWindow() noexcept
 
                 for (auto& vertex : vertices)
                 {
-                    if (pos.X + vertex.X >= windowSizeInMeters.X || pos.X - vertex.X  <= 0)
+                    if (pos.X + vertex.X >= windowSizeInMeters.X)
                     {
+                        body.SetPosition(Math::Vec2F(windowSizeInMeters.X - vertex.X, pos.Y));
                         body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
                     }
 
-                    if (pos.Y - vertex.Y <= windowSizeInMeters.Y || pos.Y + vertex.Y >= 0)
+                    if (pos.X - vertex.X  <= 0)
                     {
+                        body.SetPosition(Math::Vec2F(0 + vertex.X, pos.Y));
+                        body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
+                    }
+
+                    if (pos.Y - vertex.Y <= windowSizeInMeters.Y)
+                    {
+                        body.SetPosition(Math::Vec2F(pos.X, windowSizeInMeters.Y + vertex.Y));
+                        body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
+                    }
+
+                    if (pos.Y + vertex.Y >= 0)
+                    {
+                        body.SetPosition(Math::Vec2F(pos.X, 0 - vertex.Y));
                         body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
                     }
                 }

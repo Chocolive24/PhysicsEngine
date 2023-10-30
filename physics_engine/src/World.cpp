@@ -106,9 +106,57 @@ namespace PhysicsEngine
                             Math::Vec2F(radius, radius));
 
                     _quadTree.InsertInRoot(simplifiedCircle, colliderRef);
-                }
-            }
-        }
+                    break;
+                } // Case circle.
+
+                case static_cast<int>(Math::ShapeType::Rectangle):
+                {
+                    const auto rect = std::get<Math::RectangleF>(colShape) +
+                            GetBody(collider.GetBodyRef()).Position();
+
+                    _quadTree.InsertInRoot(rect, colliderRef);
+                    break;
+                } // Case rectangle.
+
+                case static_cast<int>(Math::ShapeType::Polygon):
+                {
+                    Math::Vec2F minVertex(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+                    Math::Vec2F maxVertex(std::numeric_limits<float>::lowest(),
+                                          std::numeric_limits<float>::lowest());
+
+                    const auto poly = std::get<Math::PolygonF>(colShape) +
+                            GetBody(collider.GetBodyRef()).Position();
+
+                    for (const auto& vertex : poly.Vertices())
+                    {
+                        if (minVertex.X > vertex.X)
+                        {
+                            minVertex.X = vertex.X;
+                        }
+
+                        if (maxVertex.X < vertex.X)
+                        {
+                            maxVertex.X = vertex.X;
+                        }
+
+                        if (minVertex.Y > vertex.Y)
+                        {
+                            minVertex.Y = vertex.Y;
+                        }
+
+                        if (maxVertex.Y < vertex.Y)
+                        {
+                            maxVertex.Y = vertex.Y;
+                        }
+                    } // For range vertex.
+
+                    Math::RectangleF simplifiedPoly(minVertex, maxVertex);
+
+                    _quadTree.InsertInRoot(simplifiedPoly, colliderRef);
+                    break;
+                } // Case polygon.
+            } // Switch collider shape index.
+        } // For int i < colliders.size().
 
         _quadTree.CalculatePossiblePairs();
     }
