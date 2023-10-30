@@ -2,13 +2,12 @@
 // Created by Olivier on 19.10.2023.
 //
 
-#include <iostream>
 #include "Sample.h"
 
 void Sample::Init() noexcept
 {
     _timer.Init();
-    std::cout << _timer.TotalTime() << "\n";
+
     _world.Init(_startBodyCount);
 
     onInit();
@@ -16,7 +15,6 @@ void Sample::Init() noexcept
 
 void Sample::Deinit() noexcept
 {
-    std::cout << _timer.TotalTime() << "\n";
     _world.Deinit();
 
     onDeinit();

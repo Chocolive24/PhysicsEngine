@@ -149,6 +149,23 @@ void TriggerColliderSample::onDeinit() noexcept
     _gameObjects.clear();
 }
 
+void TriggerColliderSample::drawQuadNode(const PhysicsEngine::QuadNode& node) const noexcept
+{
+    if (node.Children[0] != nullptr)
+    {
+        for (const auto& child : node.Children)
+        {
+            drawQuadNode(*child);
+        }
+    }
+
+    const auto center = Metrics::MetersToPixels(node.Boundary.Center());
+    auto size = Metrics::MetersToPixels(node.Boundary.Size());
+    size.Y = -size.Y;
+    constexpr SDL_Color boundaryColor{255, 255, 255, 255};
+    DrawableGeometry::EmptyRectangle(center, size, boundaryColor);
+}
+
 void TriggerColliderSample::OnTriggerEnter(PhysicsEngine::ColliderRef colliderRefA,
                                            PhysicsEngine::ColliderRef colliderRefB) noexcept
 {
@@ -356,21 +373,4 @@ void TriggerColliderSample::maintainObjectsInWindow() noexcept
             } // Case polygon.
         } // Switch case.
     } // For range.
-}
-
-void TriggerColliderSample::drawQuadNode(const PhysicsEngine::QuadNode& node) const noexcept
-{
-    if (node.Children[0] != nullptr)
-    {
-        for (const auto& child : node.Children)
-        {
-            drawQuadNode(*child);
-        }
-    }
-
-    const auto center = Metrics::MetersToPixels(node.Boundary.Center());
-    auto size = Metrics::MetersToPixels(node.Boundary.Size());
-    size.Y = -size.Y;
-    constexpr SDL_Color boundaryColor{255, 255, 255, 255};
-    DrawableGeometry::EmptyRectangle(center, size, boundaryColor);
 }

@@ -27,8 +27,8 @@ private:
     void addRectangle(Math::Vec2F minBound, Math::Vec2F maxBound, Math::Vec2F rndVelocity) noexcept;
     void addPolygon(Math::Vec2F centerPos, const std::vector<Math::Vec2F>& vertices, Math::Vec2F rndVelocity) noexcept;
 
-    void maintainObjectsInWindow() noexcept;
     void drawQuadNode(const PhysicsEngine::QuadNode& node) const noexcept;
+    void maintainObjectsInWindow() noexcept;
 
 public:
     explicit TriggerColliderSample() noexcept = default;

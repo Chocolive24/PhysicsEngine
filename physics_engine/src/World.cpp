@@ -347,8 +347,12 @@ namespace PhysicsEngine
     {
         _bodies.clear();
         _bodiesGenIndices.clear();
+
         _colliders.clear();
         _collidersGenIndices.clear();
+        _colliderPairs.clear();
+
+        _contactListener = nullptr;
 
         _quadTree.Clear();
     }
