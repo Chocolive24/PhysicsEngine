@@ -34,23 +34,31 @@ namespace PhysicsEngine
         std::vector<QuadNode> _nodes;
         static constexpr int _maxDepth = 5;
 
+        std::vector<ColliderPair> _possiblePairs;
+
+        void insertInNode(QuadNode& node,
+                          Math::RectangleF simplifiedShape,
+                          ColliderRef colliderRef,
+                          int depth) noexcept;
+
+        void addNodePossiblePairs(const QuadNode& node) noexcept;
+
     public:
         QuadTree() noexcept = default;
 
         void Init() noexcept;
         void InsertInRoot(Math::RectangleF simplifiedShape, ColliderRef colliderRef) noexcept;
-        void InsertInNode(QuadNode& node,
-                          Math::RectangleF simplifiedShape,
-                          ColliderRef colliderRef,
-                          int depth) noexcept;
 
+        void CalculatePossiblePairs() noexcept;
         void Clear() noexcept;
+
+        [[nodiscard]] const QuadNode& RootNode() const noexcept { return _nodes[0]; }
 
         constexpr void SetRootNodeBoundary(const Math::RectangleF boundary) noexcept
         {
             _nodes[0].Boundary = boundary;
         };
 
-        [[nodiscard]] const QuadNode& RootNode() const noexcept { return _nodes[0]; }
+        [[nodiscard]] const std::vector<ColliderPair>& PossiblePairs() const noexcept { return _possiblePairs; }
     };
 }

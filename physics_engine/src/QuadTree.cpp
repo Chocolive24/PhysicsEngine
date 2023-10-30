@@ -17,12 +17,12 @@ void PhysicsEngine::QuadTree::Init() noexcept
 
 void PhysicsEngine::QuadTree::InsertInRoot(Math::RectangleF simplifiedShape, const ColliderRef colliderRef) noexcept
 {
-    InsertInNode(_nodes[0], simplifiedShape, colliderRef, 0);
+    insertInNode(_nodes[0], simplifiedShape, colliderRef, 0);
 }
 
-void PhysicsEngine::QuadTree::InsertInNode(QuadNode& node,
+void PhysicsEngine::QuadTree::insertInNode(QuadNode& node,
                                            Math::RectangleF simplifiedShape,
-                                           const ColliderRef colliderRef,
+                                           ColliderRef colliderRef,
                                            int depth) noexcept
 {
     // If the node doesn't have any children.
@@ -69,7 +69,7 @@ void PhysicsEngine::QuadTree::InsertInNode(QuadNode& node,
 
                 if (boundInterestCount == 1)
                 {
-                    InsertInNode(*intersectNode, col.Rectangle, col.ColRef, depth + 1);
+                    insertInNode(*intersectNode, col.Rectangle, col.ColRef, depth + 1);
                 }
                 else
                 {
@@ -99,12 +99,42 @@ void PhysicsEngine::QuadTree::InsertInNode(QuadNode& node,
         if (boundInterestCount == 1)
         {
             depth++;
-            InsertInNode(*intersectNode, simplifiedShape, colliderRef, depth);
+            insertInNode(*intersectNode, simplifiedShape, colliderRef, depth);
         }
         else
         {
             SimplifiedCollider simplifiedCollider = {colliderRef, simplifiedShape};
             node.Colliders.push_back(simplifiedCollider);
+        }
+    }
+}
+
+void PhysicsEngine::QuadTree::CalculatePossiblePairs() noexcept
+{
+    addNodePossiblePairs(_nodes[0]);
+}
+
+void PhysicsEngine::QuadTree::addNodePossiblePairs(const QuadNode& node) noexcept
+{
+    for (const auto& simplColA : node.Colliders)
+    {
+        for (const auto& simplColB : node.Colliders)
+        {
+            if (simplColA.ColRef == simplColB.ColRef) continue;
+
+            if (Math::Intersect(simplColA.Rectangle, simplColB.Rectangle))
+            {
+                _possiblePairs.push_back(ColliderPair{simplColA.ColRef, simplColB.ColRef});
+            }
+        }
+    }
+
+    // If the node has children.
+    if (node.Children[0] != nullptr)
+    {
+        for (const auto& child : node.Children)
+        {
+            addNodePossiblePairs(*child);
         }
     }
 }

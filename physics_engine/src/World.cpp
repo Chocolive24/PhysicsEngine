@@ -109,32 +109,24 @@ namespace PhysicsEngine
                 }
             }
         }
+
+        _quadTree.CalculatePossiblePairs();
     }
 
     void World::resolveNarrowPhase() noexcept
     {
         std::unordered_set<ColliderPair, ColliderHash> newColliderPairs;
 
-        for (std::size_t i = 0; i < _colliders.size(); i++)
+        const auto& newPossiblePairs = _quadTree.PossiblePairs();
+
+        for (const auto& colliderPair : newPossiblePairs)
         {
-            const ColliderRef colRefA{i, _collidersGenIndices[i]};
-            const Collider colliderA = GetCollider(colRefA);
+            const auto& colliderA = _colliders[colliderPair.ColliderA.Index];
+            const auto& colliderB = _colliders[colliderPair.ColliderB.Index];
 
-            if (!colliderA.Enabled()) continue;
-
-            for (std::size_t j = 0; j < _colliders.size(); j++)
+            if (detectOverlap(colliderA, colliderB))
             {
-                const ColliderRef colRefB{j, _collidersGenIndices[j]};
-                const Collider colliderB = GetCollider(colRefB);
-
-                if (!colliderB.Enabled()) continue;
-                if (colRefB == colRefA) continue;
-                if (colliderB.GetBodyRef() == colliderA.GetBodyRef()) continue;
-
-                if (detectOverlap(colliderA, colliderB))
-                {
-                    newColliderPairs.insert(ColliderPair{colRefA, colRefB});
-                }
+                newColliderPairs.insert(colliderPair);
             }
         }
 
