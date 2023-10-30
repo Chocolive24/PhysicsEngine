@@ -77,9 +77,7 @@ void PhysicsEngine::QuadTree::InsertInNode(QuadNode& node,
                 }
             }
 
-            node.Colliders.clear();
             node.Colliders = std::move(remainingColliders);
-            std::cout << node.Colliders.size() << "\n";
         }
     }
 
@@ -105,7 +103,6 @@ void PhysicsEngine::QuadTree::InsertInNode(QuadNode& node,
         }
         else
         {
-            // Add the simplified collider to the node.
             SimplifiedCollider simplifiedCollider = {colliderRef, simplifiedShape};
             node.Colliders.push_back(simplifiedCollider);
         }

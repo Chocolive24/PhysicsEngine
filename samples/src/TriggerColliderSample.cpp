@@ -29,7 +29,7 @@ void TriggerColliderSample::Init() noexcept
         Math::Vec2F rndVelocity(Math::Random::Range(-2.f, 2.f),
                                 Math::Random::Range(-2.f, 2.f));
 
-        addCircle(rndScreenPos, Math::Vec2F::Zero());
+        addCircle(rndScreenPos, rndVelocity);
     }
 
     for (std::size_t i = 0; i < _rectangleCount; i++)
@@ -198,7 +198,7 @@ void TriggerColliderSample::addCircle(Math::Vec2F centerPos, Math::Vec2F rndVelo
     circle.ColRef = _world.CreateCollider(circle.BodyRef);
     auto& collider = _world.GetCollider(circle.ColRef);
     collider.SetIsTrigger(true);
-    collider.SetShape(Math::CircleF(Math::Vec2F::Zero(), Math::Random::Range(0.15f, 0.3f)));
+    collider.SetShape(Math::CircleF(Math::Vec2F::Zero(), Math::Random::Range(0.1f, 0.15f)));
 
     _gameObjects.push_back(circle);
 }

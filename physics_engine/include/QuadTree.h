@@ -32,7 +32,7 @@ namespace PhysicsEngine
     {
     private:
         std::vector<QuadNode> _nodes;
-        static constexpr int _maxDepth = 3;
+        static constexpr int _maxDepth = 5;
 
     public:
         QuadTree() noexcept = default;
