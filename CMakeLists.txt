@@ -12,6 +12,13 @@ add_library(Math ${MATH_SRC_FILES})
 set_target_properties(Math PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(Math PUBLIC libs/math/include/)
 
+# Create the Common library with Math as a dependency
+file(GLOB_RECURSE COMMON_SRC_FILES common/include/*.h common/src/*.cpp)
+add_library(Common ${COMMON_SRC_FILES})
+set_target_properties(Common PROPERTIES LINKER_LANGUAGE CXX)
+target_include_directories(Common PUBLIC common/include/)
+target_link_libraries(Common PUBLIC Math)
+
 # Create the PhysicsEngineCommon library with Math as a dependency
 file(GLOB_RECURSE PHYSICS_SRC_FILES physics_engine/include/*.h physics_engine/src/*.cpp)
 add_library(PhysicsEngineCommon ${PHYSICS_SRC_FILES})
@@ -24,14 +31,7 @@ file(GLOB_RECURSE SDL_APP_SRC_FILES sdl_application/include/*.h sdl_application/
 add_library(SDL_AppCommon ${SDL_APP_SRC_FILES})
 set_target_properties(SDL_AppCommon PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(SDL_AppCommon PUBLIC sdl_application/include/)
-target_link_libraries(SDL_AppCommon PUBLIC SDL2::SDL2 Math)
-
-# Create the Common library with Math as a dependency
-file(GLOB_RECURSE COMMON_SRC_FILES common/include/*.h common/src/*.cpp)
-add_library(Common ${COMMON_SRC_FILES})
-set_target_properties(Common PROPERTIES LINKER_LANGUAGE CXX)
-target_include_directories(Common PUBLIC common/include/)
-target_link_libraries(Common PUBLIC Math)
+target_link_libraries(SDL_AppCommon PUBLIC SDL2::SDL2 Math Common)
 
 # Create the Samples library with dependencies on PhysicsEngineCommon, SDL_AppCommon, Common, and Math
 file(GLOB_RECURSE SAMPLES_SRC_FILES samples/include/*.h samples/src/*.cpp)

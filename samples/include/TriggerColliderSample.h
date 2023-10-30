@@ -13,7 +13,7 @@ struct GameObject
 class TriggerColliderSample : public Sample, public PhysicsEngine::ContactListener
 {
 private:
-    static constexpr int _circleCount = 16;
+    static constexpr int _circleCount = 4;
     static constexpr int _rectangleCount = 0;
     static constexpr int _polygonCount = 0;
     static constexpr int _totalObjectCount = _circleCount + _rectangleCount + _polygonCount;
@@ -36,6 +36,8 @@ public:
     void HandleInputs(SDL_Event event) noexcept override;
     void Update() noexcept override;
     void Deinit() noexcept override;
+
+    void DrawQuadNode(const PhysicsEngine::QuadNode& node) const noexcept;
 
     void OnTriggerEnter(PhysicsEngine::ColliderRef colliderRefA,
                         PhysicsEngine::ColliderRef colliderRefB) noexcept override;

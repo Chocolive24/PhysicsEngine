@@ -29,7 +29,7 @@ void TriggerColliderSample::Init() noexcept
         Math::Vec2F rndVelocity(Math::Random::Range(-2.f, 2.f),
                                 Math::Random::Range(-2.f, 2.f));
 
-        addCircle(rndScreenPos, rndVelocity);
+        addCircle(rndScreenPos, Math::Vec2F::Zero());
     }
 
     for (std::size_t i = 0; i < _rectangleCount; i++)
@@ -64,7 +64,21 @@ void TriggerColliderSample::Init() noexcept
 
 void TriggerColliderSample::HandleInputs(SDL_Event event) noexcept
 {
+    switch (event.type)
+    {
+        case SDL_MOUSEBUTTONDOWN:
+            if (event.button.button == SDL_BUTTON_LEFT)
+            {
+                Math::Vec2I mousePosition;
+                SDL_GetMouseState(&mousePosition.X, &mousePosition.Y);
 
+                auto mousePosF = static_cast<Math::Vec2F>(mousePosition);
+                auto mM = Metrics::PixelsToMeters(mousePosF);
+
+                addCircle(mM, Math::Vec2F::Zero());
+            }
+            break;
+    }
 }
 
 void TriggerColliderSample::Update() noexcept
@@ -101,7 +115,7 @@ void TriggerColliderSample::Update() noexcept
 
             case static_cast<int>(Math::ShapeType::Rectangle):
             {
-                DrawableGeometry::Rectangle(
+                DrawableGeometry::FilledRectangle(
                         Metrics::MetersToPixels(_world.GetBody(object.BodyRef).Position()),
                         Metrics::MetersToPixels(std::get<Math::RectangleF>(colShape).Size()),
                         object.CollisionNbr > 0 ? _collisionColor : _noCollisionColor);
@@ -131,6 +145,8 @@ void TriggerColliderSample::Update() noexcept
             } // Case polygon.
         } // Switch case.
     } // For gameObjects range.
+
+    DrawQuadNode(_world.QuadTree().RootNode());
 }
 
 void TriggerColliderSample::Deinit() noexcept
@@ -302,4 +318,21 @@ void TriggerColliderSample::maintainObjectsInWindow() noexcept
             } // Case polygon.
         } // Switch case.
     } // For range.
+}
+
+void TriggerColliderSample::DrawQuadNode(const PhysicsEngine::QuadNode& node) const noexcept
+{
+    if (node.Children[0] != nullptr)
+    {
+        for (const auto& child : node.Children)
+        {
+            DrawQuadNode(*child);
+        }
+    }
+
+    const auto center = Metrics::MetersToPixels(node.Boundary.Center());
+    auto size = Metrics::MetersToPixels(node.Boundary.Size());
+    size.Y = -size.Y;
+    constexpr SDL_Color boundaryColor{255, 255, 255, 255};
+    DrawableGeometry::EmptyRectangle(center, size, boundaryColor);
 }

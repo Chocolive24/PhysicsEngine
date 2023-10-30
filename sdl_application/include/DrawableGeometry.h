@@ -40,12 +40,20 @@ namespace DrawableGeometry
     void Circle(Math::Vec2F centerPos, float radius, std::size_t segments, SDL_Color color) noexcept;
 
     /**
-     * @brief Rectangle is a method that creates vertices and indices to form a rectangle.
+     * @brief FilledRectangle is a method that creates vertices and indices to form a filled rectangle.
      * @param centerPos The position of the center of the rectangle.
      * @param size The width and height of the rectangle.
      * @param color The color of the rectangle.
      */
-    void Rectangle(Math::Vec2F centerPos, Math::Vec2F size, SDL_Color color) noexcept;
+    void FilledRectangle(Math::Vec2F centerPos, Math::Vec2F size, SDL_Color color) noexcept;
+
+    /**
+     * @brief EmptyRectangle is a method that creates vertices and indices to form an empty rectangle.
+     * @param centerPos The position of the center of the rectangle.
+     * @param size The width and height of the rectangle.
+     * @param color The color of the rectangle.
+     */
+    void EmptyRectangle(Math::Vec2F centerPos, Math::Vec2F size, SDL_Color color) noexcept;
 
     /**
      * @brief Polygon is a method that creates vertices and indices to form a polygon.

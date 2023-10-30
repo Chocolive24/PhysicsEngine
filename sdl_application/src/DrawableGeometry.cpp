@@ -60,7 +60,7 @@ namespace DrawableGeometry
         Indices.push_back(indicesOffset);  // Connect the last vertex to the center
     }
 
-    void Rectangle(const Math::Vec2F centerPos, const Math::Vec2F size, const SDL_Color color) noexcept
+    void FilledRectangle(Math::Vec2F centerPos, Math::Vec2F size, SDL_Color color) noexcept
     {
         const int indicesOffset = static_cast<int>(Vertices.size());
 
@@ -117,27 +117,49 @@ namespace DrawableGeometry
         const int indicesOffset = static_cast<int>(Vertices.size());
 
         const auto lineVector = endPoint - startPoint;
+
+        if (lineVector.Length() == 0) return;
+
         const auto lineDirection = lineVector.Normalized();
         const auto vPerp = Math::Vec2F(lineDirection.Y, -lineDirection.X);
 
-        const auto p0 = startPoint + vPerp * (thickness * 0.5f);
+        //const auto p0 = startPoint + vPerp * (thickness * 0.5f);
         const auto p1 = startPoint - vPerp * (thickness * 0.5f);
         const auto p2 = endPoint + vPerp * (thickness * 0.5f);
-        const auto p3 = endPoint - vPerp * (thickness * 0.5f);
+        //const auto p3 = endPoint - vPerp * (thickness * 0.5f);
 
-        addVertex(p0, color);
-        addVertex(p1, color);
-        addVertex(p2, color);
-        addVertex(p3, color);
+        Math::RectangleF lineRect(p1, p2);
 
-        // First triangle.
-        Indices.push_back(indicesOffset);
-        Indices.push_back(indicesOffset + 1);
-        Indices.push_back(indicesOffset + 2);
+        FilledRectangle(lineRect.Center(), lineRect.Size(), color);
 
-        // Second triangle.
-        Indices.push_back(indicesOffset);
-        Indices.push_back(indicesOffset + 2);
-        Indices.push_back(indicesOffset + 3);
+//        addVertex(p0, color);
+//        addVertex(p1, color);
+//        addVertex(p2, color);
+//        addVertex(p3, color);
+
+//        // First triangle.
+//        Indices.push_back(indicesOffset);
+//        Indices.push_back(indicesOffset + 1);
+//        Indices.push_back(indicesOffset + 2);
+//
+//        // Second triangle.
+//        Indices.push_back(indicesOffset);
+//        Indices.push_back(indicesOffset + 2);
+//        Indices.push_back(indicesOffset + 3);
+    }
+
+    void EmptyRectangle(Math::Vec2F centerPos, Math::Vec2F size, SDL_Color color) noexcept
+    {
+        const auto halfSize = size * 0.5f;
+
+        const auto topRightCorner = Math::Vec2F(centerPos.X + halfSize.X, centerPos.Y - halfSize.Y);
+        const auto bottomRightCorner = centerPos + halfSize;
+        const auto bottomLeftCorner = Math::Vec2F(centerPos.X - halfSize.X, centerPos.Y + halfSize.Y);
+        const auto topLeftCorner = centerPos - halfSize;
+
+        DrawableGeometry::Line(bottomRightCorner, topRightCorner, 1.f, color);
+        DrawableGeometry::Line(bottomLeftCorner, bottomRightCorner, 1.f, color);
+        DrawableGeometry::Line(bottomLeftCorner, topLeftCorner, 1.f, color);
+        DrawableGeometry::Line(topLeftCorner, topRightCorner, 1.f, color);
     }
 }

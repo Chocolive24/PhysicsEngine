@@ -31,7 +31,7 @@ protected:
     PhysicsEngine::World _world;
     Timer _timer;
 
-    static constexpr int _startBodyCount = 100;
+    static constexpr int _startBodyCount = 2;
 
 public:
     Sample() noexcept = default;

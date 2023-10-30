@@ -48,6 +48,8 @@ namespace PhysicsEngine
 
     void World::resolveBroadPhase() noexcept
     {
+        _quadTree.Clear();
+
         // Sets the minimum and maximum collision zone limits of the world rectangle to floating maximum and
         // lowest values.
         Math::Vec2F worldMinBound(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
@@ -82,12 +84,12 @@ namespace PhysicsEngine
         }
 
         // Set the first rectangle of the quad-tree to calculated collision area rectangle.
-        _quadTree.SetRootNodeRectangle(Math::RectangleF(worldMinBound, worldMaxBound));
+        _quadTree.SetRootNodeBoundary(Math::RectangleF(worldMinBound, worldMaxBound));
 
         for (std::size_t i = 0; i < _colliders.size(); i++)
         {
-            const ColliderRef& colRef = {i, _collidersGenIndices[i]};
-            const auto& collider = GetCollider(colRef);
+            ColliderRef colliderRef = {i, _collidersGenIndices[i]};
+            const auto& collider = GetCollider(colliderRef);
 
             if (!collider.Enabled()) continue;
 
@@ -100,9 +102,10 @@ namespace PhysicsEngine
                     const auto circle = std::get<Math::CircleF>(colShape);
                     const auto radius = circle.Radius();
                     const auto simplifiedCircle = Math::RectangleF::FromCenter(
-                            circle.Center(),Math::Vec2F(radius, radius));
+                            GetBody(collider.GetBodyRef()).Position(),
+                            Math::Vec2F(radius, radius));
 
-                    _quadTree.InsertInRoot(simplifiedCircle, colRef);
+                    _quadTree.InsertInRoot(simplifiedCircle, colliderRef);
                 }
             }
         }
@@ -306,6 +309,8 @@ namespace PhysicsEngine
         _bodiesGenIndices.clear();
         _colliders.clear();
         _collidersGenIndices.clear();
+
+        _quadTree.Clear();
     }
 
     [[nodiscard]] BodyRef World::CreateBody() noexcept

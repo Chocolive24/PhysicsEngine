@@ -119,6 +119,12 @@ namespace PhysicsEngine
          * @return A collider reference to the collider in the world (see ColliderRef).
          */
         [[nodiscard]] ColliderRef CreateCollider(BodyRef bodyRef) noexcept;
+
+        /**
+         * @brief QuadTree is a method that gives the quad-tree of the world.
+         * @return The quad-tree of the world.
+         */
+        [[nodiscard]] QuadTree QuadTree() const noexcept { return _quadTree; };
     };
 }
 

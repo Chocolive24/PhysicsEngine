@@ -6,22 +6,33 @@
 
 namespace PhysicsEngine
 {
+    /**
+     * @struct SimplifiedCollider is a struct that stores the data of a collider in a simplified way (aka it stores
+     * is collider reference in the world and its shape in rectangle).
+     */
+    struct SimplifiedCollider
+    {
+        ColliderRef ColRef;
+        Math::RectangleF Rectangle;
+    };
+
     struct QuadNode
     {
-        Math::RectangleF Rectangle{Math::Vec2F::Zero(), Math::Vec2F::Zero()};
+        Math::RectangleF Boundary{Math::Vec2F::Zero(), Math::Vec2F::Zero()};
         std::array<QuadNode*, 4> Children{};
-        std::vector<ColliderRef> Colliders{};
+        std::vector<SimplifiedCollider> Colliders{};
 
-        static constexpr int MaxColliderNbr = 16;
+        static constexpr int MaxColliderNbr = 1;
 
         constexpr QuadNode() noexcept = default;
+        explicit QuadNode(Math::RectangleF boundary) noexcept : Boundary(boundary) {};
     };
 
     class QuadTree
     {
     private:
         std::vector<QuadNode> _nodes;
-        static constexpr int _maxDepth = 5;
+        static constexpr int _maxDepth = 2;
 
     public:
         QuadTree() noexcept = default;
@@ -33,9 +44,13 @@ namespace PhysicsEngine
                           ColliderRef colliderRef,
                           int depth) noexcept;
 
-        constexpr void SetRootNodeRectangle(const Math::RectangleF rectangle) noexcept
+        void Clear() noexcept;
+
+        constexpr void SetRootNodeBoundary(const Math::RectangleF boundary) noexcept
         {
-            _nodes[0].Rectangle = rectangle;
+            _nodes[0].Boundary = boundary;
         };
+
+        [[nodiscard]] const QuadNode& RootNode() const noexcept { return _nodes[0]; }
     };
 }
