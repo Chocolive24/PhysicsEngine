@@ -64,14 +64,14 @@ public:
      * @note The planet bodies are instantiated with an orbital velocity in order to create the orbital movement around
      * the sun.
      */
-    void Init() noexcept override;
+    void onInit() noexcept override;
 
     /**
      * @brief HandleInputs is a method that performs the different action of the sample
      * according to the inputs.
      * @param event The SDL event that contains the input data.
      */
-    void HandleInputs(SDL_Event event) noexcept override;
+    void onHandleInputs(SDL_Event event) noexcept override;
 
     /**
      * @brief Update is a method that updates the sample.\n
@@ -81,10 +81,12 @@ public:
      * - Calls the world Update method.\n
      * - Calls the drawCelestialBodies method.\n
      */
-    void Update() noexcept override;
+    void onUpdate() noexcept override;
+
+    void onRender() noexcept override;
 
     /**
      * @brief Deinit is a method that deinitializes the sample (aka clear all the celestial bodies).
      */
-    void Deinit() noexcept override;
+    void onDeinit() noexcept override;
 };

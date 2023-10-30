@@ -28,16 +28,16 @@ private:
     void addPolygon(Math::Vec2F centerPos, const std::vector<Math::Vec2F>& vertices, Math::Vec2F rndVelocity) noexcept;
 
     void maintainObjectsInWindow() noexcept;
+    void drawQuadNode(const PhysicsEngine::QuadNode& node) const noexcept;
 
 public:
     explicit TriggerColliderSample() noexcept = default;
 
-    void Init() noexcept override;
-    void HandleInputs(SDL_Event event) noexcept override;
-    void Update() noexcept override;
-    void Deinit() noexcept override;
-
-    void DrawQuadNode(const PhysicsEngine::QuadNode& node) const noexcept;
+    void onInit() noexcept override;
+    void onHandleInputs(SDL_Event event) noexcept override;
+    void onUpdate() noexcept override;
+    void onRender() noexcept override;
+    void onDeinit() noexcept override;
 
     void OnTriggerEnter(PhysicsEngine::ColliderRef colliderRefA,
                         PhysicsEngine::ColliderRef colliderRefB) noexcept override;

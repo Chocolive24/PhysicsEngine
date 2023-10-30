@@ -15,6 +15,7 @@
 
 //TODO: TOUT COMMENTER
 
+#include <iostream>
 #include "SampleManager.h"
 #include "DrawableGeometry.h"
 
@@ -53,6 +54,8 @@ int main()
                                Window::BackgroundColor.a);
 
         sampleManager.Update();
+
+        sampleManager.Render();
 
         SDL_RenderGeometry(window.Renderer(),
                            nullptr,

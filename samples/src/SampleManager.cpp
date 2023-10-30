@@ -45,3 +45,8 @@ void SampleManager::Update() const noexcept
 {
     _samples[_currentSampleIdx]->Update();
 }
+
+void SampleManager::Render() const noexcept
+{
+    _samples[_currentSampleIdx]->Render();
+}

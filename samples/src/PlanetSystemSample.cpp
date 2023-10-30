@@ -9,10 +9,8 @@
 
 #include <iostream>
 
-void PlanetSystemSample::Init() noexcept
+void PlanetSystemSample::onInit() noexcept
 {
-    Sample::Init();
-
     constexpr Math::Vec2F centerOfScreen(Window::WindowWidth / 2.f, Window::WindowHeight / 2.f);
     constexpr Math::Vec2F sunPos = Metrics::PixelsToMeters(centerOfScreen);
 
@@ -34,7 +32,7 @@ void PlanetSystemSample::Init() noexcept
     }
 }
 
-void PlanetSystemSample::HandleInputs(const SDL_Event event) noexcept
+void PlanetSystemSample::onHandleInputs(const SDL_Event event) noexcept
 {
     switch (event.type)
     {
@@ -54,8 +52,9 @@ void PlanetSystemSample::HandleInputs(const SDL_Event event) noexcept
 }
 
 
-void PlanetSystemSample::Update() noexcept
+void PlanetSystemSample::onUpdate() noexcept
 {
+
     if (_mustCreatePlanet)
     {
         Math::Vec2I mousePosition;
@@ -85,14 +84,28 @@ void PlanetSystemSample::Update() noexcept
         }
     }
 
-    _timer.Tick();
-    const auto deltaTime = _timer.DeltaTime();
-
     calculatePlanetMovements();
+}
 
-    _world.Update(deltaTime);
+void PlanetSystemSample::onRender() noexcept
+{
+    // Draw the sun.
+    auto sunBodyPos = _world.GetBody(_sun.BodyRef).Position();
+    auto sunScreenPos = Metrics::MetersToPixels(sunBodyPos);
+    DrawableGeometry::Circle(sunScreenPos, _sun.Radius, 15, _sun.Color);
 
-    drawCelestialBodies();
+    // Draw the planets.
+    for(auto& p : _planets)
+    {
+        auto planetBodyPos = _world.GetBody(p.BodyRef).Position();
+        auto planetScreenPos = Metrics::MetersToPixels(planetBodyPos);
+        DrawableGeometry::Circle(planetScreenPos, p.Radius, 15, p.Color);
+    }
+}
+
+void PlanetSystemSample::onDeinit() noexcept
+{
+    _planets.clear();
 }
 
 [[nodiscard]] CelestialBody PlanetSystemSample::createPlanet(Math::Vec2F pos, float radius, SDL_Color color) noexcept
@@ -128,26 +141,4 @@ void PlanetSystemSample::calculatePlanetMovements() noexcept
 
         planetBody.ApplyForce(a);
     }
-}
-
-void PlanetSystemSample::drawCelestialBodies() noexcept
-{
-    // Draw the sun.
-    auto sunBodyPos = _world.GetBody(_sun.BodyRef).Position();
-    auto sunScreenPos = Metrics::MetersToPixels(sunBodyPos);
-    DrawableGeometry::Circle(sunScreenPos, _sun.Radius, 15, _sun.Color);
-
-    // Draw the planets.
-    for(auto& p : _planets)
-    {
-        auto planetBodyPos = _world.GetBody(p.BodyRef).Position();
-        auto planetScreenPos = Metrics::MetersToPixels(planetBodyPos);
-        DrawableGeometry::Circle(planetScreenPos, p.Radius, 15, p.Color);
-    }
-}
-
-void PlanetSystemSample::Deinit() noexcept
-{
-    Sample::Deinit();
-    _planets.clear();
 }

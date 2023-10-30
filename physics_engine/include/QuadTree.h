@@ -22,7 +22,7 @@ namespace PhysicsEngine
         std::array<QuadNode*, 4> Children{};
         std::vector<SimplifiedCollider> Colliders{};
 
-        static constexpr int MaxColliderNbr = 1;
+        static constexpr int MaxColliderNbr = 16;
 
         constexpr QuadNode() noexcept = default;
         explicit QuadNode(Math::RectangleF boundary) noexcept : Boundary(boundary) {};

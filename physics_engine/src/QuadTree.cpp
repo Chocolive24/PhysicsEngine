@@ -147,4 +147,6 @@ void PhysicsEngine::QuadTree::Clear() noexcept
 
         std::fill(node.Children.begin(), node.Children.end(), nullptr);
     }
+
+    _possiblePairs.clear();
 }

@@ -17,4 +17,5 @@ public:
     void Init() noexcept;
     void HandleInputs(SDL_Event event);
     void Update() const noexcept;
+    void Render() const noexcept;
 };

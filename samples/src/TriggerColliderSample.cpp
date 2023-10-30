@@ -10,10 +10,8 @@
 
 #include <iostream>
 
-void TriggerColliderSample::Init() noexcept
+void TriggerColliderSample::onInit() noexcept
 {
-    Sample::Init();
-
     _world.SetContactListener(this);
 
     const auto windowSizeInMeters = Metrics::PixelsToMeters(
@@ -30,6 +28,11 @@ void TriggerColliderSample::Init() noexcept
                                 Math::Random::Range(-2.f, 2.f));
 
         addCircle(rndScreenPos, rndVelocity);
+
+        if (_gameObjects[i].CollisionNbr != 0)
+        {
+            std::cout << i << " : " << _gameObjects[i].CollisionNbr << "\n";
+        }
     }
 
     for (std::size_t i = 0; i < _rectangleCount; i++)
@@ -62,7 +65,7 @@ void TriggerColliderSample::Init() noexcept
     }
 }
 
-void TriggerColliderSample::HandleInputs(SDL_Event event) noexcept
+void TriggerColliderSample::onHandleInputs(SDL_Event event) noexcept
 {
     switch (event.type)
     {
@@ -81,10 +84,8 @@ void TriggerColliderSample::HandleInputs(SDL_Event event) noexcept
     }
 }
 
-void TriggerColliderSample::Update() noexcept
+void TriggerColliderSample::onUpdate() noexcept
 {
-    _timer.Tick();
-
     Math::Vec2I mousePosition;
     SDL_GetMouseState(&mousePosition.X, &mousePosition.Y);
 
@@ -92,11 +93,10 @@ void TriggerColliderSample::Update() noexcept
     auto mM = Metrics::PixelsToMeters(mousePosF);
 
     maintainObjectsInWindow();
+}
 
-    //_world.GetBody(_gameObjects[_circleCount + _rectangleCount].BodyRef).SetPosition(mM);
-
-    _world.Update(_timer.DeltaTime());
-
+void TriggerColliderSample::onRender() noexcept
+{
     for (auto& object : _gameObjects)
     {
         const auto colShape = _world.GetCollider(object.ColRef).Shape();
@@ -146,12 +146,11 @@ void TriggerColliderSample::Update() noexcept
         } // Switch case.
     } // For gameObjects range.
 
-    DrawQuadNode(_world.QuadTree().RootNode());
+    drawQuadNode(_world.QuadTree().RootNode());
 }
 
-void TriggerColliderSample::Deinit() noexcept
+void TriggerColliderSample::onDeinit() noexcept
 {
-    Sample::Deinit();
     _gameObjects.clear();
 }
 
@@ -320,13 +319,13 @@ void TriggerColliderSample::maintainObjectsInWindow() noexcept
     } // For range.
 }
 
-void TriggerColliderSample::DrawQuadNode(const PhysicsEngine::QuadNode& node) const noexcept
+void TriggerColliderSample::drawQuadNode(const PhysicsEngine::QuadNode& node) const noexcept
 {
     if (node.Children[0] != nullptr)
     {
         for (const auto& child : node.Children)
         {
-            DrawQuadNode(*child);
+            drawQuadNode(*child);
         }
     }
 

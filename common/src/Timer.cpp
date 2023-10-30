@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Timer.h"
 
 void Timer::Init() noexcept

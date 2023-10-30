@@ -27,12 +27,6 @@ enum class SampleType
  */
 class Sample
 {
-protected:
-    PhysicsEngine::World _world;
-    Timer _timer;
-
-    static constexpr int _startBodyCount = 2;
-
 public:
     Sample() noexcept = default;
 
@@ -41,8 +35,21 @@ public:
     /**
      * @brief Init is a method that initializes the sample.
      */
-    virtual void Init() noexcept;
-    virtual void HandleInputs(SDL_Event event) noexcept = 0;
-    virtual void Update() noexcept = 0;
-    virtual void Deinit() noexcept;
+    void Init() noexcept;
+    void HandleInputs(SDL_Event event) noexcept;
+    void Update() noexcept;
+    void Render() noexcept;
+    void Deinit() noexcept;
+
+protected:
+    PhysicsEngine::World _world;
+    Timer _timer;
+
+    static constexpr int _startBodyCount = 2;
+
+    virtual void onInit() noexcept = 0;
+    virtual void onHandleInputs(SDL_Event event) noexcept = 0;
+    virtual void onUpdate() noexcept = 0;
+    virtual void onRender() noexcept = 0;
+    virtual void onDeinit() noexcept = 0;
 };
