@@ -66,6 +66,6 @@ namespace PhysicsEngine
 
         [[nodiscard]] const std::vector<ColliderPair>& PossiblePairs() const noexcept { return _possiblePairs; }
 
-        [[nodiscard]] constexpr int MaxDepth() noexcept { return _maxDepth; }
+        [[nodiscard]] static constexpr int MaxDepth() noexcept { return _maxDepth; }
     };
 }

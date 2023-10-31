@@ -192,18 +192,18 @@ void insertRecursive(QuadNode& node,
 TEST_P(ColliderNumberFixture, Insert)
 {
     World world;
-    world.Init();
-
     QuadTree quadTree;
-    quadTree.Init();
-
     const auto colNbr = GetParam();
+
+    std::vector<QuadNode> expectedNodes;
+
+    world.Init();
+    quadTree.Init();
 
     std::vector<Collider> colliders;
     colliders.reserve(colNbr);
 
-    std::vector<QuadNode> expectedNodes;
-    expectedNodes.resize(Math::Pow(QuadNode::BoundaryDivisionCount, quadTree.MaxDepth()),
+    expectedNodes.resize(Math::Pow(QuadNode::BoundaryDivisionCount, QuadTree::MaxDepth()),
                          QuadNode());
 
     for (std::size_t i = 0; i < colNbr; i++)
@@ -248,21 +248,99 @@ TEST_P(ColliderNumberFixture, Insert)
                         simplifiedCircle,
                         colliderRef,
                         0,
-                        quadTree.MaxDepth());
+                        QuadTree::MaxDepth());
     }
 
     CheckRecursive(quadTree.RootNode(), expectedNodes[0]);
 }
 
-//TEST_P(ColliderNumberFixture, CalculatePossiblePairs)
-//{
-//    auto colNbr = GetParam();
-//
-//    std::vector<ColliderPair> expectedPairs;
-//    expectedPairs.reserve(colNbr);
-//
-//    for (std::size_t i = 0; i < colNbr; i++)
-//    {
-//
-//    }
-//}
+void CalculatePairsInNode(std::vector<ColliderPair>& possiblePairs, const QuadNode& node) noexcept
+{
+    for (const auto& simplColA : node.Colliders)
+    {
+        for (const auto& simplColB : node.Colliders)
+        {
+            if (simplColA.ColRef == simplColB.ColRef) continue;
+
+            if (Math::Intersect(simplColA.Rectangle, simplColB.Rectangle))
+            {
+                possiblePairs.push_back(ColliderPair{simplColA.ColRef, simplColB.ColRef});
+            }
+        }
+    }
+
+    // If the node has children.
+    if (node.Children[0] != nullptr)
+    {
+        for (const auto& child : node.Children)
+        {
+            CalculatePairsInNode(possiblePairs, *child);
+        }
+    }
+}
+
+TEST_P(ColliderNumberFixture, CalculatePossiblePairs)
+{
+    World world;
+    QuadTree quadTree;
+
+    world.Init();
+    quadTree.Init();
+
+    const auto colNbr = GetParam();
+
+
+    std::vector<Collider> colliders;
+    colliders.reserve(colNbr);
+
+    std::vector<ColliderPair> possiblePairs;
+
+    for (std::size_t i = 0; i < colNbr; i++)
+    {
+        Math::Vec2F rndScreenPos(Math::Random::Range(1.f, 7.f),
+                                 Math::Random::Range(-1.f, -5.f));
+
+        Math::Vec2F rndVelocity(Math::Random::Range(-2.f, 2.f),
+                                Math::Random::Range(-2.f, 2.f));
+
+        // Body.
+        BodyRef bodyRef = world.CreateBody();
+        auto& body = world.GetBody(bodyRef);
+        body = PhysicsEngine::Body(rndScreenPos, rndVelocity, 1.f);
+
+        // Collider.
+        ColliderRef colRef = world.CreateCollider(bodyRef);
+        auto& collider = world.GetCollider(colRef);
+        collider.SetIsTrigger(true);
+        collider.SetShape(Math::CircleF(Math::Vec2F::Zero(),
+                                        Math::Random::Range(0.1f, 0.15f)));
+
+        colliders.push_back(collider);
+    }
+
+    for (std::size_t i = 0; i < colliders.size(); i++)
+    {
+        ColliderRef colliderRef = {i, 0};
+        const auto& col = world.GetCollider(colliderRef);
+
+        const auto colShape = col.Shape();
+
+        const auto circle = std::get<Math::CircleF>(colShape);
+        const auto radius = circle.Radius();
+        const auto simplifiedCircle = Math::RectangleF::FromCenter(
+                world.GetBody(col.GetBodyRef()).Position(),
+                Math::Vec2F(radius, radius));
+
+        quadTree.Insert(simplifiedCircle, colliderRef);
+    }
+
+    quadTree.CalculatePossiblePairs();
+    CalculatePairsInNode(possiblePairs, quadTree.RootNode());
+
+    const auto& quadPossiblePairs = quadTree.PossiblePairs();
+
+    for (std::size_t  i = 0; i < quadPossiblePairs.size(); i++)
+    {
+        EXPECT_EQ(quadPossiblePairs[i], possiblePairs[i]);
+    }
+}
