@@ -21,7 +21,7 @@ namespace PhysicsEngine
         /**
          * @brief MaxColliderNbr is the maximum number of colliders that can be considered in a quad-tree zone.
          */
-        static constexpr int MaxColliderNbr = 10;
+        static constexpr int MaxColliderNbr = 6;
 
         static constexpr int BoundaryDivisionCount = 4;
 
