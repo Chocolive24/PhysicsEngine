@@ -13,9 +13,9 @@ struct GameObject
 class TriggerColliderSample : public Sample, public PhysicsEngine::ContactListener
 {
 private:
-    static constexpr int _circleCount = 150;
-    static constexpr int _rectangleCount = 150;
-    static constexpr int _polygonCount = 150;
+    static constexpr int _circleCount = 333;
+    static constexpr int _rectangleCount = 333;
+    static constexpr int _polygonCount = 333;
     static constexpr int _totalObjectCount = _circleCount + _rectangleCount + _polygonCount;
 
     static constexpr SDL_Color _noCollisionColor = {255, 0, 0, 255};

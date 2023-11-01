@@ -7,13 +7,12 @@
 #include "Angle.h"
 #include "TrigoLUT.h"
 #include "Definition.h"
+#include "Const.h"
 
 constexpr float CalculateLut(Math::Radian radian, std::array<float, Size> table, float step, float rangeStart = 0.f);
 
 namespace Math
 {
-    constexpr static float Pi = 3.14159265358979323846f;
-    constexpr static float Epsilon = 0.001f;
     constexpr static const float TanMargin = 0.001f;
 
     constexpr static float SinCosStep = Pi * 2 / Size;

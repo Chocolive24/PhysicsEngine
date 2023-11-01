@@ -21,6 +21,8 @@
 
 int main()
 {
+    new int(1);
+
     Window window{};
     window.Init();
 

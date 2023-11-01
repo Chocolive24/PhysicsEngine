@@ -7,6 +7,7 @@
 
 #include "Exception.h"
 #include "Definition.h"
+#include "Const.h"
 
 #include <stdexcept>
 
@@ -33,9 +34,9 @@ namespace Math
             return _value;
         }
 
-        NOALIAS constexpr operator Radian() const noexcept;
+        NOALIAS operator Radian() const noexcept;
 
-        NOALIAS constexpr Degree(Radian radian) noexcept;
+        NOALIAS Degree(Radian radian) noexcept;
 
         [[nodiscard]] NOALIAS constexpr Degree operator+(const Degree degree) const noexcept
         {
@@ -253,14 +254,14 @@ namespace Math
             return !operator<(radian);
         }
     };
-}
 
-constexpr Math::Degree::operator Radian() const noexcept
-{
-    return Radian(_value);
-}
+    inline Degree::operator Radian() const noexcept
+    {
+        return Radian(_value);
+    }
 
-constexpr Math::Degree::Degree(Radian radian) noexcept
-{
-    _value = static_cast<float>(radian) * 180.0f / 3.14159265358979323846f;
+    inline Degree::Degree(Radian radian) noexcept
+    {
+        _value = static_cast<float>(radian) * 180.0f / Math::Pi;
+    }
 }

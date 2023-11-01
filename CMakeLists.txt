@@ -6,6 +6,29 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(SDL2 REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 
+# Define a CMake variable to control AddressSanitizer
+option(ENABLE_ADDRESS_SANITIZER "Enable AddressSanitizer" OFF)
+
+IF(MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX2 /Oi /Oy-")
+
+    # Check if AddressSanitizer is enabled
+    if(ENABLE_ADDRESS_SANITIZER)
+        # Enable AddressSanitizer flags and options
+        add_compile_options(/fsanitize=address /fno-omit-frame-pointer)
+        add_link_options(/fsanitize=address)
+    endif()
+else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -save-temps -march=haswell -ffast-math")
+
+    # Check if AddressSanitizer is enabled
+    if(ENABLE_ADDRESS_SANITIZER)
+        # Enable AddressSanitizer flags and options
+        add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
+        add_link_options(-fsanitize=address)
+    endif()
+ENDIF()
+
 # Create the Math library
 file(GLOB_RECURSE MATH_SRC_FILES libs/math/include/*.h libs/math/src/*.cpp)
 add_library(Math ${MATH_SRC_FILES})
@@ -57,12 +80,6 @@ foreach(test_file ${PHYSICS_TEST_FILES} )
     target_link_libraries(${test_name} PRIVATE PhysicsEngineCommon)
     target_link_libraries(${test_name} PRIVATE GTest::gtest GTest::gtest_main)
 
-    IF(MSVC)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX2 /Oi /Oy-")
-    else()
-        set_target_properties(${test_name} PROPERTIES COMPILE_FLAGS "-save-temps -march=haswell -ffast-math -fno-omit-frame-pointer")
-    ENDIF()
-
     set_target_properties (${test_name} PROPERTIES FOLDER Courses)
 endforeach()
 
@@ -77,11 +94,7 @@ foreach(test_file ${COMMON_TEST_FILES} )
     target_link_libraries(${test_name} PRIVATE Common)
     target_link_libraries(${test_name} PRIVATE GTest::gtest GTest::gtest_main)
 
-    IF(MSVC)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX2 /Oi /Oy-")
-    else()
-        set_target_properties(${test_name} PROPERTIES COMPILE_FLAGS "-save-temps -march=haswell -ffast-math -fno-omit-frame-pointer")
-    ENDIF()
+
 
     set_target_properties (${test_name} PROPERTIES FOLDER Courses)
 endforeach()

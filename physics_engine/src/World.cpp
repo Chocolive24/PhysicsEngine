@@ -2,8 +2,6 @@
  * @author Olivier
  */
 
-
-#include <iostream>
 #include "World.h"
 
 namespace PhysicsEngine

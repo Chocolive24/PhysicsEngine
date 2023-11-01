@@ -23,12 +23,13 @@ namespace PhysicsEngine
     struct QuadNode
     {
         /**
-         * @brief MaxColliderNbr is the maximum number of colliders that can be considered in a quad-tree zone.
+         * @brief MaxColliderNbr is the maximum number of colliders that the node can stores before a subdivision
+         * of the world.
          */
         static constexpr int MaxColliderNbr = 6;
 
         /**
-         * @brief BoundaryDivisionCount is the number of space boundary subdivision.
+         * @brief BoundaryDivisionCount is the number of space boundary subdivision for the node.
          */
         static constexpr int BoundaryDivisionCount = 4;
 
@@ -41,7 +42,7 @@ namespace PhysicsEngine
     };
 
     /**
-     * @class QuadTree is a class
+     * @class QuadTree is a class that represents a quad-tree used for spatial partitioning of colliders.
      */
     class QuadTree
     {
@@ -54,12 +55,25 @@ namespace PhysicsEngine
          */
         static constexpr int _maxDepth = 5;
 
+        /**
+         * @brief insertInNode is a method that insert a collider in the node given in parameter
+         * (in its simplified shape) in the given node in parameter.
+         * @param node The node in which the collider must be inserted.
+         * @param simplifiedShape The simplified shape of the collider (aka its shape in rectangle).
+         * @param colliderRef The collider reference in the world.
+         * @param depth The depth in which the node is.
+         */
         void insertInNode(QuadNode& node,
                           Math::RectangleF simplifiedShape,
                           ColliderRef colliderRef,
                           int depth) noexcept;
 
-        void addNodePossiblePairs(const QuadNode& node) noexcept;
+        /**
+         * @brief calculateNodePossiblePairs is a method that calculates the possible pair of collider
+         * in the node given in parameter.
+         * @param node
+         */
+        void calculateNodePossiblePairs(const QuadNode& node) noexcept;
 
     public:
         QuadTree() noexcept = default;
@@ -105,7 +119,7 @@ namespace PhysicsEngine
          * subdivision) to the new one given in parameter.
          * @param boundary The boundary of the first space subdivision.
          */
-        constexpr void SetRootNodeBoundary(const Math::RectangleF boundary) noexcept
+        void SetRootNodeBoundary(const Math::RectangleF boundary) noexcept
         {
             _nodes[0].Boundary = boundary;
         };

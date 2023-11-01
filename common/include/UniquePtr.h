@@ -13,7 +13,7 @@ template<typename T>
 class UniquePtr
 {
 private:
-    T *_ptr = nullptr;
+    T* _ptr = nullptr;
 
 public:
     constexpr explicit UniquePtr() noexcept = default;
@@ -57,6 +57,17 @@ public:
     [[nodiscard]] static constexpr UniquePtr<T> MakeUnique(T value) noexcept
     {
         return UniquePtr<T>(new T(value));
+    }
+
+    /**
+     * @brief MakeUnique is a method that creates a unique pointer of the type of the value in parameter.
+     * @param value The value to point with the unique pointer.
+     * @return The unique pointer object that points the value.
+     */
+    template<typename U>
+    [[nodiscard]] static constexpr UniquePtr<T> MakeUnique(U value) noexcept
+    {
+        return UniquePtr<T>(new U(value));
     }
 
     /**

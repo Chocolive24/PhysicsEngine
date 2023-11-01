@@ -5,10 +5,10 @@
 namespace PhysicsEngine
 {
 
-/**
- * @class Allocator is an abstract class the defines the fundamental elements shared between all different custom
- * allocators. It also enabled to see and analise the number of allocations made and the amount of memory used.
- */
+    /**
+     * @class Allocator is an abstract class the defines the fundamental elements shared between all different custom
+     * allocators. It also enabled to see and analise the number of allocations made and the amount of memory used.
+     */
     class Allocator
     {
     protected:
@@ -75,6 +75,10 @@ namespace PhysicsEngine
         [[nodiscard]] std::size_t AllocationCount() const noexcept { return _allocationCount; }
     };
 
+    /**
+     * @class LinearAllocator is a class that defines a linear allocator (aka an allocator that allocates memory block
+     * one after the other).
+     */
     class LinearAllocator final : public Allocator
     {
     private:
@@ -86,12 +90,31 @@ namespace PhysicsEngine
 
         ~LinearAllocator() override { _currentPosPtr = nullptr; }
 
+        /**
+         * @brief Allocate is a method that allocates a given amount of memory.
+         * @param allocationSize The size of the allocation to do.
+         * @param alignment The alignment in memory of the allocation.
+         * @return A pointer pointing to the memory (aka a void*).
+         */
         void* Allocate(std::size_t allocationSize, std::size_t alignment) override;
+
+        /**
+         * @brief Deallocate is a method that deallocates a block of memory given in parameter.
+         * @param ptr The pointer to the memory block to deallocates.
+         */
         void Deallocate(void* ptr) override;
 
+        /**
+         * @brief Clear is a method that reset the allocator to its start state (aka it sets the currentPosPtr to
+         * the rootPtr, sets the size to 0 and reset memory values to 0).
+         */
         void Clear() noexcept;
     };
 
+    /**
+     * @class LinearAllocator is a class that defines a proxy allocator (aka an allocator that redirects all
+     * allocations/deallocations to the an intern allocator).
+     */
     class ProxyAllocator final : public Allocator
     {
     private:
@@ -101,16 +124,34 @@ namespace PhysicsEngine
         explicit ProxyAllocator(Allocator& allocator) noexcept : _allocator(allocator) {};
         ~ProxyAllocator() override = default;
 
+        /**
+         * @brief Allocate is a method that allocates a given amount of memory.
+         * @param allocationSize The size of the allocation to do.
+         * @param alignment The alignment in memory of the allocation.
+         * @return A pointer pointing to the memory (aka a void*).
+         */
         [[nodiscard]] void* Allocate(std::size_t size, std::size_t alignment) noexcept override;
+
+        /**
+         * @brief Deallocate is a method that deallocates a block of memory given in parameter.
+         * @param ptr The pointer to the memory block to deallocates.
+         */
         void Deallocate(void* ptr) noexcept override;
     };
 
-/**
- * @namespace MemoryAlignment is a namespace that contains useful functions for calculating memory alignments
- * for allocations.
- */
+    /**
+     * @namespace MemoryAlignment is a namespace that contains useful functions for calculating memory alignments
+     * for allocations.
+     */
     namespace MemoryAlignment
     {
+        /**
+         * @brief CalculateAlignForwardAdjustment is a method that calculates the adjustment to apply to the memory
+         * address to match the alignment in memory given in parameter.
+         * @param address The address to align in memory.
+         * @param alignment The alignment in memory.
+         * @return The adjustment to apply to the memory address to match the alignment.
+         */
         std::size_t CalculateAlignForwardAdjustment(const void* address, std::size_t alignment);
     }
 }

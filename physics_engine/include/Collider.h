@@ -52,14 +52,14 @@ namespace PhysicsEngine
          * with a circle shape given in parameter.
          * @param circle The new mathematical shape for the collider.
          */
-        constexpr void SetShape(Math::CircleF circle) noexcept { _shape = circle; }
+        void SetShape(Math::CircleF circle) noexcept { _shape = circle; }
 
         /**
          * @brief SetShape is a method that replaces the current mathematical shape of the collider
          * with rectangle shape given in parameter.
          * @param rectangle The new mathematical shape for the collider.
          */
-        constexpr void SetShape(Math::RectangleF rectangle) noexcept { _shape = rectangle; }
+        void SetShape(Math::RectangleF rectangle) noexcept { _shape = rectangle; }
 
         /**
          * @brief SetShape is a method that replaces the current mathematical shape of the collider
@@ -227,7 +227,7 @@ namespace PhysicsEngine
          * @brief VerticesCount is a method that gives the number of vertices of the polygon collider.
          * @return The number of vertices of the polygon collider.
          */
-        [[nodiscard]] constexpr std::size_t VerticesCount() const noexcept { return _vertices.size(); }
+        [[nodiscard]] std::size_t VerticesCount() const noexcept { return _vertices.size(); }
 
         /**
         * @brief SetVertices is a method that replaces the current vertices of the polygon collider
@@ -241,7 +241,7 @@ namespace PhysicsEngine
          * (aka if it has a at least 3 vertices).
          * @return True if the polygon collider is valid.
          */
-        [[nodiscard]] constexpr bool IsValid() const noexcept
+        [[nodiscard]] bool IsValid() const noexcept
         {
             return _vertices.size() > 2;
         };

@@ -63,7 +63,7 @@ namespace Math
     {
     public:
         /**
-         * @brief Construct a new FilledRectangle object
+         * @brief Construct a new Rectangle object
          * @param position the position of the rectangle
          * @param size the size of the rectangle
          */
