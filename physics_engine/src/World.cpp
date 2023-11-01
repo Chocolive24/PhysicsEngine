@@ -354,7 +354,7 @@ namespace PhysicsEngine
 
         _contactListener = nullptr;
 
-        _quadTree.Clear();
+        _quadTree.Deinit();
     }
 
     [[nodiscard]] BodyRef World::CreateBody() noexcept

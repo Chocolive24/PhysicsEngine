@@ -150,3 +150,18 @@ void PhysicsEngine::QuadTree::Clear() noexcept
 
     _possiblePairs.clear();
 }
+
+void PhysicsEngine::QuadTree::Deinit() noexcept
+{
+    for(auto& node : _nodes)
+    {
+        node.Colliders.clear();
+
+        for (auto& child : node.Children)
+        {
+            delete child;
+        }
+    }
+
+    _possiblePairs.clear();
+}
