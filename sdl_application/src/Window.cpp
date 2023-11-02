@@ -5,10 +5,10 @@
 
 void Window::Init() noexcept
 {
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
-        std::cerr << "Failed to initialize the SDL2 library Error :" <<  " " << SDL_GetError() << "\n";
-        Deinit();
+        SDL_Log("Failed to initialize the SDL2 library Error  :%s", SDL_GetError());
+        return;
     }
 
     _window = SDL_CreateWindow("SDL2 Window",
@@ -16,31 +16,39 @@ void Window::Init() noexcept
                                SDL_WINDOWPOS_CENTERED,
                                WindowWidth,
                                WindowHeight,
-                               SDL_WINDOW_RESIZABLE);
+                               SDL_WINDOW_SHOWN);
 
-    if (!_window)
+    if (_window == nullptr)
     {
-        std::cerr << "Failed to create window! Error :" << " " << SDL_GetError() << "\n";
-        Deinit();
-        exit(1);
+        SDL_Log("Failed to create window! Error : %s", SDL_GetError());
+        return;
     }
 
-   _renderer = SDL_CreateRenderer(_window, 0, SDL_RENDERER_ACCELERATED);
+    _renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED);
 
-    if (!_renderer)
+    if (_renderer == nullptr)
     {
-        std::cerr << "Renderer could not be created! Error :" << " " << SDL_GetError() << "\n";
-        Deinit();
-        exit(1);
+        SDL_Log("Renderer could not be created! Error : %s", SDL_GetError());
+        return;
     }
+}
+
+void Window::RunAppLoop()
+{
+   
 }
 
 void Window::Deinit() const noexcept
 {
-    if (_renderer) SDL_DestroyRenderer(_renderer);
-    if (_window) SDL_DestroyWindow(_window);
+    if (_renderer != nullptr)
+    {
+        SDL_DestroyRenderer(_renderer);
+    }
+
+    if (_window != nullptr)
+    {
+        SDL_DestroyWindow(_window);
+    }
 
     SDL_Quit();
 }
-
-

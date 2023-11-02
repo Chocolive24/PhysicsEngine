@@ -15,20 +15,18 @@ IF(MSVC)
     # Check if AddressSanitizer is enabled
     if(ENABLE_ADDRESS_SANITIZER)
         # Enable AddressSanitizer flags and options
-        add_compile_options(/fsanitize=address /fno-omit-frame-pointer)
-        add_link_options(/fsanitize=address)
+        add_compile_options(/fsanitize=address /DEBUG)
     endif()
-else()
+ELSE()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -save-temps -march=haswell -ffast-math")
 
     # Check if AddressSanitizer is enabled
     if(ENABLE_ADDRESS_SANITIZER)
         # Enable AddressSanitizer flags and options
-        add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
-        add_link_options(-fsanitize=address)
+        add_compile_options(-fsanitize=address)
     endif()
 ENDIF()
-
+    
 # Create the Math library
 file(GLOB_RECURSE MATH_SRC_FILES libs/math/include/*.h libs/math/src/*.cpp)
 add_library(Math ${MATH_SRC_FILES})
@@ -54,7 +52,8 @@ file(GLOB_RECURSE SDL_APP_SRC_FILES sdl_application/include/*.h sdl_application/
 add_library(SDL_AppCommon ${SDL_APP_SRC_FILES})
 set_target_properties(SDL_AppCommon PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(SDL_AppCommon PUBLIC sdl_application/include/)
-target_link_libraries(SDL_AppCommon PUBLIC SDL2::SDL2 Math Common)
+target_link_libraries(SDL_AppCommon $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
+        $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static> Math Common)
 
 # Create the Samples library with dependencies on PhysicsEngineCommon, SDL_AppCommon, Common, and Math
 file(GLOB_RECURSE SAMPLES_SRC_FILES samples/include/*.h samples/src/*.cpp)
@@ -66,9 +65,6 @@ target_link_libraries(Samples PUBLIC PhysicsEngineCommon SDL_AppCommon Common Ma
 # Create the PhysicsEngine executable with the Samples library as a dependency
 add_executable(PhysicsEngine main.cpp)
 target_link_libraries(PhysicsEngine PRIVATE Samples)
-
-# Disable SDL main
-add_definitions(-DSDL_MAIN_HANDLED)
 
 # Tests Physics Engine
 file(GLOB_RECURSE PHYSICS_TEST_FILES physics_engine/tests/*.cpp)

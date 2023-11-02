@@ -38,6 +38,7 @@ public:
     static constexpr int WindowHeight = 680;
 
     void Init() noexcept;
+    void RunAppLoop();
     void Deinit() const noexcept;
 
     [[nodiscard]] constexpr SDL_Renderer* Renderer() const noexcept { return _renderer; }

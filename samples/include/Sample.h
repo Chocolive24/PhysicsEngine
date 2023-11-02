@@ -45,7 +45,7 @@ protected:
     PhysicsEngine::World _world;
     Timer _timer;
 
-    static constexpr int _startBodyCount = 2;
+    static constexpr int _startBodyCount = 1000;
 
     virtual void onInit() noexcept = 0;
     virtual void onHandleInputs(SDL_Event event) noexcept = 0;

@@ -4,25 +4,23 @@
  * @author Olivier Pachoud
  */
 
-//TODO: interface allocator
-//TODO: linear, proxy et free line allocator
-// TODO: QUad tree
+ //TODO: interface allocator
+ //TODO: linear, proxy et free line allocator
+ // TODO: QUad tree
 
-// TODO: balancer tout le main dans une classe Application -> SampleManager dans sample directory
+ // TODO: balancer tout le main dans une classe Application -> SampleManager dans sample directory
 
-//TODO: CreateBody(Vec2F pos, vel, mass) -> modifie direct dans le fonction le body.
-// pour éviter de chopper la ref puis la modif.
+ //TODO: CreateBody(Vec2F pos, vel, mass) -> modifie direct dans le fonction le body.
+ // pour éviter de chopper la ref puis la modif.
 
-//TODO: TOUT COMMENTER
+ //TODO: TOUT COMMENTER
 
 #include <iostream>
 #include "SampleManager.h"
 #include "DrawableGeometry.h"
 
-int main()
+int main([[maybe_unused]] int argc, [[maybe_unused]] char* args[])
 {
-    new int(1);
-
     Window window{};
     window.Init();
 
@@ -32,15 +30,15 @@ int main()
     SampleManager sampleManager;
     sampleManager.Init();
 
-    while(!quit)
+    while (!quit)
     {
-        while(SDL_PollEvent(&event))
+        while (SDL_PollEvent(&event))
         {
-            switch (event.type) 
+            switch (event.type)
             {
-                case SDL_QUIT:
-                    quit = true;
-                    break;
+            case SDL_QUIT:
+                quit = true;
+                break;
             }
 
             sampleManager.HandleInputs(event);
@@ -50,21 +48,21 @@ int main()
         SDL_RenderClear(window.Renderer());
 
         SDL_SetRenderDrawColor(window.Renderer(),
-                               Window::BackgroundColor.r,
-                               Window::BackgroundColor.g,
-                               Window::BackgroundColor.b,
-                               Window::BackgroundColor.a);
+            Window::BackgroundColor.r,
+            Window::BackgroundColor.g,
+            Window::BackgroundColor.b,
+            Window::BackgroundColor.a);
 
         sampleManager.Update();
 
         sampleManager.Render();
 
         SDL_RenderGeometry(window.Renderer(),
-                           nullptr,
-                           DrawableGeometry::Vertices.data(),
-                           static_cast<int>(DrawableGeometry::Vertices.size()),
-                           DrawableGeometry::Indices.data(),
-                           static_cast<int>(DrawableGeometry::Indices.size()));
+            nullptr,
+            DrawableGeometry::Vertices.data(),
+            static_cast<int>(DrawableGeometry::Vertices.size()),
+            DrawableGeometry::Indices.data(),
+            static_cast<int>(DrawableGeometry::Indices.size()));
 
         SDL_RenderPresent(window.Renderer());
     }

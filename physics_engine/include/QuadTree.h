@@ -50,6 +50,8 @@ namespace PhysicsEngine
         std::vector<QuadNode> _nodes;
         std::vector<ColliderPair> _possiblePairs;
 
+        int _nodeIndex = 1;
+
         /**
          * @brief MaxDepth is the maximum depth of the quad-tree recursive space subdivision.
          */

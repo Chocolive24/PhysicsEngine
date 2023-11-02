@@ -47,9 +47,11 @@ TEST_P(AllocationSizeAndAlignmentFixture, LinearAllocate)
 {
     auto [size, align] = GetParam();
 
-    void* ptr = std::malloc(10000); // 10000 is the allocator size
+    const int allocatorSize = 1000;
 
-    LinearAllocator linearAllocator(ptr, 10000);
+    void* ptr = std::malloc(allocatorSize);
+
+    LinearAllocator linearAllocator(ptr, allocatorSize);
 
     void* allocatedPtr = linearAllocator.Allocate(size, align);
 

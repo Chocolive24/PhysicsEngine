@@ -25,7 +25,7 @@ namespace PhysicsEngine
 
         for (auto& node : _nodes)
         {
-            node.Colliders.reserve(QuadNode::MaxColliderNbr);
+            node.Colliders.reserve(QuadNode::MaxColliderNbr + 1);
         }
     }
 
@@ -60,11 +60,17 @@ namespace PhysicsEngine
                 const auto bottomLeftCorner = center - halfSize;
                 const auto leftMiddle = Math::Vec2F(center.X - halfSize.X, center.Y);
 
-                //TODO: utiliser _nodes au leiu de new Quad.
-                node.Children[0] = new QuadNode(Math::RectangleF(leftMiddle, topMiddle));
-                node.Children[1] = new QuadNode(Math::RectangleF(center, topRightCorner));
-                node.Children[2] = new QuadNode(Math::RectangleF(bottomLeftCorner, center));
-                node.Children[3] = new QuadNode(Math::RectangleF(bottomMiddle, rightMiddle));
+                _nodes[_nodeIndex].Boundary = Math::RectangleF(leftMiddle, topMiddle);
+                _nodes[_nodeIndex + 1].Boundary = Math::RectangleF(center, topRightCorner);
+                _nodes[_nodeIndex + 2].Boundary = Math::RectangleF(bottomLeftCorner, center);
+                _nodes[_nodeIndex + 3].Boundary = Math::RectangleF(bottomMiddle, rightMiddle);
+
+                node.Children[0] = &_nodes[_nodeIndex];
+                node.Children[1] = &_nodes[_nodeIndex + 1];
+                node.Children[2] = &_nodes[_nodeIndex + 2];
+                node.Children[3] = &_nodes[_nodeIndex + 3];
+
+                _nodeIndex += 4;
 
                 std::vector<SimplifiedCollider> remainingColliders; //TODO: std::array avec max col nbr.
 
@@ -163,20 +169,16 @@ namespace PhysicsEngine
             std::fill(node.Children.begin(), node.Children.end(), nullptr);
         }
 
+        _nodeIndex = 1;
+
         _possiblePairs.clear();
     }
 
     void QuadTree::Deinit() noexcept
     {
-        for (auto& node : _nodes)
-        {
-            node.Colliders.clear();
+        _nodes.clear();
 
-            for (auto& child : node.Children)
-            {
-                delete child;
-            }
-        }
+        _nodeIndex = 1;
 
         _possiblePairs.clear();
     }

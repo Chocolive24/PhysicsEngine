@@ -109,7 +109,7 @@ void PlanetSystemSample::onDeinit() noexcept
 
 [[nodiscard]] CelestialBody PlanetSystemSample::createPlanet(Math::Vec2F pos, float radius, SDL_Color color) noexcept
 {
-    auto& sunBody = _world.GetBody(_sun.BodyRef);
+    const auto sunBody = _world.GetBody(_sun.BodyRef);
     CelestialBody p = { _world.CreateBody(), radius, color };
     auto& pBody = _world.GetBody(p.BodyRef);
 
