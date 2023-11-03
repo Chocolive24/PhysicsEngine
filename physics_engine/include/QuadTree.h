@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Allocator.h"
 #include "Collider.h"
 
 #include <vector>
@@ -48,6 +49,8 @@ namespace PhysicsEngine
     {
     private:
         std::vector<QuadNode> _nodes;
+
+        HeapAllocator _heapAllocator;
         std::vector<ColliderPair> _possiblePairs;
 
         int _nodeIndex = 1;

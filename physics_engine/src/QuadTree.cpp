@@ -4,6 +4,11 @@
 
 #include "QuadTree.h"
 
+#ifdef TRACY_ENABLE
+#include <Tracy.hpp>
+#endif // TRACY_ENABLE
+
+
 namespace PhysicsEngine
 {
     template<typename T>
@@ -39,6 +44,9 @@ namespace PhysicsEngine
         ColliderRef colliderRef,
         int depth) noexcept
     {
+    #ifdef TRACY_ENABLE
+            ZoneScoped;
+    #endif
         // If the node doesn't have any children.
         if (node.Children[0] == nullptr)
         {
@@ -137,6 +145,10 @@ namespace PhysicsEngine
 
     void QuadTree::calculateNodePossiblePairs(const QuadNode& node) noexcept
     {
+    #ifdef TRACY_ENABLE
+            ZoneScoped;
+    #endif
+
         for (const auto& simplColA : node.Colliders)
         {
             for (const auto& simplColB : node.Colliders)
@@ -177,6 +189,9 @@ namespace PhysicsEngine
 
     void QuadTree::calculateChildrenNodePossiblePairs(const QuadNode& node, SimplifiedCollider simplCol) noexcept
     {
+    #ifdef TRACY_ENABLE
+            ZoneScoped;
+    #endif
         //// If the current node has children, we need to compare the simplified collider from its parent node with its children.
         //if (node.Children[0] != nullptr)
         //{

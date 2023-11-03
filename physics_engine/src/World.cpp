@@ -26,6 +26,9 @@ namespace PhysicsEngine
 
     void World::Update(const float deltaTime) noexcept
     {
+    #ifdef TRACY_ENABLE
+            ZoneScoped;
+    #endif
         for (auto& body : _bodies)
         {
             if (!body.IsValid()) continue;
@@ -51,9 +54,9 @@ namespace PhysicsEngine
 
     void World::resolveBroadPhase() noexcept
     {
-        #ifdef TRACY_ENABLE
-                ZoneScoped;
-        #endif
+    #ifdef TRACY_ENABLE
+            ZoneScoped;
+    #endif
 
         _quadTree.Clear();
 
@@ -61,6 +64,10 @@ namespace PhysicsEngine
         // lowest values.
         Math::Vec2F worldMinBound(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
         Math::Vec2F worldMaxBound(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
+
+    #ifdef TRACY_ENABLE
+        ZoneNamedN(SetRoodNodeBoundary, "RootNodeBoundary", true);
+    #endif
 
         // Adjust the size of the collision zone in the world rectangle to the most distant bodies.
         for (const auto& collider : _colliders)
@@ -93,6 +100,9 @@ namespace PhysicsEngine
         // Set the first rectangle of the quad-tree to calculated collision area rectangle.
         _quadTree.SetRootNodeBoundary(Math::RectangleF(worldMinBound, worldMaxBound));
 
+    #ifdef TRACY_ENABLE
+            ZoneNamedN(InsertCollidersInQuadTree, "InsertCollidersInQuadTree", true);
+    #endif
         for (std::size_t i = 0; i < _colliders.size(); i++)
         {
             ColliderRef colliderRef = {i, _collidersGenIndices[i]};
@@ -170,6 +180,13 @@ namespace PhysicsEngine
 
     void World::resolveNarrowPhase() noexcept
     {
+    #ifdef TRACY_ENABLE
+            ZoneScoped;
+    #endif
+
+    #ifdef TRACY_ENABLE
+            ZoneNamedN(DetectingColliderPairs, "DetectingColliderPairs", true);
+    #endif
         std::unordered_set<ColliderPair, ColliderHash> newColliderPairs;
 
         const auto& newPossiblePairs = _quadTree.PossiblePairs();
@@ -184,6 +201,10 @@ namespace PhysicsEngine
                 newColliderPairs.insert(colliderPair);
             }
         }
+
+    #ifdef TRACY_ENABLE
+            ZoneNamedN(CallContactListener, "CallContactListener", true);
+    #endif
 
         for (auto& colliderPair : newColliderPairs)
         {
@@ -231,6 +252,9 @@ namespace PhysicsEngine
 
     bool World::detectOverlap(const Collider& colA, const Collider& colB) noexcept
     {
+    #ifdef TRACY_ENABLE
+            ZoneScoped;
+    #endif
         const auto& bodyA = GetBody(colA.GetBodyRef());
         const auto& bodyB = GetBody(colB.GetBodyRef());
 

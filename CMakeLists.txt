@@ -57,10 +57,8 @@ target_include_directories(PhysicsEngineCommon PUBLIC physics_engine/include/)
 target_link_libraries(PhysicsEngineCommon PUBLIC Math)
 
 if (USE_TRACY)
-    target_compile_definitions(PhysicsEngineCommon PRIVATE TRACY_ENABLE)
-    # Link the TracyClient library
-    target_link_libraries(PhysicsEngineCommon PRIVATE TracyClient)
-
+    target_compile_definitions(PhysicsEngineCommon PUBLIC TRACY_ENABLE)
+    # Add TracyClient.cpp as a source file for your executable
     target_sources(PhysicsEngineCommon PRIVATE ${CMAKE_SOURCE_DIR}/externals/TracyClient.cpp)
 endif()
 
@@ -85,15 +83,19 @@ if (USE_TRACY)
     target_link_libraries(Samples PRIVATE TracyClient)
 endif()
 
+# Add the Tracy source code as part of your project
+add_library(TracyClient STATIC externals/TracyClient.cpp)
+
+# Include the Tracy headers
+target_include_directories(TracyClient PUBLIC Tracy/)
+
 # Create the PhysicsEngine executable with the Samples library as a dependency
 add_executable(PhysicsEngine main.cpp)
 
 if (USE_TRACY)
     target_compile_definitions(PhysicsEngine PUBLIC TRACY_ENABLE)
     # Link the TracyClient library
-    target_link_libraries(PhysicsEngine PUBLIC TracyClient)
-    # Add TracyClient.cpp as a source file for your executable
-    target_sources(PhysicsEngine PRIVATE ${CMAKE_SOURCE_DIR}/externals/TracyClient.cpp)
+    target_link_libraries(PhysicsEngine PRIVATE TracyClient)
 endif()
 
 # Link the Samples library

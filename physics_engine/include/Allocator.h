@@ -1,6 +1,12 @@
 #pragma once
 
+#ifdef TRACY_ENABLE
+#include <Tracy.hpp>
+#endif // TRACY_ENABLE
+
 #include <cstddef>
+#include <memory>
+#include <vector>
 
 namespace PhysicsEngine
 {
@@ -73,6 +79,24 @@ namespace PhysicsEngine
          * @return The count of allocation made with the allocator..
          */
         [[nodiscard]] std::size_t AllocationCount() const noexcept { return _allocationCount; }
+    };
+
+    class HeapAllocator final : public Allocator
+    {
+    public:
+        /**
+         * @brief Allocate is a method that allocates a given amount of memory.
+         * @param allocationSize The size of the allocation to do.
+         * @param alignment The alignment in memory of the allocation.
+         * @return A pointer pointing to the memory (aka a void*).
+         */
+        void* Allocate(std::size_t allocationSize, std::size_t alignment) override;
+
+        /**
+         * @brief Deallocate is a method that deallocates a block of memory given in parameter.
+         * @param ptr The pointer to the memory block to deallocates.
+         */
+        void Deallocate(void* ptr) override;
     };
 
     /**
@@ -154,4 +178,55 @@ namespace PhysicsEngine
          */
         std::size_t CalculateAlignForwardAdjustment(const void* address, std::size_t alignment);
     }
+
+    /**
+     * \brief Custom proxy allocator respecting _allocatortraits
+     */
+    template<typename T>
+    class StandardAllocator
+    {
+    public:
+        typedef T value_type;
+        StandardAllocator(Allocator& allocator);
+        template <class U>
+        StandardAllocator(const StandardAllocator<U>& allocator) noexcept : _allocator(allocator.GetAllocator()) {}
+        T* allocate(std::size_t n);
+        void deallocate(T* ptr, std::size_t n);
+        [[nodiscard]] Allocator& GetAllocator() const { return _allocator; }
+    protected:
+        Allocator& _allocator;
+    };
+
+
+    template <class T, class U>
+    constexpr bool operator== (const StandardAllocator<T>&, const StandardAllocator<U>&) noexcept
+    {
+        return true;
+    }
+
+    template <class T, class U>
+    constexpr bool operator!= (const StandardAllocator<T>&, const StandardAllocator<U>&) noexcept
+    {
+        return false;
+    }
+
+    template <typename T>
+    StandardAllocator<T>::StandardAllocator(Allocator& allocator) : _allocator(allocator)
+    {
+    }
+
+    template <typename T>
+    T* StandardAllocator<T>::allocate(std::size_t n)
+    {
+        return static_cast<T*>(_allocator.Allocate(n * sizeof(T), alignof(T)));
+    }
+
+    template <typename T>
+    void StandardAllocator<T>::deallocate(T* ptr, std::size_t n)
+    {
+        _allocator.Deallocate(ptr);
+    }
+
+    template<typename T>
+    using AllocVector = std::vector<T, StandardAllocator<T>>;
 }

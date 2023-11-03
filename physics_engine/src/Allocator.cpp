@@ -4,10 +4,29 @@
 
 #include "Allocator.h"
 
-#include <cstdint>
-
 namespace PhysicsEngine
 {
+    void* HeapAllocator::Allocate(std::size_t allocationSize, std::size_t alignment)
+    {
+        const auto size = allocationSize * alignment;
+        auto* ptr = std::malloc(size);
+
+    #ifdef TRACY_ENABLE
+            TracyAlloc(ptr, size);
+    #endif
+
+        return ptr;
+    }
+
+    void HeapAllocator::Deallocate(void* ptr)
+    {
+    #ifdef TRACY_ENABLE
+            TracyFree(ptr);
+    #endif
+
+        std::free(ptr);
+    }
+
     void* LinearAllocator::Allocate(std::size_t allocationSize, std::size_t alignment)
     {
         const auto adjustment = MemoryAlignment::CalculateAlignForwardAdjustment(_currentPosPtr,
