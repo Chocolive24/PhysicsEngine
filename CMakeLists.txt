@@ -6,7 +6,16 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(SDL2 REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 
-# Define a CMake variable to control AddressSanitizer
+# Add a CMake option to enable or disable Tracy Profiler
+option(USE_TRACY "Use Tracy Profiler" OFF)
+
+if (USE_TRACY)
+    # Enable Tracy profiling by setting the preprocessor directive
+    add_compile_definitions(TRACY_ENABLE)
+    # Include Tracy's headers for the entire project
+    include_directories(externals/tracy/)
+endif()
+
 option(ENABLE_ADDRESS_SANITIZER "Enable AddressSanitizer" OFF)
 
 IF(MSVC)
@@ -26,7 +35,7 @@ ELSE()
         add_compile_options(-fsanitize=address)
     endif()
 ENDIF()
-    
+
 # Create the Math library
 file(GLOB_RECURSE MATH_SRC_FILES libs/math/include/*.h libs/math/src/*.cpp)
 add_library(Math ${MATH_SRC_FILES})
@@ -47,6 +56,14 @@ set_target_properties(PhysicsEngineCommon PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(PhysicsEngineCommon PUBLIC physics_engine/include/)
 target_link_libraries(PhysicsEngineCommon PUBLIC Math)
 
+if (USE_TRACY)
+    target_compile_definitions(PhysicsEngineCommon PRIVATE TRACY_ENABLE)
+    # Link the TracyClient library
+    target_link_libraries(PhysicsEngineCommon PRIVATE TracyClient)
+
+    target_sources(PhysicsEngineCommon PRIVATE ${CMAKE_SOURCE_DIR}/externals/TracyClient.cpp)
+endif()
+
 # Create the SDL_AppCommon library with Math as a dependency
 file(GLOB_RECURSE SDL_APP_SRC_FILES sdl_application/include/*.h sdl_application/src/*.cpp)
 add_library(SDL_AppCommon ${SDL_APP_SRC_FILES})
@@ -62,9 +79,26 @@ set_target_properties(Samples PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(Samples PUBLIC samples/include/)
 target_link_libraries(Samples PUBLIC PhysicsEngineCommon SDL_AppCommon Common Math)
 
+if (USE_TRACY)
+    target_compile_definitions(Samples PRIVATE TRACY_ENABLE)
+    # Link the TracyClient library
+    target_link_libraries(Samples PRIVATE TracyClient)
+endif()
+
 # Create the PhysicsEngine executable with the Samples library as a dependency
 add_executable(PhysicsEngine main.cpp)
+
+if (USE_TRACY)
+    target_compile_definitions(PhysicsEngine PUBLIC TRACY_ENABLE)
+    # Link the TracyClient library
+    target_link_libraries(PhysicsEngine PUBLIC TracyClient)
+    # Add TracyClient.cpp as a source file for your executable
+    target_sources(PhysicsEngine PRIVATE ${CMAKE_SOURCE_DIR}/externals/TracyClient.cpp)
+endif()
+
+# Link the Samples library
 target_link_libraries(PhysicsEngine PRIVATE Samples)
+
 
 # Tests Physics Engine
 file(GLOB_RECURSE PHYSICS_TEST_FILES physics_engine/tests/*.cpp)

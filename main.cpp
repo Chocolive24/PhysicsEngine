@@ -15,9 +15,16 @@
 
  //TODO: TOUT COMMENTER
 
-#include <iostream>
 #include "SampleManager.h"
 #include "DrawableGeometry.h"
+
+//#ifdef TRACY_ENABLE
+//#include <Tracy.hpp>
+//#include <TracyC.h>
+//#endif // TRACY_ENABLE
+
+
+#include <iostream>
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char* args[])
 {
@@ -65,6 +72,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char* args[])
             static_cast<int>(DrawableGeometry::Indices.size()));
 
         SDL_RenderPresent(window.Renderer());
+
+    //#ifdef TRACY_ENABLE
+    //        FrameMark;
+    //#endif
     }
 
     window.Deinit();

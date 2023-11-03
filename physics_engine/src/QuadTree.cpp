@@ -154,6 +154,12 @@ namespace PhysicsEngine
             {
                 for (const auto& childNode : node.Children)
                 {
+                    // Check the collision only if the collider touche the children boundary.
+                    /*if (Math::Intersect(simplColA.Rectangle, node.Boundary))
+                    {
+                        calculateChildrenNodePossiblePairs(*childNode, simplColA);
+                    }*/
+
                     calculateChildrenNodePossiblePairs(*childNode, simplColA);
                 }
             }
@@ -171,6 +177,18 @@ namespace PhysicsEngine
 
     void QuadTree::calculateChildrenNodePossiblePairs(const QuadNode& node, SimplifiedCollider simplCol) noexcept
     {
+        //// If the current node has children, we need to compare the simplified collider from its parent node with its children.
+        //if (node.Children[0] != nullptr)
+        //{
+        //    for (const auto& child : node.Children)
+        //    {
+        //        if (Math::Intersect(simplCol.Rectangle, child->Boundary))
+        //        {
+        //            calculateChildrenNodePossiblePairs(*child, simplCol);
+        //        }
+        //    }
+        //}
+
         // For each colliders in the current node, compare it with the simplified collider from its parent node.
         for (const auto& nodeSimplCol : node.Colliders)
         {

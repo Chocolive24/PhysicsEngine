@@ -2,6 +2,11 @@
  * @author Olivier
  */
 
+#ifdef TRACY_ENABLE
+#include <Tracy.hpp>
+#include <TracyC.h>
+#endif // TRACY_ENABLE
+
 #include "World.h"
 
 namespace PhysicsEngine
@@ -46,6 +51,10 @@ namespace PhysicsEngine
 
     void World::resolveBroadPhase() noexcept
     {
+        #ifdef TRACY_ENABLE
+                ZoneScoped;
+        #endif
+
         _quadTree.Clear();
 
         // Sets the minimum and maximum collision zone limits of the world rectangle to floating maximum and
