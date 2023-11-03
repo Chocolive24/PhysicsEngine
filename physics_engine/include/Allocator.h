@@ -49,6 +49,12 @@ namespace PhysicsEngine
          */
         virtual void* Allocate(std::size_t allocationSize, std::size_t alignment) = 0;
 
+        template<typename T>
+        T* Allocate(std::size_t allocationSize)
+        {
+            return static_cast<T*>(Allocate(allocationSize, sizeof(T)));
+        }
+
         /**
          * @brief Deallocate is a method that deallocates a block of memory given in parameter.
          * @param ptr The pointer to the memory block to deallocates.
@@ -99,85 +105,85 @@ namespace PhysicsEngine
         void Deallocate(void* ptr) override;
     };
 
-    /**
-     * @class LinearAllocator is a class that defines a linear allocator (aka an allocator that allocates memory block
-     * one after the other).
-     */
-    class LinearAllocator final : public Allocator
-    {
-    private:
-        void* _currentPosPtr = nullptr;
+    ///**
+    // * @class LinearAllocator is a class that defines a linear allocator (aka an allocator that allocates memory block
+    // * one after the other).
+    // */
+    //class LinearAllocator final : public Allocator
+    //{
+    //private:
+    //    void* _currentPosPtr = nullptr;
 
-    public:
-        LinearAllocator() noexcept = default;
-        LinearAllocator(void* rootPtr, std::size_t size) : Allocator(rootPtr, size), _currentPosPtr(rootPtr) {};
+    //public:
+    //    LinearAllocator() noexcept = default;
+    //    LinearAllocator(void* rootPtr, std::size_t size) : Allocator(rootPtr, size), _currentPosPtr(rootPtr) {};
 
-        ~LinearAllocator() override { _currentPosPtr = nullptr; }
+    //    ~LinearAllocator() override { _currentPosPtr = nullptr; }
 
-        /**
-         * @brief Allocate is a method that allocates a given amount of memory.
-         * @param allocationSize The size of the allocation to do.
-         * @param alignment The alignment in memory of the allocation.
-         * @return A pointer pointing to the memory (aka a void*).
-         */
-        void* Allocate(std::size_t allocationSize, std::size_t alignment) override;
+    //    /**
+    //     * @brief Allocate is a method that allocates a given amount of memory.
+    //     * @param allocationSize The size of the allocation to do.
+    //     * @param alignment The alignment in memory of the allocation.
+    //     * @return A pointer pointing to the memory (aka a void*).
+    //     */
+    //    void* Allocate(std::size_t allocationSize, std::size_t alignment) override;
 
-        /**
-         * @brief Deallocate is a method that deallocates a block of memory given in parameter.
-         * @param ptr The pointer to the memory block to deallocates.
-         */
-        void Deallocate(void* ptr) override;
+    //    /**
+    //     * @brief Deallocate is a method that deallocates a block of memory given in parameter.
+    //     * @param ptr The pointer to the memory block to deallocates.
+    //     */
+    //    void Deallocate(void* ptr) override;
 
-        /**
-         * @brief Clear is a method that reset the allocator to its start state (aka it sets the currentPosPtr to
-         * the rootPtr, sets the size to 0 and reset memory values to 0).
-         */
-        void Clear() noexcept;
-    };
+    //    /**
+    //     * @brief Clear is a method that reset the allocator to its start state (aka it sets the currentPosPtr to
+    //     * the rootPtr, sets the size to 0 and reset memory values to 0).
+    //     */
+    //    void Clear() noexcept;
+    //};
 
-    /**
-     * @class LinearAllocator is a class that defines a proxy allocator (aka an allocator that redirects all
-     * allocations/deallocations to the an intern allocator).
-     */
-    class ProxyAllocator final : public Allocator
-    {
-    private:
-        Allocator& _allocator;
+    ///**
+    // * @class LinearAllocator is a class that defines a proxy allocator (aka an allocator that redirects all
+    // * allocations/deallocations to the an intern allocator).
+    // */
+    //class ProxyAllocator final : public Allocator
+    //{
+    //private:
+    //    Allocator& _allocator;
 
-    public:
-        explicit ProxyAllocator(Allocator& allocator) noexcept : _allocator(allocator) {};
-        ~ProxyAllocator() override = default;
+    //public:
+    //    explicit ProxyAllocator(Allocator& allocator) noexcept : _allocator(allocator) {};
+    //    ~ProxyAllocator() override = default;
 
-        /**
-         * @brief Allocate is a method that allocates a given amount of memory.
-         * @param allocationSize The size of the allocation to do.
-         * @param alignment The alignment in memory of the allocation.
-         * @return A pointer pointing to the memory (aka a void*).
-         */
-        [[nodiscard]] void* Allocate(std::size_t size, std::size_t alignment) noexcept override;
+    //    /**
+    //     * @brief Allocate is a method that allocates a given amount of memory.
+    //     * @param allocationSize The size of the allocation to do.
+    //     * @param alignment The alignment in memory of the allocation.
+    //     * @return A pointer pointing to the memory (aka a void*).
+    //     */
+    //    [[nodiscard]] void* Allocate(std::size_t size, std::size_t alignment) noexcept override;
 
-        /**
-         * @brief Deallocate is a method that deallocates a block of memory given in parameter.
-         * @param ptr The pointer to the memory block to deallocates.
-         */
-        void Deallocate(void* ptr) noexcept override;
-    };
+    //    /**
+    //     * @brief Deallocate is a method that deallocates a block of memory given in parameter.
+    //     * @param ptr The pointer to the memory block to deallocates.
+    //     */
+    //    void Deallocate(void* ptr) noexcept override;
+    //};
 
-    /**
-     * @namespace MemoryAlignment is a namespace that contains useful functions for calculating memory alignments
-     * for allocations.
-     */
-    namespace MemoryAlignment
-    {
-        /**
-         * @brief CalculateAlignForwardAdjustment is a method that calculates the adjustment to apply to the memory
-         * address to match the alignment in memory given in parameter.
-         * @param address The address to align in memory.
-         * @param alignment The alignment in memory.
-         * @return The adjustment to apply to the memory address to match the alignment.
-         */
-        std::size_t CalculateAlignForwardAdjustment(const void* address, std::size_t alignment);
-    }
+    ///**
+    // * @namespace MemoryAlignment is a namespace that contains useful functions for calculating memory alignments
+    // * for allocations.
+    // */
+    //namespace MemoryAlignment
+    //{
+    //    /**
+    //     * @brief CalculateAlignForwardAdjustment is a method that calculates the adjustment to apply to the memory
+    //     * address to match the alignment in memory given in parameter.
+    //     * @param address The address to align in memory.
+    //     * @param alignment The alignment in memory.
+    //     * @return The adjustment to apply to the memory address to match the alignment.
+    //     */
+    //    std::size_t CalculateAlignForwardAdjustment(const void* address, std::size_t alignment);
+    //}
 
     /**
      * \brief Custom proxy allocator respecting _allocatortraits
@@ -185,6 +191,9 @@ namespace PhysicsEngine
     template<typename T>
     class StandardAllocator
     {
+    protected:
+        Allocator& _allocator;
+
     public:
         typedef T value_type;
         StandardAllocator(Allocator& allocator);
@@ -193,26 +202,21 @@ namespace PhysicsEngine
         T* allocate(std::size_t n);
         void deallocate(T* ptr, std::size_t n);
         [[nodiscard]] Allocator& GetAllocator() const { return _allocator; }
-    protected:
-        Allocator& _allocator;
     };
-
-
-    template <class T, class U>
-    constexpr bool operator== (const StandardAllocator<T>&, const StandardAllocator<U>&) noexcept
-    {
-        return true;
-    }
-
-    template <class T, class U>
-    constexpr bool operator!= (const StandardAllocator<T>&, const StandardAllocator<U>&) noexcept
-    {
-        return false;
-    }
 
     template <typename T>
     StandardAllocator<T>::StandardAllocator(Allocator& allocator) : _allocator(allocator)
     {
+    }
+
+    template <class T, class U>
+    constexpr bool operator==(const StandardAllocator<T>& a, const StandardAllocator<U>& b) noexcept {
+        return &a.GetAllocator() == &b.GetAllocator();
+    }
+
+    template <class T, class U>
+    constexpr bool operator!=(const StandardAllocator<T>& a, const StandardAllocator<U>& b) noexcept {
+        return &a.GetAllocator() != &b.GetAllocator();
     }
 
     template <typename T>

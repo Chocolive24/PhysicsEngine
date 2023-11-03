@@ -8,7 +8,6 @@
 #include <Tracy.hpp>
 #endif // TRACY_ENABLE
 
-
 namespace PhysicsEngine
 {
     template<typename T>
