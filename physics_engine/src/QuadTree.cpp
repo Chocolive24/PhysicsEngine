@@ -148,6 +148,15 @@ namespace PhysicsEngine
                     _possiblePairs.push_back(ColliderPair{ simplColA.ColRef, simplColB.ColRef });
                 }
             }
+
+            // If the node has children, we need to compare the simplified collider with the colliders in the children nodes.
+            if (node.Children[0] != nullptr)
+            {
+                for (const auto& childNode : node.Children)
+                {
+                    calculateChildrenNodePossiblePairs(*childNode, simplColA);
+                }
+            }
         }
 
         // If the node has children.
@@ -156,6 +165,27 @@ namespace PhysicsEngine
             for (const auto& child : node.Children)
             {
                 calculateNodePossiblePairs(*child);
+            }
+        }
+    }
+
+    void QuadTree::calculateChildrenNodePossiblePairs(const QuadNode& node, SimplifiedCollider simplCol) noexcept
+    {
+        // For each colliders in the current node, compare it with the simplified collider from its parent node.
+        for (const auto& nodeSimplCol : node.Colliders)
+        {
+            if (Math::Intersect(simplCol.Rectangle, nodeSimplCol.Rectangle))
+            {
+                _possiblePairs.push_back(ColliderPair{ simplCol.ColRef, nodeSimplCol.ColRef });
+            }
+        }
+
+        // If the current node has children, we need to compare the simplified collider from its parent node with its children.
+        if (node.Children[0] != nullptr)
+        {
+            for (const auto& child : node.Children)
+            {
+                calculateChildrenNodePossiblePairs(*child, simplCol);
             }
         }
     }

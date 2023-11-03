@@ -169,13 +169,16 @@ void TriggerColliderSample::drawQuadNode(const PhysicsEngine::QuadNode& node) co
 void TriggerColliderSample::OnTriggerEnter(PhysicsEngine::ColliderRef colliderRefA,
                                            PhysicsEngine::ColliderRef colliderRefB) noexcept
 {
-    for (auto& object : _gameObjects)
+    _gameObjects[colliderRefA.Index].CollisionNbr++;
+    _gameObjects[colliderRefB.Index].CollisionNbr++;
+
+    /*for (auto& object : _gameObjects)
     {
         if (object.ColRef == colliderRefA || object.ColRef == colliderRefB)
         {
             object.CollisionNbr++;
         }
-    }
+    }*/
 }
 
 void TriggerColliderSample::OnTriggerStay(PhysicsEngine::ColliderRef colliderRefA,
@@ -187,13 +190,8 @@ void TriggerColliderSample::OnTriggerStay(PhysicsEngine::ColliderRef colliderRef
 void TriggerColliderSample::OnTriggerExit(PhysicsEngine::ColliderRef colliderRefA,
                                           PhysicsEngine::ColliderRef colliderRefB) noexcept
 {
-    for (auto& object : _gameObjects)
-    {
-        if (object.ColRef == colliderRefA || object.ColRef == colliderRefB)
-        {
-            object.CollisionNbr--;
-        }
-    }
+    _gameObjects[colliderRefA.Index].CollisionNbr--;
+    _gameObjects[colliderRefB.Index].CollisionNbr--;
 }
 
 void TriggerColliderSample::addCircle(Math::Vec2F centerPos, Math::Vec2F rndVelocity) noexcept

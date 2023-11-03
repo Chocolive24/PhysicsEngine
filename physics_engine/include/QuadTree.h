@@ -26,7 +26,7 @@ namespace PhysicsEngine
          * @brief MaxColliderNbr is the maximum number of colliders that the node can stores before a subdivision
          * of the world.
          */
-        static constexpr int MaxColliderNbr = 6;
+        static constexpr int MaxColliderNbr = 2;
 
         /**
          * @brief BoundaryDivisionCount is the number of space boundary subdivision for the node.
@@ -76,6 +76,13 @@ namespace PhysicsEngine
          * @param node
          */
         void calculateNodePossiblePairs(const QuadNode& node) noexcept;
+
+        /**
+         * @brief calculateNodePossiblePairs is a method that calculates the possible pair of collider
+         * in the node given in parameter.
+         * @param node
+         */
+        void calculateChildrenNodePossiblePairs(const QuadNode& node, SimplifiedCollider simplCol) noexcept;
 
     public:
         QuadTree() noexcept = default;
