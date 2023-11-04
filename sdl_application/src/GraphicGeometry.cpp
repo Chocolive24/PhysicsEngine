@@ -3,10 +3,10 @@
 //
 
 #include <iostream>
-#include "DrawableGeometry.h"
+#include "GraphicGeometry.h"
 #include "Shape.h"
 
-namespace DrawableGeometry
+namespace GraphicGeometry
 {
     std::vector<SDL_Vertex> Vertices;
     std::vector<int> Indices;
@@ -131,21 +131,6 @@ namespace DrawableGeometry
         Math::RectangleF lineRect(p1, p2);
 
         FilledRectangle(lineRect.Center(), lineRect.Size(), color);
-
-//        addVertex(p0, color);
-//        addVertex(p1, color);
-//        addVertex(p2, color);
-//        addVertex(p3, color);
-
-//        // First triangle.
-//        Indices.push_back(indicesOffset);
-//        Indices.push_back(indicesOffset + 1);
-//        Indices.push_back(indicesOffset + 2);
-//
-//        // Second triangle.
-//        Indices.push_back(indicesOffset);
-//        Indices.push_back(indicesOffset + 2);
-//        Indices.push_back(indicesOffset + 3);
     }
 
     void EmptyRectangle(Math::Vec2F centerPos, Math::Vec2F size, SDL_Color color) noexcept
@@ -157,9 +142,9 @@ namespace DrawableGeometry
         const auto bottomLeftCorner = Math::Vec2F(centerPos.X - halfSize.X, centerPos.Y + halfSize.Y);
         const auto topLeftCorner = centerPos - halfSize;
 
-        DrawableGeometry::Line(bottomRightCorner, topRightCorner, 1.f, color);
-        DrawableGeometry::Line(bottomLeftCorner, bottomRightCorner, 1.f, color);
-        DrawableGeometry::Line(bottomLeftCorner, topLeftCorner, 1.f, color);
-        DrawableGeometry::Line(topLeftCorner, topRightCorner, 1.f, color);
+        GraphicGeometry::Line(bottomRightCorner, topRightCorner, 1.f, color);
+        GraphicGeometry::Line(bottomLeftCorner, bottomRightCorner, 1.f, color);
+        GraphicGeometry::Line(bottomLeftCorner, topLeftCorner, 1.f, color);
+        GraphicGeometry::Line(topLeftCorner, topRightCorner, 1.f, color);
     }
 }

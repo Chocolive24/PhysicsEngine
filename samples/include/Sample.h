@@ -28,7 +28,7 @@ enum class SampleType
 class Sample
 {
 public:
-    Sample() noexcept = default;
+    Sample(std::string name) noexcept : _name(name) {};
 
     virtual ~Sample() = default;
 
@@ -36,19 +36,24 @@ public:
      * @brief Init is a method that initializes the sample.
      */
     void Init() noexcept;
-    void HandleInputs(SDL_Event event) noexcept;
+    void HandleInputs(SDL_Event event, bool isMouseOnAnImGuiWindow) noexcept;
     void Update() noexcept;
     void Render() noexcept;
     void Deinit() noexcept;
 
+    const std::string Name() const noexcept { return _name; }
+
 protected:
+    std::string _name;
+    std::string _description;
+
     PhysicsEngine::World _world;
     Timer _timer;
 
-    static constexpr int _startBodyCount = 1000;
+    static constexpr int _startBodyCount = 100;
 
     virtual void onInit() noexcept = 0;
-    virtual void onHandleInputs(SDL_Event event) noexcept = 0;
+    virtual void onHandleInputs(SDL_Event event, bool isMouseOnAnImGuiWindow) noexcept = 0;
     virtual void onUpdate() noexcept = 0;
     virtual void onRender() noexcept = 0;
     virtual void onDeinit() noexcept = 0;

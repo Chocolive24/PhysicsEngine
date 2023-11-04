@@ -1,6 +1,10 @@
 #include "Window.h"
 #include "Utility.h"
 
+#include "imgui.h"
+#include "imgui_impl_sdl2.h"
+#include "imgui_impl_sdlrenderer2.h"
+
 #include <iostream>
 
 void Window::Init() noexcept
@@ -31,6 +35,14 @@ void Window::Init() noexcept
         SDL_Log("Renderer could not be created! Error : %s", SDL_GetError());
         return;
     }
+
+    // Initialize ImGui
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui::StyleColorsDark;
+
+    ImGui_ImplSDL2_InitForSDLRenderer(_window, _renderer);
+    ImGui_ImplSDLRenderer2_Init(_renderer);
 }
 
 void Window::RunAppLoop()
@@ -40,6 +52,9 @@ void Window::RunAppLoop()
 
 void Window::Deinit() const noexcept
 {
+    ImGui_ImplSDL2_Shutdown();
+    ImGui_ImplSDLRenderer2_Shutdown();
+
     if (_renderer != nullptr)
     {
         SDL_DestroyRenderer(_renderer);

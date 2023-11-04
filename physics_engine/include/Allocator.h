@@ -105,6 +105,55 @@ namespace PhysicsEngine
         void Deallocate(void* ptr) override;
     };
 
+    /**
+     * \brief Custom proxy allocator respecting _allocatortraits
+     */
+    template<typename T>
+    class StandardAllocator
+    {
+    protected:
+        Allocator& _allocator;
+
+    public:
+        typedef T value_type;
+        StandardAllocator(Allocator& allocator);
+        template <class U>
+        StandardAllocator(const StandardAllocator<U>& allocator) noexcept : _allocator(allocator.GetAllocator()) {}
+        T* allocate(std::size_t n);
+        void deallocate(T* ptr, std::size_t n);
+        [[nodiscard]] Allocator& GetAllocator() const { return _allocator; }
+    };
+
+    template <typename T>
+    StandardAllocator<T>::StandardAllocator(Allocator& allocator) : _allocator(allocator)
+    {
+    }
+
+    template <class T, class U>
+    constexpr bool operator==(const StandardAllocator<T>& a, const StandardAllocator<U>& b) noexcept {
+        return &a.GetAllocator() == &b.GetAllocator();
+    }
+
+    template <class T, class U>
+    constexpr bool operator!=(const StandardAllocator<T>& a, const StandardAllocator<U>& b) noexcept {
+        return &a.GetAllocator() != &b.GetAllocator();
+    }
+
+    template <typename T>
+    T* StandardAllocator<T>::allocate(std::size_t n)
+    {
+        return static_cast<T*>(_allocator.Allocate(n * sizeof(T), alignof(T)));
+    }
+
+    template <typename T>
+    void StandardAllocator<T>::deallocate(T* ptr, std::size_t n)
+    {
+        _allocator.Deallocate(ptr);
+    }
+
+    template<typename T>
+    using AllocVector = std::vector<T, StandardAllocator<T>>;
+
     ///**
     // * @class LinearAllocator is a class that defines a linear allocator (aka an allocator that allocates memory block
     // * one after the other).
@@ -184,53 +233,4 @@ namespace PhysicsEngine
     //     */
     //    std::size_t CalculateAlignForwardAdjustment(const void* address, std::size_t alignment);
     //}
-
-    /**
-     * \brief Custom proxy allocator respecting _allocatortraits
-     */
-    template<typename T>
-    class StandardAllocator
-    {
-    protected:
-        Allocator& _allocator;
-
-    public:
-        typedef T value_type;
-        StandardAllocator(Allocator& allocator);
-        template <class U>
-        StandardAllocator(const StandardAllocator<U>& allocator) noexcept : _allocator(allocator.GetAllocator()) {}
-        T* allocate(std::size_t n);
-        void deallocate(T* ptr, std::size_t n);
-        [[nodiscard]] Allocator& GetAllocator() const { return _allocator; }
-    };
-
-    template <typename T>
-    StandardAllocator<T>::StandardAllocator(Allocator& allocator) : _allocator(allocator)
-    {
-    }
-
-    template <class T, class U>
-    constexpr bool operator==(const StandardAllocator<T>& a, const StandardAllocator<U>& b) noexcept {
-        return &a.GetAllocator() == &b.GetAllocator();
-    }
-
-    template <class T, class U>
-    constexpr bool operator!=(const StandardAllocator<T>& a, const StandardAllocator<U>& b) noexcept {
-        return &a.GetAllocator() != &b.GetAllocator();
-    }
-
-    template <typename T>
-    T* StandardAllocator<T>::allocate(std::size_t n)
-    {
-        return static_cast<T*>(_allocator.Allocate(n * sizeof(T), alignof(T)));
-    }
-
-    template <typename T>
-    void StandardAllocator<T>::deallocate(T* ptr, std::size_t n)
-    {
-        _allocator.Deallocate(ptr);
-    }
-
-    template<typename T>
-    using AllocVector = std::vector<T, StandardAllocator<T>>;
 }

@@ -31,10 +31,10 @@ private:
     void maintainObjectsInWindow() noexcept;
 
 public:
-    explicit TriggerColliderSample() noexcept = default;
+    TriggerColliderSample(std::string name) noexcept : Sample(name) {};
 
     void onInit() noexcept override;
-    void onHandleInputs(SDL_Event event) noexcept override;
+    void onHandleInputs(SDL_Event event, bool isMouseOnAnImGuiWindow) noexcept override;
     void onUpdate() noexcept override;
     void onRender() noexcept override;
     void onDeinit() noexcept override;

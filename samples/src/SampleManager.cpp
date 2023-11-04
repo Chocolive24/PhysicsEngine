@@ -8,45 +8,36 @@
 
 void SampleManager::Init() noexcept
 {
-    _samples[0] = UniquePtr<Sample>::MakeUnique<TriggerColliderSample>(TriggerColliderSample());
-    _samples[1] = UniquePtr<Sample>::MakeUnique<PlanetSystemSample>(PlanetSystemSample());
+    _samples[0] = UniquePtr<Sample>::MakeUnique<TriggerColliderSample>(TriggerColliderSample("Colliders Trigger"));
+    _samples[1] = UniquePtr<Sample>::MakeUnique<PlanetSystemSample>(PlanetSystemSample("Planet System"));
 
     _samples[_currentSampleIdx]->Init();
 }
 
-void SampleManager::HandleInputs(SDL_Event event)
+void SampleManager::HandleCurrentSampleInputs(const SDL_Event event, const bool isMouseOnAnImGuiWindow) const noexcept
 {
-    switch (event.type)
-    {
-        case SDL_KEYDOWN:
-        {
-            switch(event.key.keysym.scancode)
-            {
-                case SDL_SCANCODE_1:
-                    _samples[_currentSampleIdx]->Deinit();
-                    _currentSampleIdx = static_cast<int>(SampleType::PlanetSystem);
-                    _samples[_currentSampleIdx]->Init();
-                    break;
-                case SDL_SCANCODE_2:
-                    _samples[_currentSampleIdx]->Deinit();
-                    _currentSampleIdx = static_cast<int>(SampleType::Trigger);
-                    _samples[_currentSampleIdx]->Init();
-                    break;
-                default:
-                    break;
-            } // Switch key.keysym.scancode.
-        } //  Case Key down.
-    } // Switch event type.
-
-    _samples[_currentSampleIdx]->HandleInputs(event);
+    _samples[_currentSampleIdx]->HandleInputs(event, isMouseOnAnImGuiWindow);
 }
 
-void SampleManager::Update() const noexcept
+void SampleManager::UpdateCurrentSample() const noexcept
 {
     _samples[_currentSampleIdx]->Update();
 }
 
-void SampleManager::Render() const noexcept
+void SampleManager::RenderCurrentSample() const noexcept
 {
     _samples[_currentSampleIdx]->Render();
+}
+
+void SampleManager::RestartSample() noexcept
+{
+    _samples[_currentSampleIdx]->Deinit();
+    _samples[_currentSampleIdx]->Init();
+}
+
+void SampleManager::ChangeSample(const int index) noexcept
+{
+    _samples[_currentSampleIdx]->Deinit();
+    _currentSampleIdx = index;
+    _samples[_currentSampleIdx]->Init();
 }

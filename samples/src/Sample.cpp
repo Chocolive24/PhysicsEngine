@@ -13,16 +13,9 @@ void Sample::Init() noexcept
     onInit();
 }
 
-void Sample::Deinit() noexcept
+void Sample::HandleInputs(const SDL_Event event, const bool isMouseOnAnImGuiWindow) noexcept
 {
-    _world.Deinit();
-
-    onDeinit();
-}
-
-void Sample::HandleInputs(SDL_Event event) noexcept
-{
-    onHandleInputs(event);
+    onHandleInputs(event, isMouseOnAnImGuiWindow);
 }
 
 void Sample::Update() noexcept
@@ -37,4 +30,11 @@ void Sample::Update() noexcept
 void Sample::Render() noexcept
 {
     onRender();
+}
+
+void Sample::Deinit() noexcept
+{
+    _world.Deinit();
+
+    onDeinit();
 }

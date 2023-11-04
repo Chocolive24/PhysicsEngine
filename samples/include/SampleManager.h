@@ -9,13 +9,22 @@
 
 class SampleManager
 {
-private:
-    std::array<UniquePtr<Sample>, 2> _samples;
-    int _currentSampleIdx = 0;
-
 public:
+    static constexpr int SampleCount = 2;
+
     void Init() noexcept;
-    void HandleInputs(SDL_Event event);
-    void Update() const noexcept;
-    void Render() const noexcept;
+    void HandleCurrentSampleInputs(SDL_Event event, bool isMouseOnAnImGuiWindow) const noexcept;
+    void UpdateCurrentSample() const noexcept;
+    void RenderCurrentSample() const noexcept;
+
+    void RestartSample() noexcept;
+    void ChangeSample(int index) noexcept;
+
+    constexpr int CurrentSampleIdx() const noexcept { return _currentSampleIdx; }
+    const Sample* CurrentSample() const noexcept { return _samples[_currentSampleIdx].Get(); }
+    const Sample* GetSampleAtIndex(int index) const noexcept { return _samples[index].Get(); }
+
+private:
+    std::array<UniquePtr<Sample>, SampleCount> _samples;
+    int _currentSampleIdx = 0;
 };

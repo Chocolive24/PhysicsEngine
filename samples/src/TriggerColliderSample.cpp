@@ -4,7 +4,7 @@
 
 #include "TriggerColliderSample.h"
 #include "Metrics.h"
-#include "DrawableGeometry.h"
+#include "GraphicGeometry.h"
 #include "Window.h"
 #include "Random.h"
 
@@ -60,7 +60,7 @@ void TriggerColliderSample::onInit() noexcept
     }
 }
 
-void TriggerColliderSample::onHandleInputs(SDL_Event event) noexcept
+void TriggerColliderSample::onHandleInputs(const SDL_Event event, const bool isMouseOnAnImGuiWindow) noexcept
 {
     switch (event.type)
     {
@@ -96,7 +96,7 @@ void TriggerColliderSample::onRender() noexcept
         {
             case static_cast<int>(Math::ShapeType::Circle):
             {
-                DrawableGeometry::Circle(
+                GraphicGeometry::Circle(
                         Metrics::MetersToPixels(_world.GetBody(object.BodyRef).Position()),
                         Metrics::MetersToPixels(std::get<Math::CircleF>(colShape).Radius()),
                         50,
@@ -106,7 +106,7 @@ void TriggerColliderSample::onRender() noexcept
 
             case static_cast<int>(Math::ShapeType::Rectangle):
             {
-                DrawableGeometry::FilledRectangle(
+                GraphicGeometry::FilledRectangle(
                         Metrics::MetersToPixels(_world.GetBody(object.BodyRef).Position()),
                         Metrics::MetersToPixels(std::get<Math::RectangleF>(colShape).Size()),
                         object.CollisionNbr > 0 ? _collisionColor : _noCollisionColor);
@@ -127,7 +127,7 @@ void TriggerColliderSample::onRender() noexcept
                     _verticesInPixels.push_back(Metrics::MetersToPixels(vertex));
                 }
 
-                DrawableGeometry::Polygon(
+                GraphicGeometry::Polygon(
                         Metrics::MetersToPixels(_world.GetBody(object.BodyRef).Position()),
                         _verticesInPixels,
                         object.CollisionNbr > 0 ? _collisionColor : _noCollisionColor);
@@ -161,7 +161,7 @@ void TriggerColliderSample::drawQuadNode(const PhysicsEngine::QuadNode& node) co
         auto size = Metrics::MetersToPixels(node.Boundary.Size());
         size.Y = -size.Y;
         constexpr SDL_Color boundaryColor{ 255, 255, 255, 255 };
-        DrawableGeometry::EmptyRectangle(center, size, boundaryColor);
+        GraphicGeometry::EmptyRectangle(center, size, boundaryColor);
     }
     
 }

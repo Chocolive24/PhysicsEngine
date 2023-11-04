@@ -54,7 +54,7 @@ TEST(QuadTree, DefaultConstructor)
 
 void InitRecursive(const QuadNode& node)
 {
-    EXPECT_EQ(node.Colliders.capacity(), QuadNode::MaxColliderNbr);
+    EXPECT_EQ(node.Colliders.capacity(), QuadNode::MaxColliderNbr + 1);
 
     if (node.Children[0] != nullptr)
     {

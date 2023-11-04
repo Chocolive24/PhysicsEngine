@@ -57,7 +57,7 @@ public:
      */
     static constexpr std::size_t StartPlanetNbr = 200;
 
-    explicit PlanetSystemSample() noexcept = default;
+    PlanetSystemSample(std::string name) noexcept : Sample(name) {};
 
     /**
      * @brief Init is a method that initializes the planet system sample (aka instantiates the sun and all the planets).
@@ -71,7 +71,7 @@ public:
      * according to the inputs.
      * @param event The SDL event that contains the input data.
      */
-    void onHandleInputs(SDL_Event event) noexcept override;
+    void onHandleInputs(SDL_Event event, bool isMouseOnAnImGuiWindow) noexcept override;
 
     /**
      * @brief Update is a method that updates the sample.\n

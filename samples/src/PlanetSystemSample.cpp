@@ -2,7 +2,7 @@
 // Created by Olivier on 15.10.2023.
 //
 
-#include "DrawableGeometry.h"
+#include "GraphicGeometry.h"
 #include "Metrics.h"
 #include "Random.h"
 #include "PlanetSystemSample.h"
@@ -32,14 +32,14 @@ void PlanetSystemSample::onInit() noexcept
     }
 }
 
-void PlanetSystemSample::onHandleInputs(const SDL_Event event) noexcept
+void PlanetSystemSample::onHandleInputs(const SDL_Event event, const bool isMouseOnAnImGuiWindow) noexcept
 {
     switch (event.type)
     {
     case SDL_MOUSEBUTTONDOWN:
         if (event.button.button == SDL_BUTTON_LEFT)
         {
-            _mustCreatePlanet = true;
+            _mustCreatePlanet = !isMouseOnAnImGuiWindow;
         }
         break;
     case SDL_MOUSEBUTTONUP:
@@ -49,6 +49,8 @@ void PlanetSystemSample::onHandleInputs(const SDL_Event event) noexcept
         }
         break;
     }
+
+    
 }
 
 
@@ -91,14 +93,14 @@ void PlanetSystemSample::onRender() noexcept
     // Draw the sun.
     auto sunBodyPos = _world.GetBody(_sun.BodyRef).Position();
     auto sunScreenPos = Metrics::MetersToPixels(sunBodyPos);
-    DrawableGeometry::Circle(sunScreenPos, _sun.Radius, 15, _sun.Color);
+    GraphicGeometry::Circle(sunScreenPos, _sun.Radius, 15, _sun.Color);
 
     // Draw the planets.
     for (auto& p : _planets)
     {
         auto planetBodyPos = _world.GetBody(p.BodyRef).Position();
         auto planetScreenPos = Metrics::MetersToPixels(planetBodyPos);
-        DrawableGeometry::Circle(planetScreenPos, p.Radius, 15, p.Color);
+        GraphicGeometry::Circle(planetScreenPos, p.Radius, 15, p.Color);
     }
 }
 

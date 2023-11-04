@@ -14,7 +14,7 @@
 
 #include <vector>
 
-namespace DrawableGeometry
+namespace GraphicGeometry
 {
     /**
      * @brief Vertices are the fundamental elements used to define the shape and structure of graphics objects.
