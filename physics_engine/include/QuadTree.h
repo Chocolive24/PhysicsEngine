@@ -48,9 +48,9 @@ namespace PhysicsEngine
     class QuadTree
     {
     private:
-        //HeapAllocator _heapAllocator;
+        HeapAllocator _heapAllocator;
 
-        std::vector<QuadNode> _nodes;
+        AllocVector<QuadNode> _nodes{ _heapAllocator };
         std::vector<ColliderPair> _possiblePairs;
 
         int _nodeIndex = 1;
