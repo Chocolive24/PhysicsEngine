@@ -194,6 +194,16 @@ void TriggerColliderSample::OnTriggerExit(PhysicsEngine::ColliderRef colliderRef
     _gameObjects[colliderRefB.Index].CollisionNbr--;
 }
 
+void TriggerColliderSample::OnCollisionEnter(PhysicsEngine::ColliderRef colliderRefA, 
+                                             PhysicsEngine::ColliderRef colliderRefB) noexcept
+{
+}
+
+void TriggerColliderSample::OnCollisionExit(PhysicsEngine::ColliderRef colliderRefA, 
+                                            PhysicsEngine::ColliderRef colliderRefB) noexcept
+{
+}
+
 void TriggerColliderSample::addCircle(Math::Vec2F centerPos, Math::Vec2F rndVelocity) noexcept
 {
     GameObject circle;

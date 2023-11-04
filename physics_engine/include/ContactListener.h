@@ -8,6 +8,7 @@
  */
 
 #include "Collider.h"
+#include "Vec2.h"
 
 namespace PhysicsEngine
 {
@@ -40,6 +41,20 @@ namespace PhysicsEngine
        * @param colliderRefB The collider reference of the second collider in the world.
        */
        virtual void OnTriggerExit(ColliderRef colliderRefA, ColliderRef colliderRefB) noexcept = 0;
+
+       /**
+       * @brief OnCollisionEnter is an abstract method that is called when two colliders enter in collision.
+       * @param colliderRefA The collider reference of the first collider in the world.
+       * @param colliderRefB The collider reference of the second collider in the world.
+       */
+       virtual void OnCollisionEnter(ColliderRef colliderRefA, ColliderRef colliderRefB) noexcept = 0;
+
+       /**
+      * @brief OnCollisionEnter is an abstract method that is called when two colliders stop colliding.
+      * @param colliderRefA The collider reference of the first collider in the world.
+      * @param colliderRefB The collider reference of the second collider in the world.
+      */
+       virtual void OnCollisionExit(ColliderRef colliderRefA, ColliderRef colliderRefB) noexcept = 0;
     };
 }
 

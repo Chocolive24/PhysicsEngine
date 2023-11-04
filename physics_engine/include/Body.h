@@ -12,6 +12,14 @@
 
 namespace PhysicsEngine
 {
+    enum class BodyType
+    {
+        Dynamic,
+        Kinematic,
+        Static,
+        None
+    };
+
     class Body
     {
     private:
@@ -19,6 +27,8 @@ namespace PhysicsEngine
         Math::Vec2F _velocity = Math::Vec2F::Zero();
         float _mass = -1.f;
         Math::Vec2F _forces = Math::Vec2F::Zero();
+
+        BodyType _bodyType = BodyType::Dynamic;
 
     public:
         constexpr Body() noexcept = default;
@@ -89,5 +99,18 @@ namespace PhysicsEngine
          * @return True if the body is valid.
          */
         [[nodiscard]] constexpr bool IsValid() const noexcept { return _mass > 0; }
+
+        /**
+         * @brief GetBodyType is a method that gives the body-type of the body.
+         * @return The body-type of the body.
+         */
+        [[nodiscard]] constexpr BodyType GetBodyType() const noexcept { return _bodyType; }
+
+        /**
+         * @brief SetBodyType is a method that replaces the current body-type of the body by the new one given
+         * in parameter.
+         * @param newBodyType The new body-type for the body. 
+         */
+        constexpr void SetBodyType(const BodyType newBodyType) noexcept { _bodyType = newBodyType; }
     };
 }

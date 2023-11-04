@@ -185,25 +185,25 @@ namespace PhysicsEngine
     #endif
 
     #ifdef TRACY_ENABLE
-            ZoneNamedN(DetectingColliderPairs, "DetectingColliderPairs", true);
+            ZoneNamedN(DetectOverlap, "Detect Overlap", true);
     #endif
         std::unordered_set<ColliderPair, ColliderHash> newColliderPairs;
 
         const auto& newPossiblePairs = _quadTree.PossiblePairs();
 
-        for (const auto& colliderPair : newPossiblePairs)
+        for (const auto& possiblePair : newPossiblePairs)
         {
-            const auto& colliderA = _colliders[colliderPair.ColliderA.Index];
-            const auto& colliderB = _colliders[colliderPair.ColliderB.Index];
+            const auto& colliderA = _colliders[possiblePair.ColliderA.Index];
+            const auto& colliderB = _colliders[possiblePair.ColliderB.Index];
 
-            if (detectOverlap(colliderA, colliderB))
+            if (detectContact(colliderA, colliderB))
             {
-                newColliderPairs.insert(colliderPair);
+                newColliderPairs.insert(possiblePair);
             }
         }
 
     #ifdef TRACY_ENABLE
-            ZoneNamedN(CallContactListener, "CallContactListener", true);
+            ZoneNamedN(ResolveColliderPairs, "Resolve collider pairs", true);
     #endif
 
         for (auto& colliderPair : newColliderPairs)
@@ -213,13 +213,15 @@ namespace PhysicsEngine
 
             if (!colliderA.IsTrigger() && !colliderB.IsTrigger())
             {
+                // Resolve contact
+                _contactListener->OnCollisionEnter(colliderPair.ColliderA, colliderPair.ColliderB);
                 continue;
             }
 
             // If there was no collision in the previous frame -> OnTriggerEnter.
             if (_colliderPairs.find(colliderPair) == _colliderPairs.end())
             {
-                _contactListener->OnTriggerEnter(colliderPair.ColliderA,colliderPair.ColliderB);
+                _contactListener->OnTriggerEnter(colliderPair.ColliderA, colliderPair.ColliderB);
             }
             // If there was a collision in the previous frame and there is always a collision -> OnTriggerStay.
             else
@@ -235,6 +237,8 @@ namespace PhysicsEngine
 
             if (!colliderA.IsTrigger() && !colliderB.IsTrigger())
             {
+                //resolve Contact
+                // OnContactExit
                 continue;
             }
 
@@ -250,7 +254,7 @@ namespace PhysicsEngine
         _colliderPairs = newColliderPairs;
     }
 
-    bool World::detectOverlap(const Collider& colA, const Collider& colB) noexcept
+    bool World::detectContact(const Collider& colA, const Collider& colB) noexcept
     {
     #ifdef TRACY_ENABLE
             ZoneScoped;
@@ -258,15 +262,18 @@ namespace PhysicsEngine
         const auto& bodyA = GetBody(colA.GetBodyRef());
         const auto& bodyB = GetBody(colB.GetBodyRef());
 
+        const auto mustCalculateContact = !colA.IsTrigger() && !colB.IsTrigger();
+
         const auto colShapeA = colA.Shape();
         const auto colShapeB = colB.Shape();
+
+        bool doCollidersIntersect = false;
 
         switch (colShapeA.index())
         {
             case static_cast<int>(Math::ShapeType::Circle):
             {
-                const auto circleA = std::get<Math::CircleF>(colShapeA) +
-                        bodyA.Position();
+                const auto circleA = std::get<Math::CircleF>(colShapeA) + bodyA.Position();
 
                 switch (colShapeB.index())
                 {
@@ -274,29 +281,49 @@ namespace PhysicsEngine
                     {
                         const auto circleB = std::get<Math::CircleF>(colShapeB) + bodyB.Position();
 
-                        return Math::Intersect(circleA, circleB);
-                    }
+                        doCollidersIntersect = Math::Intersect(circleA, circleB);
 
+                        // Create the circle-circle Contact if needed.
+                        if (mustCalculateContact && doCollidersIntersect)
+                        {
+                            const auto c1 = circleA.Center(), c2 = circleB.Center();
+                            const auto r1 = circleA.Radius(), r2 = circleB.Radius();
+
+                            const auto delta = c1 - c2;
+                            _contact.Normal = delta.Normalized();
+                            _contact.Point = c1 + delta * 0.5f;
+                            _contact.Penetration = r1 + r2 - delta.Length();
+                        }
+
+                        break;
+                    } // Case circle B.
+                    
                     case static_cast<int>(Math::ShapeType::Rectangle):
                     {
                         const auto rectB = std::get<Math::RectangleF>(colShapeB) +
                                 bodyB.Position();
 
-                        return Math::Intersect(circleA, rectB);
-                    }
+                        doCollidersIntersect = Math::Intersect(circleA, rectB);
+                        break;
+                    } // Case rectangle B.
 
                     case static_cast<int>(Math::ShapeType::Polygon):
                     {
                         const auto polygonB = std::get<Math::PolygonF>(colShapeB) +
                                 bodyB.Position();
 
-                        return Math::Intersect(circleA, polygonB);
-                    }
+                        doCollidersIntersect = Math::Intersect(circleA, polygonB);
+                        break;
+                    } // Case polygon B.
 
                     case static_cast<int>(Math::ShapeType::None):
-                        return false;
-                }
-            }
+                        break;
+                    default:
+                        break;
+                } // Switch shape collider B.
+
+                break;
+            } // Case circle A.
 
             case static_cast<int>(Math::ShapeType::Rectangle):
             {
@@ -309,28 +336,36 @@ namespace PhysicsEngine
                         const auto circleB = std::get<Math::CircleF>(colShapeB) +
                                              bodyB.Position();
 
-                        return Math::Intersect(rectA, circleB);
-                    }
+                        doCollidersIntersect = Math::Intersect(rectA, circleB);
+                        break;
+                    } // Case circle B.
 
                     case static_cast<int>(Math::ShapeType::Rectangle):
                     {
                         const auto rectB = std::get<Math::RectangleF>(colShapeB) +
                                 bodyB.Position();
 
-                        return Math::Intersect(rectA, rectB);
-                    }
+                        doCollidersIntersect = Math::Intersect(rectA, rectB);
+                        break;
+                    } // Case rectangle B.
 
                     case static_cast<int>(Math::ShapeType::Polygon):
                     {
                         const auto polygonB = std::get<Math::PolygonF>(colShapeB) +
                                               bodyB.Position();
 
-                        return Math::Intersect(rectA, polygonB);
-                    }
+                        doCollidersIntersect = Math::Intersect(rectA, polygonB);
+                        break;
+                    } // Case polygon B.
+
                     case static_cast<int>(Math::ShapeType::None):
-                        return false;
-                }
-            }
+                        break;
+                    default:
+                        break;
+                } // Switch shape collider B.
+
+                break;
+            } // Case rectangle A.
 
             case static_cast<int>(Math::ShapeType::Polygon):
             {
@@ -343,35 +378,44 @@ namespace PhysicsEngine
                     {
                         const auto circleB = std::get<Math::CircleF>(colShapeB) + bodyB.Position();
 
-                        return Math::Intersect(polygonA, circleB);
-                    }
+                        doCollidersIntersect = Math::Intersect(polygonA, circleB);
+                        break;
+                    } // Case circle B.
 
                     case static_cast<int>(Math::ShapeType::Rectangle):
                     {
                         const auto rectB = std::get<Math::RectangleF>(colShapeB) +
                                            bodyB.Position();
 
-                        return Math::Intersect(polygonA, rectB);
-                    }
+                        doCollidersIntersect = Math::Intersect(polygonA, rectB);
+                        break;
+                    } // Case rectangle B.
 
                     case static_cast<int>(Math::ShapeType::Polygon):
                     {
                         const auto polygonB = std::get<Math::PolygonF>(colShapeB) +
                                               bodyB.Position();
 
-                        return Math::Intersect(polygonA, polygonB);
-                    }
+                        doCollidersIntersect = Math::Intersect(polygonA, polygonB);
+                        break;
+                    } // Case polygon B.
 
                     case static_cast<int>(Math::ShapeType::None):
-                        return false;
-                }
-            }
+                        break;
+                    default:
+                        break;
+                } // Switch shape collider B.
+
+                break;
+            } // Case Polygon A.
 
             case static_cast<int>(Math::ShapeType::None):
-                return false;
-        }
+                break;
+            default:
+                break;
+        } // Switch shape collider A.
 
-        return false;
+        return doCollidersIntersect;
     }
 
     void World::Deinit() noexcept

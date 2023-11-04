@@ -47,4 +47,14 @@ public:
 
     void OnTriggerExit(PhysicsEngine::ColliderRef colliderRefA,
                        PhysicsEngine::ColliderRef colliderRefB) noexcept override;
+
+   
+
+    // Inherited via ContactListener
+    void OnCollisionEnter(PhysicsEngine::ColliderRef colliderRefA, 
+                          PhysicsEngine::ColliderRef colliderRefB) noexcept override;
+
+    void OnCollisionExit(PhysicsEngine::ColliderRef colliderRefA, 
+                         PhysicsEngine::ColliderRef colliderRefB) noexcept override;
+
 };
