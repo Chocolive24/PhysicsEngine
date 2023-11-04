@@ -57,4 +57,3 @@ namespace PhysicsEngine
        virtual void OnCollisionExit(ColliderRef colliderRefA, ColliderRef colliderRefB) noexcept = 0;
     };
 }
-

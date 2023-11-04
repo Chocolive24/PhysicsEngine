@@ -8,8 +8,8 @@
 
 void SampleManager::Init() noexcept
 {
-    _samples[0] = UniquePtr<Sample>::MakeUnique<TriggerColliderSample>(TriggerColliderSample("Colliders Trigger"));
-    _samples[1] = UniquePtr<Sample>::MakeUnique<PlanetSystemSample>(PlanetSystemSample("Planet System"));
+    _samples[0] = UniquePtr<Sample>::MakeUnique<TriggerColliderSample>(TriggerColliderSample());
+    _samples[1] = UniquePtr<Sample>::MakeUnique<PlanetSystemSample>(PlanetSystemSample());
 
     _samples[_currentSampleIdx]->Init();
 }

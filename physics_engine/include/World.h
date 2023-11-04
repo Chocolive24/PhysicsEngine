@@ -8,6 +8,7 @@
 
 #include "Body.h"
 #include "Collider.h"
+#include "Contact.h"
 #include "ContactListener.h"
 #include "QuadTree.h"
 #include "References.h"

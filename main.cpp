@@ -6,7 +6,6 @@
 
 #ifdef TRACY_ENABLE
 #include <Tracy.hpp>
-#include <TracyC.h>
 #endif // TRACY_ENABLE
 
 #include <imgui_impl_sdl2.h>
@@ -93,6 +92,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char* args[])
         {
             sampleManager.RestartSample();
         }
+
+        ImGui::Spacing();
+
+        ImGui::TextWrapped(sampleManager.CurrentSample()->Description().c_str());
 
         ImGui::End();
 

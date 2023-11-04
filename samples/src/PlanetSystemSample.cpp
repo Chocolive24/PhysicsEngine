@@ -53,7 +53,6 @@ void PlanetSystemSample::onHandleInputs(const SDL_Event event, const bool isMous
     
 }
 
-
 void PlanetSystemSample::onUpdate() noexcept
 {
     if (_mustCreatePlanet)

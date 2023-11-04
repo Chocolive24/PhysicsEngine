@@ -3,13 +3,15 @@
 #include "Vec2.h"
 #include "References.h"
 
-struct Contact
+namespace PhysicsEngine
 {
-	ColliderRef colliderRefA, colliderRefB;
-	Math::Vec2F Normal;
-	Math::Vec2F Point;
-	Math::Vec2F Penetration;
+	struct Contact
+	{
+		ColliderRef colliderRefA, colliderRefB;
+		Math::Vec2F Normal;
+		Math::Vec2F Point;
+		float Penetration;
 
-	float CalculateSeperatingVelocity() const noexcept;
-};
-
+		float CalculateSeperatingVelocity() const noexcept;
+	};
+}

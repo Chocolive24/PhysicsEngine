@@ -41,11 +41,6 @@ private:
      */
     void calculatePlanetMovements() noexcept;
 
-    /**
-     * @brief drawCelestialBodies is a method that draws all the celestial bodies on screen.
-     */
-    void drawCelestialBodies() noexcept;
-
 public:
     /**
      * @brief The gravitational constant for the physical world of the planet system.
@@ -57,7 +52,15 @@ public:
      */
     static constexpr std::size_t StartPlanetNbr = 200;
 
-    PlanetSystemSample(std::string name) noexcept : Sample(name) {};
+    PlanetSystemSample() noexcept = default;
+
+    std::string Name() const noexcept override { return "Planet System"; }
+
+    std::string Description() const noexcept override
+    {
+        std::string_view description = R"({write this in string view please !!})";
+        return static_cast<std::string>(description);
+    }
 
     /**
      * @brief Init is a method that initializes the planet system sample (aka instantiates the sun and all the planets).

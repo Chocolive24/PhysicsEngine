@@ -31,7 +31,15 @@ private:
     void maintainObjectsInWindow() noexcept;
 
 public:
-    TriggerColliderSample(std::string name) noexcept : Sample(name) {};
+    TriggerColliderSample() noexcept = default;
+
+    std::string Name() const noexcept override { return "Trigger Colliders"; }
+
+    std::string Description() const noexcept override
+    {
+        std::string_view description = R"({write this in string view please !!})";
+        return static_cast<std::string>(description);
+    }
 
     void onInit() noexcept override;
     void onHandleInputs(SDL_Event event, bool isMouseOnAnImGuiWindow) noexcept override;

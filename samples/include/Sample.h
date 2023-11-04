@@ -28,9 +28,12 @@ enum class SampleType
 class Sample
 {
 public:
-    Sample(std::string name) noexcept : _name(name) {};
+    Sample() noexcept = default;
 
     virtual ~Sample() = default;
+
+    virtual std::string Name() const noexcept = 0;
+    virtual std::string Description() const noexcept = 0;
 
     /**
      * @brief Init is a method that initializes the sample.
@@ -41,12 +44,7 @@ public:
     void Render() noexcept;
     void Deinit() noexcept;
 
-    const std::string Name() const noexcept { return _name; }
-
 protected:
-    std::string _name;
-    std::string _description;
-
     PhysicsEngine::World _world;
     Timer _timer;
 

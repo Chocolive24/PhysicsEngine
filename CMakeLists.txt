@@ -58,6 +58,7 @@ file(GLOB_RECURSE PHYSICS_SRC_FILES physics_engine/include/*.h physics_engine/sr
 add_library(physics ${PHYSICS_SRC_FILES})
 set_target_properties(physics PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(physics PUBLIC physics_engine/include/)
+target_include_directories(math PUBLIC libs/math/include/)
 target_link_libraries(physics PUBLIC math)
 
 if (USE_TRACY)
@@ -87,7 +88,7 @@ add_executable(main main.cpp)
 if (USE_TRACY)
     target_compile_definitions(main PUBLIC TRACY_ENABLE)
     # Link the TracyClient library
-    target_link_libraries(main PRIVATE tracyClient)
+    #target_link_libraries(main PRIVATE tracyClient)
 endif()
 
 # Link the samples library
