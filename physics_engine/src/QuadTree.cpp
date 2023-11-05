@@ -10,6 +10,11 @@
 
 namespace PhysicsEngine
 {
+    /*explicit QuadNode::QuadNode(Allocator& allocator) noexcept : Colliders(StandardAllocator<SimplifiedCollider>(allocator))
+    {
+        
+    }*/
+
     template<typename T>
     constexpr T QuadCount(T depth)
     {
@@ -25,7 +30,7 @@ namespace PhysicsEngine
 
     void QuadTree::Init() noexcept
     {
-        _nodes.resize(QuadCount(_maxDepth), QuadNode());
+        _nodes.resize(QuadCount(_maxDepth), QuadNode({_heapAllocator}));
 
         for (auto& node : _nodes)
         {
@@ -43,9 +48,9 @@ namespace PhysicsEngine
         ColliderRef colliderRef,
         int depth) noexcept
     {
-    /*#ifdef TRACY_ENABLE
+    #ifdef TRACY_ENABLE
             ZoneScoped;
-    #endif*/
+    #endif
         // If the node doesn't have any children.
         if (node.Children[0] == nullptr)
         {
@@ -105,7 +110,14 @@ namespace PhysicsEngine
                     }
                 }
 
-                node.Colliders = std::move(remainingColliders);
+                node.Colliders.clear();
+
+                for (const auto& col : remainingColliders)
+                {
+                    node.Colliders.push_back(col);
+                }
+
+                //node.Colliders = std::move(remainingColliders);
             }
         }
 
@@ -144,9 +156,9 @@ namespace PhysicsEngine
 
     void QuadTree::calculateNodePossiblePairs(const QuadNode& node) noexcept
     {
-    /*#ifdef TRACY_ENABLE
+    #ifdef TRACY_ENABLE
             ZoneScoped;
-    #endif*/
+    #endif
 
         for (const auto& simplColA : node.Colliders)
         {
@@ -188,9 +200,9 @@ namespace PhysicsEngine
 
     void QuadTree::calculateChildrenNodePossiblePairs(const QuadNode& node, SimplifiedCollider simplCol) noexcept
     {
-    /*#ifdef TRACY_ENABLE
+    #ifdef TRACY_ENABLE
             ZoneScoped;
-    #endif*/
+    #endif
         //// If the current node has children, we need to compare the simplified collider from its parent node with its children.
         //if (node.Children[0] != nullptr)
         //{

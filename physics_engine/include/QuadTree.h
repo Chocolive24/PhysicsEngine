@@ -27,7 +27,7 @@ namespace PhysicsEngine
          * @brief MaxColliderNbr is the maximum number of colliders that the node can stores before a subdivision
          * of the world.
          */
-        static constexpr int MaxColliderNbr = 2;
+        static constexpr int MaxColliderNbr = 8;
 
         /**
          * @brief BoundaryDivisionCount is the number of space boundary subdivision for the node.
@@ -36,10 +36,10 @@ namespace PhysicsEngine
 
         Math::RectangleF Boundary{Math::Vec2F::Zero(), Math::Vec2F::Zero()};
         std::array<QuadNode*, BoundaryDivisionCount> Children{};
-        std::vector<SimplifiedCollider> Colliders{};
+        AllocVector<SimplifiedCollider> Colliders{};
 
-        constexpr QuadNode() noexcept = default;
-        explicit QuadNode(Math::RectangleF boundary) noexcept : Boundary(boundary) {};
+        //constexpr QuadNode() noexcept = default;
+        explicit QuadNode(Allocator& allocator) noexcept : Colliders{ StandardAllocator<SimplifiedCollider> {allocator} } {}
     };
 
     /**
@@ -48,7 +48,7 @@ namespace PhysicsEngine
     class QuadTree
     {
     private:
-        HeapAllocator _heapAllocator;
+        HeapAllocator _heapAllocator{};
 
         std::vector<QuadNode> _nodes;
         std::vector<ColliderPair> _possiblePairs;

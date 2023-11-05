@@ -9,7 +9,7 @@ namespace PhysicsEngine
 {
 	/**
 	* @struct ContactSolver is a struct that contains all the data and methods needed to calculates 
-	all the behaviors of a physical contact.
+	* all the behaviors of a physical contact.
 	*/
 	struct ContactSolver
 	{

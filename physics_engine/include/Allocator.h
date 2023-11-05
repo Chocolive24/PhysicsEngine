@@ -24,7 +24,7 @@ namespace PhysicsEngine
         std::size_t _allocationCount = 0;
 
     public:
-        Allocator() noexcept = default;
+        Allocator() = default;
         Allocator(void* rootPtr, std::size_t size) noexcept
         {
             _rootPtr = rootPtr;
@@ -106,14 +106,11 @@ namespace PhysicsEngine
     };
 
     /**
-     * \brief Custom proxy allocator respecting _allocatortraits
+     * @brief Custom proxy allocator respecting allocator_traits
      */
     template<typename T>
     class StandardAllocator
     {
-    protected:
-        Allocator& _allocator;
-
     public:
         typedef T value_type;
         StandardAllocator(Allocator& allocator);
@@ -122,21 +119,27 @@ namespace PhysicsEngine
         T* allocate(std::size_t n);
         void deallocate(T* ptr, std::size_t n);
         [[nodiscard]] Allocator& GetAllocator() const { return _allocator; }
+
+    protected:
+        Allocator& _allocator;
     };
+
+
+    template <class T, class U>
+    constexpr bool operator== (const StandardAllocator<T>&, const StandardAllocator<U>&) noexcept
+    {
+        return true;
+    }
+
+    template <class T, class U>
+    constexpr bool operator!= (const StandardAllocator<T>&, const StandardAllocator<U>&) noexcept
+    {
+        return false;
+    }
 
     template <typename T>
     StandardAllocator<T>::StandardAllocator(Allocator& allocator) : _allocator(allocator)
     {
-    }
-
-    template <class T, class U>
-    constexpr bool operator==(const StandardAllocator<T>& a, const StandardAllocator<U>& b) noexcept {
-        return &a.GetAllocator() == &b.GetAllocator();
-    }
-
-    template <class T, class U>
-    constexpr bool operator!=(const StandardAllocator<T>& a, const StandardAllocator<U>& b) noexcept {
-        return &a.GetAllocator() != &b.GetAllocator();
     }
 
     template <typename T>
@@ -146,7 +149,7 @@ namespace PhysicsEngine
     }
 
     template <typename T>
-    void StandardAllocator<T>::deallocate(T* ptr, std::size_t n)
+    void StandardAllocator<T>::deallocate(T* ptr, [[maybe_unused]] std::size_t n)
     {
         _allocator.Deallocate(ptr);
     }

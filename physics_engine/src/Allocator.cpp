@@ -13,7 +13,9 @@ namespace PhysicsEngine
             return nullptr;
         }
 
-        const auto size = allocationSize * alignment;
+        // Calculate the correct size based on allocationSize alone
+        const std::size_t size = allocationSize;
+
         auto* ptr = std::malloc(size);
 
     #ifdef TRACY_ENABLE
@@ -22,6 +24,7 @@ namespace PhysicsEngine
 
         return ptr;
     }
+
 
     void HeapAllocator::Deallocate(void* ptr)
     {
