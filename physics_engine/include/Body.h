@@ -25,9 +25,9 @@ namespace PhysicsEngine
     private:
         Math::Vec2F _position = Math::Vec2F::Zero();
         Math::Vec2F _velocity = Math::Vec2F::Zero();
-        float _mass = -1.f;
         Math::Vec2F _forces = Math::Vec2F::Zero();
-
+        float _mass = -1.f;
+        float _inverseMass = -1.f;
         BodyType _bodyType = BodyType::Dynamic;
 
     public:
@@ -37,6 +37,7 @@ namespace PhysicsEngine
             _position = pos;
             _velocity = vel;
             _mass = mass;
+            _inverseMass = 1.f / mass;
         }
 
         /**
@@ -73,9 +74,20 @@ namespace PhysicsEngine
 
         /**
          * @brief SetMass is a method that replaces the current mass of the body with the new mass given in parameter.
+         * It also recalculates the inverse mass of the body with the newMass.
          * @param newMass The new mass for the body.
          */
-        void constexpr SetMass(const float newMass) noexcept { _mass = newMass; }
+        void constexpr SetMass(const float newMass) noexcept 
+        { 
+            _mass = newMass; 
+            _inverseMass = 1.f / _mass;
+        }
+
+        /**
+         * @brief InverseMass is a method that gives the inverse mass of the body.
+         * @return The inverse mass of the body.
+         */
+        [[nodiscard]] constexpr float InverseMass() const noexcept { return _inverseMass; }
 
         /**
          * @brief ApplyForce is a method that applies a force to the body and adds it to the sum of the body's forces

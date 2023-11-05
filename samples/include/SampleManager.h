@@ -10,7 +10,7 @@
 class SampleManager
 {
 public:
-    static constexpr int SampleCount = 2;
+    static constexpr int SampleCount = 3;
 
     void Init() noexcept;
     void HandleCurrentSampleInputs(SDL_Event event, bool isMouseOnAnImGuiWindow) const noexcept;

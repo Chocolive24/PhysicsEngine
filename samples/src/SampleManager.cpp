@@ -5,11 +5,13 @@
 #include "SampleManager.h"
 #include "PlanetSystemSample.h"
 #include "TriggerColliderSample.h"
+#include "CollisionSample.h"
 
 void SampleManager::Init() noexcept
 {
-    _samples[0] = UniquePtr<Sample>::MakeUnique<TriggerColliderSample>(TriggerColliderSample());
+    _samples[2] = UniquePtr<Sample>::MakeUnique<TriggerColliderSample>(TriggerColliderSample());
     _samples[1] = UniquePtr<Sample>::MakeUnique<PlanetSystemSample>(PlanetSystemSample());
+    _samples[0] = UniquePtr<Sample>::MakeUnique<CollisionSample>(CollisionSample());
 
     _samples[_currentSampleIdx]->Init();
 }

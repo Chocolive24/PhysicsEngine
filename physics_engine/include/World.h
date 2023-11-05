@@ -8,7 +8,7 @@
 
 #include "Body.h"
 #include "Collider.h"
-#include "Contact.h"
+#include "ContactSolver.h"
 #include "ContactListener.h"
 #include "QuadTree.h"
 #include "References.h"
@@ -29,7 +29,7 @@ namespace PhysicsEngine
         std::vector<std::size_t> _bodiesGenIndices{};
 
         ContactListener* _contactListener = nullptr;
-        Contact _contact;
+        ContactSolver _contactSolver;
 
         std::vector<Collider> _colliders{};
         std::vector<std::size_t> _collidersGenIndices{};
@@ -118,6 +118,7 @@ namespace PhysicsEngine
         /**
          * @brief CreateCollider is a method that creates a collider in the world and returns a
          * collider reference to this collider.
+         * @param bodyRef The body reference to the body on which the collider would be attached.
          * @return A collider reference to the collider in the world (see ColliderRef).
          */
         [[nodiscard]] ColliderRef CreateCollider(BodyRef bodyRef) noexcept;
