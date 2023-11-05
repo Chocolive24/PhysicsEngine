@@ -23,5 +23,7 @@ namespace PhysicsEngine
 
 		float CalculateSeparatingVelocity() const noexcept;
 		void ResolvePostCollisionVelocity() noexcept;
+		void ResolvePostCollisionPosition() noexcept;
+		void ResolveContact() noexcept;
 	};
 }

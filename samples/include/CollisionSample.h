@@ -40,4 +40,6 @@ private:
 	static constexpr SDL_Color _collisionColor{ 0, 255, 0, 255 };
 
 	std::array<PhysicsEngine::ColliderRef, ColliderCount> _colliderRefs;
+
+	void maintainObjectsInWindow() noexcept;
 };

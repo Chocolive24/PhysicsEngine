@@ -3,7 +3,7 @@
 float PhysicsEngine::ContactSolver::CalculateSeparatingVelocity() const noexcept
 {
     const auto relativeVelocity = bodyA->Velocity() - bodyB->Velocity();
-    const auto separatingVelocity = Math::Vec2F::Dot(relativeVelocity, Normal);
+    const auto separatingVelocity = relativeVelocity.Dot(Normal);
 
     return separatingVelocity;
 }
@@ -30,19 +30,45 @@ void PhysicsEngine::ContactSolver::ResolvePostCollisionVelocity() noexcept
     const auto inversMassBodyB = bodyB->InverseMass();
     const auto totalInverseMass = inversMassBodyA + inversMassBodyB;
 
+    const auto impulse = deltaVelocity / totalInverseMass;
+    const auto impulsePerIMass = Normal * impulse;
+
     if (bodyA->GetBodyType() == BodyType::Dynamic)
     {
-        const auto postCollisionVelocity = bodyA->Velocity() + 
-            (-1 * Normal * deltaVelocity * inversMassBodyA / totalInverseMass);
-
-        bodyA->SetVelocity(postCollisionVelocity);
+        bodyA->SetVelocity(bodyA->Velocity() + impulsePerIMass * inversMassBodyA);
     }
 
     if (bodyB->GetBodyType() == BodyType::Dynamic)
     {
-        const auto postCollisionVelocity = bodyB->Velocity() +
-            (-1 * Normal * deltaVelocity * inversMassBodyB / totalInverseMass);
-
-        bodyB->SetVelocity(postCollisionVelocity);
+        bodyB->SetVelocity(bodyB->Velocity() - impulsePerIMass * inversMassBodyB);
     }
+}
+
+void PhysicsEngine::ContactSolver::ResolvePostCollisionPosition() noexcept
+{
+    if (Penetration <= 0.001f) return;
+
+    const auto inversMassBodyA = bodyA->InverseMass();
+    const auto inversMassBodyB = bodyB->InverseMass();
+    const auto totalInverseMass = inversMassBodyA + inversMassBodyB;
+
+    if (totalInverseMass <= 0.001f) return;
+
+    const auto movePerIMass = Normal * (-Penetration / totalInverseMass);
+
+    if (bodyA->GetBodyType() == BodyType::Dynamic)
+    {
+        bodyA->SetPosition(bodyA->Position() + movePerIMass * inversMassBodyA);
+    }
+
+    if (bodyB->GetBodyType() == BodyType::Dynamic)
+    {
+        bodyB->SetPosition(bodyB->Position() + movePerIMass * inversMassBodyB);
+    }
+}
+
+void PhysicsEngine::ContactSolver::ResolveContact() noexcept
+{
+    ResolvePostCollisionVelocity();
+    ResolvePostCollisionPosition();
 }

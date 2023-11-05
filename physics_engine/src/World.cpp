@@ -193,8 +193,8 @@ namespace PhysicsEngine
 
         for (const auto& possiblePair : newPossiblePairs)
         {
-            const auto& colliderA = _colliders[possiblePair.ColliderA.Index];
-            const auto& colliderB = _colliders[possiblePair.ColliderB.Index];
+            auto& colliderA = _colliders[possiblePair.ColliderA.Index];
+            auto& colliderB = _colliders[possiblePair.ColliderB.Index];
 
             if (detectContact(colliderA, colliderB))
             {
@@ -213,7 +213,7 @@ namespace PhysicsEngine
 
             if (!colliderA.IsTrigger() && !colliderB.IsTrigger())
             {
-                // Resolve contact
+                _contactSolver.ResolveContact();
                 _contactListener->OnCollisionEnter(colliderPair.ColliderA, colliderPair.ColliderB);
                 continue;
             }
@@ -254,15 +254,24 @@ namespace PhysicsEngine
         _colliderPairs = newColliderPairs;
     }
 
-    bool World::detectContact(const Collider& colA, const Collider& colB) noexcept
+    bool World::detectContact(Collider& colA, Collider& colB) noexcept
     {
     #ifdef TRACY_ENABLE
             ZoneScoped;
     #endif
-        const auto& bodyA = GetBody(colA.GetBodyRef());
-        const auto& bodyB = GetBody(colB.GetBodyRef());
+        auto& bodyA = GetBody(colA.GetBodyRef());
+        auto& bodyB = GetBody(colB.GetBodyRef());
 
         const auto mustCalculateContact = !colA.IsTrigger() && !colB.IsTrigger();
+
+        if (mustCalculateContact)
+        {
+            _contactSolver.bodyA = &bodyA;
+            _contactSolver.bodyB = &bodyB;
+
+            _contactSolver.colliderA = &colA;
+            _contactSolver.colliderB = &colB;
+        }
 
         const auto colShapeA = colA.Shape();
         const auto colShapeB = colB.Shape();

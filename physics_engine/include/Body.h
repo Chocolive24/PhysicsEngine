@@ -57,7 +57,7 @@ namespace PhysicsEngine
          * @brief Velocity is a method that gives the velocity of the body.
          * @return The velocity of the body.
          */
-        [[nodiscard]] constexpr Math::Vec2F Velocity() const noexcept { return _velocity; }
+        [[nodiscard]] const Math::Vec2F Velocity() const noexcept { return _velocity; }
 
         /**
          * @brief SetVelocity is a method that replaces the current velocity of the body with the new velocity

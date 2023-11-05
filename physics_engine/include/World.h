@@ -42,7 +42,7 @@ namespace PhysicsEngine
 
         void resolveBroadPhase() noexcept;
         void resolveNarrowPhase() noexcept;
-        [[nodiscard]] bool detectContact(const Collider& colA, const Collider& colB) noexcept;
+        [[nodiscard]] bool detectContact(Collider& colA, Collider& colB) noexcept;
 
     public:
         World() noexcept = default;
