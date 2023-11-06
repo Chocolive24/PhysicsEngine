@@ -14,9 +14,9 @@
 
 void SampleManager::Init() noexcept
 {
-    _samples[0] = MakeUnique<Sample>(TriggerColliderSample());
+    _samples[2] = MakeUnique<Sample>(TriggerColliderSample());
     _samples[1] = MakeUnique<Sample>(PlanetSystemSample());
-    _samples[2] = MakeUnique<Sample>(CollisionSample());
+    _samples[0] = MakeUnique<Sample>(CollisionSample());
 
     _samples[_currentSampleIdx]->Init();
 }

@@ -35,11 +35,12 @@ public:
 						 PhysicsEngine::ColliderRef colliderRefB) noexcept override;
 
 private:
-	static constexpr int ColliderCount = 20;
+	static constexpr int ColliderCount = 30;
 	static constexpr SDL_Color _noCollisionColor{ 255, 0, 0, 255 };
 	static constexpr SDL_Color _collisionColor{ 0, 255, 0, 255 };
 
 	std::array<PhysicsEngine::ColliderRef, ColliderCount> _colliderRefs;
+	std::array<int, ColliderCount> _collisionsCount;
 
 	void maintainObjectsInWindow() noexcept;
 };

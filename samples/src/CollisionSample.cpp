@@ -15,6 +15,8 @@ void CollisionSample::onInit() noexcept
 {
     _world.SetContactListener(this);
 
+    std::fill(_collisionsCount.begin(), _collisionsCount.end(), 0);
+
     const auto windowSizeInMeters = Metrics::PixelsToMeters(
         Math::Vec2F(Window::WindowWidth, Window::WindowHeight));
 
@@ -40,17 +42,17 @@ void CollisionSample::onInit() noexcept
         body.SetMass(5.f);
     }
 
-    //const auto& collider1 = _world.GetCollider(_colliderRefs[0]);
-    //auto& body1 = _world.GetBody(collider1.GetBodyRef());
-    ////body1.SetPosition(Math::Vec2F(2.f, -3.f));
-    //body1.SetVelocity(Math::Vec2F(10.f, 0.f));
-    //body1.SetMass(5.f);
+   /* const auto& collider1 = _world.GetCollider(_colliderRefs[0]);
+    auto& body1 = _world.GetBody(collider1.GetBodyRef());
+    body1.SetPosition(Math::Vec2F(2.f, -3.f));
+    body1.SetVelocity(Math::Vec2F(2, 0.f));
+    body1.SetMass(5.f);
 
-    //const auto& collider2 = _world.GetCollider(_colliderRefs[1]);
-    //auto& body2 = _world.GetBody(collider2.GetBodyRef());
-    ////body2.SetPosition(Math::Vec2F(6.f, -3.f));
-    //body2.SetVelocity(Math::Vec2F(-10.f, 0.f));
-    //body2.SetMass(5.f);
+    const auto& collider2 = _world.GetCollider(_colliderRefs[1]);
+    auto& body2 = _world.GetBody(collider2.GetBodyRef());
+    body2.SetPosition(Math::Vec2F(6.f, -3.f));
+    body2.SetVelocity(Math::Vec2F(-2, 0.f));
+    body2.SetMass(5.f);*/
 }
 
 void CollisionSample::onHandleInputs(SDL_Event event, bool isMouseOnAnImGuiWindow) noexcept
@@ -91,7 +93,7 @@ void CollisionSample::onRender() noexcept
                 GraphicGeometry::Circle(Metrics::MetersToPixels(circle.Center()), 
                                         Metrics::MetersToPixels(circle.Radius()), 
                                         30, 
-                                        _noCollisionColor);
+                    _collisionsCount[colRef.Index] > 0 ? _collisionColor : _noCollisionColor);
                 break;
             }
         }
@@ -120,11 +122,19 @@ void CollisionSample::OnTriggerExit(PhysicsEngine::ColliderRef ColliderRefA,
 void CollisionSample::OnCollisionEnter(PhysicsEngine::ColliderRef ColliderRefA, 
                                        PhysicsEngine::ColliderRef ColliderRefB) noexcept
 {
+    _collisionsCount[ColliderRefA.Index]++;
+    _collisionsCount[ColliderRefB.Index]++;
+
+    std::cout << "START\n";
 }
 
 void CollisionSample::OnCollisionExit(PhysicsEngine::ColliderRef ColliderRefA, 
                                       PhysicsEngine::ColliderRef ColliderRefB) noexcept
 {
+    _collisionsCount[ColliderRefA.Index]--;
+    _collisionsCount[ColliderRefB.Index]--;
+
+    std::cout << "EXIT\n";
 }
 
 void CollisionSample::maintainObjectsInWindow() noexcept

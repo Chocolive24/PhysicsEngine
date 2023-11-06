@@ -29,7 +29,6 @@ namespace PhysicsEngine
         std::vector<std::size_t> _bodiesGenIndices{};
 
         ContactListener* _contactListener = nullptr;
-        ContactSolver _contactSolver;
 
         std::vector<Collider> _colliders{};
         std::vector<std::size_t> _collidersGenIndices{};
@@ -42,7 +41,7 @@ namespace PhysicsEngine
 
         void resolveBroadPhase() noexcept;
         void resolveNarrowPhase() noexcept;
-        [[nodiscard]] bool detectContact(Collider& colA, Collider& colB) noexcept;
+        [[nodiscard]] bool detectContact(Collider& colA, Collider& colB, ContactSolver& contactSolver) noexcept;
 
     public:
         World() noexcept = default;

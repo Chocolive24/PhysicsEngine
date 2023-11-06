@@ -163,16 +163,20 @@ namespace PhysicsEngine
             ZoneScoped;
     #endif
 
-        for (const auto& simplColA : node.Colliders)
+        for (std::size_t i = 0; i < node.Colliders.size(); i++)
         {
-            for (const auto& simplColB : node.Colliders)
+            auto& simplColA = node.Colliders[i];
+
+            for (std::size_t j = i + 1; j < node.Colliders.size(); j++)
             {
+                auto& simplColB = node.Colliders[j];
+
                 if (simplColA.ColRef == simplColB.ColRef) continue;
 
-                if (Math::Intersect(simplColA.Rectangle, simplColB.Rectangle))
-                {
+                /*if (Math::Intersect(simplColA.Rectangle, simplColB.Rectangle))
+                {*/
                     _possiblePairs.push_back(ColliderPair{ simplColA.ColRef, simplColB.ColRef });
-                }
+                //}
             }
 
             // If the node has children, we need to compare the simplified collider with the colliders in the children nodes.
@@ -221,10 +225,10 @@ namespace PhysicsEngine
         // For each colliders in the current node, compare it with the simplified collider from its parent node.
         for (const auto& nodeSimplCol : node.Colliders)
         {
-            if (Math::Intersect(simplCol.Rectangle, nodeSimplCol.Rectangle))
-            {
+            /*if (Math::Intersect(simplCol.Rectangle, nodeSimplCol.Rectangle))
+            {*/
                 _possiblePairs.push_back(ColliderPair{ simplCol.ColRef, nodeSimplCol.ColRef });
-            }
+            //}
         }
 
         // If the current node has children, we need to compare the simplified collider from its parent node with its children.

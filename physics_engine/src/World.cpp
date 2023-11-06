@@ -198,67 +198,65 @@ namespace PhysicsEngine
 
         for (const auto& possiblePair : newPossiblePairs)
         {
+            ContactSolver contactSolver;
+
             auto& colliderA = _colliders[possiblePair.ColliderA.Index];
             auto& colliderB = _colliders[possiblePair.ColliderB.Index];
 
-            if (detectContact(colliderA, colliderB))
+            auto it = _colliderPairs.find(possiblePair);
+
+            const auto doCollidersIntersect = detectContact(colliderA, colliderB, contactSolver);
+
+            if (it != _colliderPairs.end())
             {
-                newColliderPairs.insert(possiblePair);
+                if (!doCollidersIntersect)
+                {
+                    if (colliderA.IsTrigger() || colliderB.IsTrigger())
+                    {
+                        _contactListener->OnTriggerExit(possiblePair.ColliderA,
+                            possiblePair.ColliderB);
+                        
+                    }
+                    else
+                    {
+                        _contactListener->OnCollisionExit(possiblePair.ColliderA,
+                                                          possiblePair.ColliderB);
+                    }
+
+                    _colliderPairs.erase(it);
+                }
+                else
+                {
+                    if (!colliderA.IsTrigger() && !colliderB.IsTrigger())
+                    {
+                        contactSolver.ResolveContact();
+                    }
+                    
+                }
             }
-        }
-
-    #ifdef TRACY_ENABLE
-            ZoneNamedN(ResolveColliderPairs, "Resolve collider pairs", true);
-    #endif
-
-        for (auto& colliderPair : newColliderPairs)
-        {
-            Collider& colliderA = GetCollider(colliderPair.ColliderA);
-            Collider& colliderB = GetCollider(colliderPair.ColliderB);
-
-            if (!colliderA.IsTrigger() && !colliderB.IsTrigger())
-            {
-                _contactSolver.ResolveContact();
-                _contactListener->OnCollisionEnter(colliderPair.ColliderA, colliderPair.ColliderB);
-                continue;
-            }
-
-            // If there was no collision in the previous frame -> OnTriggerEnter.
-            if (_colliderPairs.find(colliderPair) == _colliderPairs.end())
-            {
-                _contactListener->OnTriggerEnter(colliderPair.ColliderA, colliderPair.ColliderB);
-            }
-            // If there was a collision in the previous frame and there is always a collision -> OnTriggerStay.
             else
             {
-                _contactListener->OnTriggerStay(colliderPair.ColliderA, colliderPair.ColliderB);
+                if (doCollidersIntersect)
+                {
+                    if (colliderA.IsTrigger() || colliderB.IsTrigger())
+                    {
+                        _contactListener->OnTriggerEnter(possiblePair.ColliderA,
+                            possiblePair.ColliderB);
+                    }
+                    else
+                    {
+                        contactSolver.ResolveContact();
+                        _contactListener->OnCollisionEnter(possiblePair.ColliderA,
+                            possiblePair.ColliderB);
+                    }
+
+                    _colliderPairs.insert(possiblePair);
+                }
             }
         }
-
-        for (auto& colliderPair : _colliderPairs)
-        {
-            Collider& colliderA = GetCollider(colliderPair.ColliderA);
-            Collider& colliderB = GetCollider(colliderPair.ColliderB);
-
-            if (!colliderA.IsTrigger() && !colliderB.IsTrigger())
-            {
-                _contactListener->OnCollisionExit(colliderPair.ColliderA,
-                                                  colliderPair.ColliderB);
-                continue;
-            }
-
-            // If there is no collision in this frame -> OnTriggerExit.
-            if (newColliderPairs.find(colliderPair) == newColliderPairs.end())
-            {
-                _contactListener->OnTriggerExit(colliderPair.ColliderA,
-                                                colliderPair.ColliderB);
-            }
-        }
-
-        _colliderPairs = newColliderPairs;
     }
 
-    bool World::detectContact(Collider& colA, Collider& colB) noexcept
+    bool World::detectContact(Collider& colA, Collider& colB, ContactSolver& contactSolver) noexcept
     {
     #ifdef TRACY_ENABLE
             ZoneScoped;
@@ -270,11 +268,11 @@ namespace PhysicsEngine
 
         if (mustCalculateContact)
         {
-            _contactSolver.bodyA = &bodyA;
-            _contactSolver.bodyB = &bodyB;
+            contactSolver.bodyA = &bodyA;
+            contactSolver.bodyB = &bodyB;
 
-            _contactSolver.colliderA = &colA;
-            _contactSolver.colliderB = &colB;
+            contactSolver.colliderA = &colA;
+            contactSolver.colliderB = &colB;
         }
 
         const auto colShapeA = colA.Shape();
@@ -303,9 +301,9 @@ namespace PhysicsEngine
                             const auto r1 = circleA.Radius(), r2 = circleB.Radius();
 
                             const auto delta = c1 - c2;
-                            _contactSolver.Normal = delta.Normalized();
-                            _contactSolver.Point = c1 + delta * 0.5f;
-                            _contactSolver.Penetration = r1 + r2 - delta.Length();
+                            contactSolver.Normal = delta.Normalized();
+                            contactSolver.Point = c1 + delta * 0.5f;
+                            contactSolver.Penetration = r1 + r2 - delta.Length();
                         }
 
                         break;
