@@ -4,8 +4,7 @@
 
 #include "Allocator.h"
 
-namespace PhysicsEngine
-{
+
     void* HeapAllocator::Allocate(std::size_t allocationSize, std::size_t alignment)
     {
         if (allocationSize == 0)
@@ -99,4 +98,3 @@ namespace PhysicsEngine
     //        return adjustment;
     //    }
     //}
-}

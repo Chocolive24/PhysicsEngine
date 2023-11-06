@@ -1,6 +1,8 @@
 #include "CollisionSample.h"
 #include "GraphicGeometry.h"
 #include "Metrics.h"
+#include "Random.h"
+
 #include <iostream>
 
 std::string CollisionSample::Description() const noexcept
@@ -13,6 +15,9 @@ void CollisionSample::onInit() noexcept
 {
     _world.SetContactListener(this);
 
+    const auto windowSizeInMeters = Metrics::PixelsToMeters(
+        Math::Vec2F(Window::WindowWidth, Window::WindowHeight));
+
     for (auto& colRef : _colliderRefs)
     {
         const auto bodyRef = _world.CreateBody();
@@ -20,26 +25,37 @@ void CollisionSample::onInit() noexcept
 
         colRef = _world.CreateCollider(bodyRef);
         auto& collider = _world.GetCollider(colRef);
-        collider.SetShape(Math::CircleF(0.3f));
+        collider.SetShape(Math::CircleF(0.2f));
         collider.SetFriction(1.f);
         collider.SetRestitution(1.f);
+
+        auto rndPos = Math::Vec2F(Math::Random::Range(1.f, windowSizeInMeters.X),
+                                  Math::Random::Range(-1.f, windowSizeInMeters.Y));
+
+        auto rndVel = Math::Vec2F(Math::Random::Range(-2.f, 2.f),
+                                  Math::Random::Range(-2.f, 2.f));
+
+        body.SetPosition(rndPos);
+        body.SetVelocity(rndVel);
+        body.SetMass(5.f);
     }
 
-    const auto& collider1 = _world.GetCollider(_colliderRefs[0]);
-    auto& body1 = _world.GetBody(collider1.GetBodyRef());
-    body1.SetPosition(Math::Vec2F(2.f, -3.f));
-    body1.SetVelocity(Math::Vec2F(1.f, 0.f));
-    body1.SetMass(5.f);
+    //const auto& collider1 = _world.GetCollider(_colliderRefs[0]);
+    //auto& body1 = _world.GetBody(collider1.GetBodyRef());
+    ////body1.SetPosition(Math::Vec2F(2.f, -3.f));
+    //body1.SetVelocity(Math::Vec2F(10.f, 0.f));
+    //body1.SetMass(5.f);
 
-    const auto& collider2 = _world.GetCollider(_colliderRefs[1]);
-    auto& body2 = _world.GetBody(collider2.GetBodyRef());
-    body2.SetPosition(Math::Vec2F(6.f, -3.f));
-    body2.SetVelocity(Math::Vec2F(-1.f, 0.f));
-    body2.SetMass(5.f);
+    //const auto& collider2 = _world.GetCollider(_colliderRefs[1]);
+    //auto& body2 = _world.GetBody(collider2.GetBodyRef());
+    ////body2.SetPosition(Math::Vec2F(6.f, -3.f));
+    //body2.SetVelocity(Math::Vec2F(-10.f, 0.f));
+    //body2.SetMass(5.f);
 }
 
 void CollisionSample::onHandleInputs(SDL_Event event, bool isMouseOnAnImGuiWindow) noexcept
 {
+    
 }
 
 void CollisionSample::onUpdate() noexcept
@@ -55,7 +71,7 @@ void CollisionSample::onUpdate() noexcept
         totalVel += body.Velocity().Length();
     }
 
-    std::cout << totalVel << "\n";
+    //std::cout << totalVel << "\n";
 }
 
 void CollisionSample::onRender() noexcept

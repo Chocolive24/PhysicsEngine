@@ -30,7 +30,11 @@ namespace PhysicsEngine
 
     void QuadTree::Init() noexcept
     {
-        _nodes.resize(QuadCount(_maxDepth), QuadNode({_heapAllocator}));
+    #ifdef TRACY_ENABLE
+            ZoneScoped;
+    #endif // TRACY_ENABLE
+  
+        _nodes.resize(QuadCount(_maxDepth), QuadNode({ *_heapAllocator }));
 
         for (auto& node : _nodes)
         {
@@ -84,7 +88,8 @@ namespace PhysicsEngine
 
                 _nodeIndex += 4;
 
-                std::vector<SimplifiedCollider> remainingColliders; //TODO: std::array avec max col nbr.
+                AllocVector<SimplifiedCollider> remainingColliders{ {*_heapAllocator} };
+                //TODO: std::array avec max col nbr.
 
                 for (const auto& col : node.Colliders)
                 {
@@ -116,8 +121,6 @@ namespace PhysicsEngine
                 {
                     node.Colliders.push_back(col);
                 }
-
-                //node.Colliders = std::move(remainingColliders);
             }
         }
 
@@ -236,6 +239,10 @@ namespace PhysicsEngine
 
     void QuadTree::Clear() noexcept
     {
+#ifdef TRACY_ENABLE
+        ZoneScoped;
+#endif // TRACY_ENABLE
+
         for (auto& node : _nodes)
         {
             node.Colliders.clear();
@@ -250,6 +257,9 @@ namespace PhysicsEngine
 
     void QuadTree::Deinit() noexcept
     {
+#ifdef TRACY_ENABLE
+        ZoneScoped;
+#endif // TRACY_ENABLE
         _nodes.clear();
 
         _nodeIndex = 1;

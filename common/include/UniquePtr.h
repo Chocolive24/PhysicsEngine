@@ -50,30 +50,31 @@ public:
     }
 
     /**
-     * @brief MakeUnique is a method that creates a unique pointer of the type of the value in parameter.
-     * @param value The value to point with the unique pointer.
-     * @return The unique pointer object that points the value.
-     */
-    [[nodiscard]] static constexpr UniquePtr<T> MakeUnique(T value) noexcept
-    {
-        return UniquePtr<T>(new T(value));
-    }
-
-    /**
-     * @brief MakeUnique is a method that creates a unique pointer of the type of the value in parameter.
-     * @param value The value to point with the unique pointer.
-     * @return The unique pointer object that points the value.
-     */
-    template<typename U>
-    [[nodiscard]] static constexpr UniquePtr<T> MakeUnique(U value) noexcept
-    {
-        return UniquePtr<T>(new U(value));
-    }
-
-    /**
      * @brief Get is a method that gives the pointer inside the unique pointer object.
      * @param value The value to point with the unique pointer.
      * @return The pointer inside the unique pointer object.
      */
     [[nodiscard]] constexpr T* Get() const noexcept { return _ptr; }
 };
+
+/**
+* @brief MakeUnique is a method that creates a unique pointer of the type of the value in parameter.
+* @param value The value to point with the unique pointer.
+* @return The unique pointer object that points the value.
+*/
+template<typename T>
+[[nodiscard]] UniquePtr<T> MakeUnique(const T& value) noexcept
+{
+    return UniquePtr<T>(new T(value));
+}
+
+/**
+ * @brief MakeUnique is a method that creates a unique pointer of the type of the value in parameter.
+ * @param value The value to point with the unique pointer.
+ * @return The unique pointer object that points the value.
+ */
+template<typename T, typename U>
+[[nodiscard]] UniquePtr<T> MakeUnique(const U& value) noexcept
+{
+    return UniquePtr<T>(new U(value));
+}

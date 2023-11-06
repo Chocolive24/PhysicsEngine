@@ -13,6 +13,9 @@ namespace PhysicsEngine
 {
     void World::Init(int preallocatedBodyCount) noexcept
     {
+#ifdef TRACY_ENABLE
+        ZoneScoped;
+#endif // TRACY_ENABLE
         if (preallocatedBodyCount < 0) preallocatedBodyCount = 0;
 
         _bodies.resize(preallocatedBodyCount, Body());
@@ -66,7 +69,7 @@ namespace PhysicsEngine
         Math::Vec2F worldMaxBound(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
 
     #ifdef TRACY_ENABLE
-        ZoneNamedN(SetRoodNodeBoundary, "RootNodeBoundary", true);
+        ZoneNamedN(SetRoodNodeBoundary, "SetRootNodeBoundary", true);
     #endif
 
         // Adjust the size of the collision zone in the world rectangle to the most distant bodies.
@@ -137,7 +140,9 @@ namespace PhysicsEngine
 
                 case static_cast<int>(Math::ShapeType::Polygon):
                 {
-                    Math::Vec2F minVertex(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+                    Math::Vec2F minVertex(std::numeric_limits<float>::max(), 
+                                          std::numeric_limits<float>::max());
+
                     Math::Vec2F maxVertex(std::numeric_limits<float>::lowest(),
                                           std::numeric_limits<float>::lowest());
 
@@ -237,17 +242,16 @@ namespace PhysicsEngine
 
             if (!colliderA.IsTrigger() && !colliderB.IsTrigger())
             {
-                //resolve Contact
-                // OnContactExit
+                _contactListener->OnCollisionExit(colliderPair.ColliderA,
+                                                  colliderPair.ColliderB);
                 continue;
             }
 
             // If there is no collision in this frame -> OnTriggerExit.
             if (newColliderPairs.find(colliderPair) == newColliderPairs.end())
             {
-                _contactListener->OnTriggerExit(
-                        colliderPair.ColliderA,
-                        colliderPair.ColliderB);
+                _contactListener->OnTriggerExit(colliderPair.ColliderA,
+                                                colliderPair.ColliderB);
             }
         }
 
@@ -429,6 +433,9 @@ namespace PhysicsEngine
 
     void World::Deinit() noexcept
     {
+#ifdef TRACY_ENABLE
+        ZoneScoped;
+#endif // TRACY_ENABLE
         _bodies.clear();
         _bodiesGenIndices.clear();
 

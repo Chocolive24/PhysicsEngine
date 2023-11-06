@@ -2,6 +2,7 @@
 
 #include "Allocator.h"
 #include "Collider.h"
+#include "UniquePtr.h"
 
 #include <vector>
 
@@ -48,10 +49,10 @@ namespace PhysicsEngine
     class QuadTree
     {
     private:
-        HeapAllocator _heapAllocator{};
+        UniquePtr<HeapAllocator> _heapAllocator = MakeUnique(HeapAllocator());
 
-        std::vector<QuadNode> _nodes;
-        std::vector<ColliderPair> _possiblePairs;
+        AllocVector<QuadNode> _nodes{ StandardAllocator<QuadNode> {*_heapAllocator} };
+        AllocVector<ColliderPair> _possiblePairs{ StandardAllocator<ColliderPair> {*_heapAllocator} };
 
         int _nodeIndex = 1;
 
@@ -141,7 +142,7 @@ namespace PhysicsEngine
          * touch each other.
          * @return The possible pairs of collider whose simplified shapes touch each other.
          */
-        [[nodiscard]] const std::vector<ColliderPair>& PossiblePairs() const noexcept { return _possiblePairs; }
+        [[nodiscard]] const AllocVector<ColliderPair>& PossiblePairs() const noexcept { return _possiblePairs; }
 
         /**
          * @brief MaxDepth is a method that gives the maximum depth of the quad-tree recursive space subdivision.

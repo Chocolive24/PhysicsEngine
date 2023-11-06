@@ -7,11 +7,16 @@
 #include "TriggerColliderSample.h"
 #include "CollisionSample.h"
 
+#ifdef TRACY_ENABLE
+#include "Tracy.hpp"
+#endif // TRACY_ENABLE
+
+
 void SampleManager::Init() noexcept
 {
-    _samples[2] = UniquePtr<Sample>::MakeUnique<TriggerColliderSample>(TriggerColliderSample());
-    _samples[1] = UniquePtr<Sample>::MakeUnique<PlanetSystemSample>(PlanetSystemSample());
-    _samples[0] = UniquePtr<Sample>::MakeUnique<CollisionSample>(CollisionSample());
+    _samples[0] = MakeUnique<Sample>(TriggerColliderSample());
+    _samples[1] = MakeUnique<Sample>(PlanetSystemSample());
+    _samples[2] = MakeUnique<Sample>(CollisionSample());
 
     _samples[_currentSampleIdx]->Init();
 }
@@ -23,11 +28,18 @@ void SampleManager::HandleCurrentSampleInputs(const SDL_Event event, const bool 
 
 void SampleManager::UpdateCurrentSample() const noexcept
 {
+#ifdef TRACY_ENABLE
+    ZoneScoped;
+#endif // TRACY_ENABLE
+
     _samples[_currentSampleIdx]->Update();
 }
 
 void SampleManager::RenderCurrentSample() const noexcept
 {
+#ifdef TRACY_ENABLE
+    ZoneScoped;
+#endif // TRACY_ENABLE
     _samples[_currentSampleIdx]->Render();
 }
 

@@ -51,7 +51,7 @@ file(GLOB_RECURSE COMMON_SRC_FILES common/include/*.h common/src/*.cpp)
 add_library(common ${COMMON_SRC_FILES})
 set_target_properties(common PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(common PUBLIC common/include/)
-target_link_libraries(common PUBLIC math)
+target_link_libraries(common PRIVATE math)
 
 # Create the PhysicsEngineCommon library with Math as a dependency
 file(GLOB_RECURSE PHYSICS_SRC_FILES physics_engine/include/*.h physics_engine/src/*.cpp)
@@ -59,7 +59,7 @@ add_library(physics ${PHYSICS_SRC_FILES})
 set_target_properties(physics PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(physics PUBLIC physics_engine/include/)
 target_include_directories(math PUBLIC libs/math/include/)
-target_link_libraries(physics PUBLIC math)
+target_link_libraries(physics PRIVATE math common)
 
 if (USE_TRACY)
     target_compile_definitions(physics PUBLIC TRACY_ENABLE)
@@ -72,7 +72,7 @@ file(GLOB_RECURSE SDL_APP_SRC_FILES sdl_application/include/*.h sdl_application/
 add_library(graphics ${SDL_APP_SRC_FILES})
 set_target_properties(graphics PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(graphics PUBLIC sdl_application/include/)
-target_link_libraries(graphics $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
+target_link_libraries(graphics PRIVATE $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
         $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static> math common imgui::imgui)
 
 # Create the samples library with dependencies on PhysicsEngineCommon, SDL_AppCommon, Common, and Math
@@ -80,20 +80,21 @@ file(GLOB_RECURSE samples_SRC_FILES samples/include/*.h samples/src/*.cpp)
 add_library(samples ${samples_SRC_FILES})
 set_target_properties(samples PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(samples PUBLIC samples/include/)
-target_link_libraries(samples PUBLIC physics graphics common math imgui::imgui)
+target_link_libraries(samples PRIVATE physics graphics common math imgui::imgui)
+if (USE_TRACY)
+    target_compile_definitions(samples PUBLIC TRACY_ENABLE)
+    # Link the TracyClient library
+    target_link_libraries(samples PRIVATE tracyClient)
+endif()
 
 # Create the PhysicsEngine executable with the samples library as a dependency
 add_executable(main main.cpp)
-
+target_link_libraries(main PRIVATE physics graphics common math imgui::imgui samples)
 if (USE_TRACY)
     target_compile_definitions(main PUBLIC TRACY_ENABLE)
     # Link the TracyClient library
     #target_link_libraries(main PRIVATE tracyClient)
 endif()
-
-# Link the samples library
-target_link_libraries(main PRIVATE samples)
-
 
 # Tests physics library.
 file(GLOB_RECURSE PHYSICS_TEST_FILES physics_engine/tests/*.cpp)

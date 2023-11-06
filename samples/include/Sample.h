@@ -30,6 +30,11 @@ class Sample
 public:
     Sample() noexcept = default;
 
+    Sample(const Sample& other)
+    {
+        
+    }
+
     virtual ~Sample() = default;
 
     virtual std::string Name() const noexcept = 0;

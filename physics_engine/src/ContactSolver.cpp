@@ -46,13 +46,13 @@ void PhysicsEngine::ContactSolver::ResolvePostCollisionVelocity() noexcept
 
 void PhysicsEngine::ContactSolver::ResolvePostCollisionPosition() noexcept
 {
-    if (Penetration <= 0.001f) return;
+    if (Penetration <= 0) return;
 
     const auto inversMassBodyA = bodyA->InverseMass();
     const auto inversMassBodyB = bodyB->InverseMass();
     const auto totalInverseMass = inversMassBodyA + inversMassBodyB;
 
-    if (totalInverseMass <= 0.001f) return;
+    if (totalInverseMass <= 0) return;
 
     const auto movePerIMass = Normal * (-Penetration / totalInverseMass);
 
