@@ -25,6 +25,8 @@ namespace PhysicsEngine
     class World
     {
     private:
+        Math::Vec2F _gravity;
+
         std::vector<Body> _bodies{};
         std::vector<std::size_t> _bodiesGenIndices{};
 
@@ -51,7 +53,7 @@ namespace PhysicsEngine
          * bodies (aka bodies with negative mass).
          * @param preAllocatedBodyCount The number of bodies to pre-allocate in memory. Default value is 100.
          */
-        void Init(int preAllocatedBodyCount = 100) noexcept;
+        void Init(Math::Vec2F gravity = Math::Vec2F::Zero(), int preAllocatedBodyCount = 100) noexcept;
 
         /**
          * @brief Update is a method that calculates the new velocities of all the world's valid bodies
@@ -65,6 +67,19 @@ namespace PhysicsEngine
          * @brief Deinit is a method that clears all bodies and colliders.
          */
         void Deinit() noexcept;
+
+        /**
+        * @brief Gravity is a method that gives the gravity of the world.
+        * @return The gravity of the world.
+        */
+        constexpr Math::Vec2F Gravity() const noexcept { return _gravity; }
+
+        /**
+         * @brief SetGravity is a method that replaces the value of the current world gravity by the new one
+         * given in parameter
+         * @param newGravity The new gravity to apply to the world.
+         */
+        void SetGravity(Math::Vec2F newGravity) noexcept { _gravity = newGravity; }
 
         /**
          * @brief SetContactListener is a method that sets the value of the world contact-listener with the

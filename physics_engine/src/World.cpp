@@ -11,11 +11,14 @@
 
 namespace PhysicsEngine
 {
-    void World::Init(int preallocatedBodyCount) noexcept
+    void World::Init(Math::Vec2F gravity, int preallocatedBodyCount) noexcept
     {
 #ifdef TRACY_ENABLE
         ZoneScoped;
 #endif // TRACY_ENABLE
+
+        _gravity = gravity;
+
         if (preallocatedBodyCount < 0) preallocatedBodyCount = 0;
 
         _bodies.resize(preallocatedBodyCount, Body());
@@ -36,16 +39,42 @@ namespace PhysicsEngine
         {
             if (!body.IsValid()) continue;
 
-            // a = F / m
-            Math::Vec2F acceleration = body.Forces() / body.Mass();
+            switch (body.GetBodyType())
+            {
+                case BodyType::Dynamic:
+                {
+                    body.ApplyForce(_gravity * body.Mass());
 
-            // Change velocity according to delta time.
-            body.SetVelocity(body.Velocity() + acceleration * deltaTime);
+                    // a = F / m
+                    // TODO: * inverMass -> pour opti un peu.
+                    Math::Vec2F acceleration = body.Forces() / body.Mass();
 
-            // Change position according to velocity and delta time.
-            body.SetPosition(body.Position() + body.Velocity() * deltaTime);
+                    // Change velocity according to delta time.
+                    body.SetVelocity(body.Velocity() + acceleration * deltaTime);
 
-            body.ResetForces();
+                    // Change position according to velocity and delta time.
+                    body.SetPosition(body.Position() + body.Velocity() * deltaTime);
+
+                    body.ResetForces();
+
+                    break;
+                }
+
+                case BodyType::Kinematic:
+                {
+                    // Kinematic bodies are not impacted by forces.
+
+                    // Change position according to velocity and delta time.
+                    body.SetPosition(body.Position() + body.Velocity() * deltaTime);
+
+                    break;
+                }
+
+                case BodyType::Static:
+                    break;
+                case BodyType::None:
+                    break;
+            }
         }
 
         if (_contactListener)

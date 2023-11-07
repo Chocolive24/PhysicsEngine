@@ -179,14 +179,6 @@ void TriggerColliderSample::OnTriggerEnter(PhysicsEngine::ColliderRef colliderRe
 {
     _gameObjects[colliderRefA.Index].CollisionNbr++;
     _gameObjects[colliderRefB.Index].CollisionNbr++;
-
-    /*for (auto& object : _gameObjects)
-    {
-        if (object.ColRef == colliderRefA || object.ColRef == colliderRefB)
-        {
-            object.CollisionNbr++;
-        }
-    }*/
 }
 
 void TriggerColliderSample::OnTriggerStay(PhysicsEngine::ColliderRef colliderRefA,

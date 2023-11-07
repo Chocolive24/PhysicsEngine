@@ -6,22 +6,24 @@
 #include "PlanetSystemSample.h"
 #include "TriggerColliderSample.h"
 #include "CollisionSample.h"
+#include "BouncingBallSample.h"
 
 #ifdef TRACY_ENABLE
 #include "Tracy.hpp"
 #endif // TRACY_ENABLE
 
-
 void SampleManager::Init() noexcept
 {
     _samples[2] = MakeUnique<Sample>(TriggerColliderSample());
     _samples[1] = MakeUnique<Sample>(PlanetSystemSample());
-    _samples[0] = MakeUnique<Sample>(CollisionSample());
+    _samples[3] = MakeUnique<Sample>(CollisionSample());
+    _samples[0] = MakeUnique<Sample>(BouncingBallSample());
 
     _samples[_currentSampleIdx]->Init();
 }
 
-void SampleManager::HandleCurrentSampleInputs(const SDL_Event event, const bool isMouseOnAnImGuiWindow) const noexcept
+void SampleManager::HandleCurrentSampleInputs(const SDL_Event event, 
+                                              const bool isMouseOnAnImGuiWindow) const noexcept
 {
     _samples[_currentSampleIdx]->HandleInputs(event, isMouseOnAnImGuiWindow);
 }

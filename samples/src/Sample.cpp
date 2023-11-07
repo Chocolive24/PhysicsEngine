@@ -8,7 +8,7 @@ void Sample::Init() noexcept
 {
     _timer.Init();
 
-    _world.Init(_startBodyCount);
+    _world.Init(_gravity, _startBodyCount);
 
     onInit();
 }

@@ -58,8 +58,6 @@ void PlanetSystemSample::onHandleInputs(const SDL_Event event, const bool isMous
         }
         break;
     }
-
-    
 }
 
 void PlanetSystemSample::onUpdate() noexcept

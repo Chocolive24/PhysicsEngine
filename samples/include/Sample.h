@@ -14,15 +14,6 @@
 #include "SDL.h"
 
 /**
- * @enum SampleType is an enum that enumerates the different sample types.
- */
-enum class SampleType
-{
-    PlanetSystem,
-    Trigger,
-};
-
-/**
  * @class Sample is an abstract class that contains the fundamental elements of a physical engine sample
  */
 class Sample
@@ -51,6 +42,7 @@ public:
 
 protected:
     PhysicsEngine::World _world;
+    Math::Vec2F _gravity;
     Timer _timer;
 
     static constexpr int _startBodyCount = 100;
