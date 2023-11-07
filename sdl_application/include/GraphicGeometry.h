@@ -27,6 +27,13 @@ namespace GraphicGeometry
     extern std::vector<int> Indices;
 
     /**
+     * @brief CircleSegmentCount is the count of circle segment needed to draw
+     * a circle in a good quality for most of the size it can have.
+     * @note It could be not enough if the circle you want to draw is big.
+     */
+    static constexpr int CircleSegmentCount = 30;
+
+    /**
      * @brief ClearGeometry is a method that deletes all vertices and indices.
      */
     void ClearGeometry()  noexcept;

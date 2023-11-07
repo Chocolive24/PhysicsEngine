@@ -297,13 +297,13 @@ namespace PhysicsEngine
                         // Create the circle-circle Contact if needed.
                         if (mustCalculateContact && doCollidersIntersect)
                         {
-                            const auto c1 = circleA.Center(), c2 = circleB.Center();
-                            const auto r1 = circleA.Radius(), r2 = circleB.Radius();
+                            const auto cA = circleA.Center(), cB = circleB.Center();
+                            const auto rA = circleA.Radius(), rB = circleB.Radius();
 
-                            const auto delta = c1 - c2;
+                            const auto delta = cA - cB;
                             contactSolver.Normal = delta.Normalized();
-                            contactSolver.Point = c1 + delta * 0.5f;
-                            contactSolver.Penetration = r1 + r2 - delta.Length();
+                            contactSolver.Point = cA + delta * 0.5f;
+                            contactSolver.Penetration = rA + rB - delta.Length();
                         }
 
                         break;
@@ -315,6 +315,45 @@ namespace PhysicsEngine
                                 bodyB.Position();
 
                         doCollidersIntersect = Math::Intersect(circleA, rectB);
+
+                        if (mustCalculateContact && doCollidersIntersect)
+                        {
+                            const auto circleCenter = circleA.Center(), rectCenter = rectB.Center();
+                            const auto rectHalfSize = rectB.HalfSize();
+
+                            const auto delta = circleCenter - rectCenter;
+
+                            Math::Vec2F closestPoint;
+
+                            closestPoint.X = Math::Clamp(delta.X, -rectHalfSize.X, rectHalfSize.X);
+                            closestPoint.Y = Math::Clamp(delta.Y, -rectHalfSize.Y, rectHalfSize.Y);
+
+                            const auto distance = (closestPoint - delta).Length();
+                            const auto closestPoinOnRect = rectCenter + closestPoint;
+
+                            auto circleToRect = (circleCenter - closestPoinOnRect);
+
+                            if (circleToRect.Length() <= Math::Epsilon)
+                            {
+                                const auto closestPointOnRectToCenter = rectCenter - closestPoinOnRect;
+                                const auto direction = closestPointOnRectToCenter.Normalized();
+                                constexpr float adjustmentFactor = 0.2f;
+
+                                const auto adjustment = adjustmentFactor * -direction;
+
+                                // Adjust the position of bodyA
+                                bodyA.SetPosition(bodyA.Position() + adjustment);
+                                const auto correctedCircle = std::get<Math::CircleF>(colShapeA) + bodyA.Position();
+
+                                // Recalculate the circleToRect vector after the adjustment
+                                circleToRect = (correctedCircle.Center() - closestPoinOnRect);
+                            }
+
+                            contactSolver.Normal = circleToRect.Normalized();
+                            contactSolver.Point = closestPoinOnRect;
+                            contactSolver.Penetration = circleA.Radius() - distance;
+                        }
+
                         break;
                     } // Case rectangle B.
 
@@ -348,6 +387,12 @@ namespace PhysicsEngine
                                              bodyB.Position();
 
                         doCollidersIntersect = Math::Intersect(rectA, circleB);
+
+                        if (mustCalculateContact && doCollidersIntersect)
+                        {
+                            detectContact(colB, colA, contactSolver);
+                        }
+
                         break;
                     } // Case circle B.
 
@@ -357,6 +402,37 @@ namespace PhysicsEngine
                                 bodyB.Position();
 
                         doCollidersIntersect = Math::Intersect(rectA, rectB);
+
+                        // Create the rectangle-rectangle Contact if needed.
+                        if (mustCalculateContact && doCollidersIntersect)
+                        {
+                            const auto cA = rectA.Center(), cB = rectB.Center();
+                            const auto halfSizeA = rectA.HalfSize(), halfSizeB = rectB.HalfSize();
+
+                            const auto delta = cA - cB;
+                            contactSolver.Point = cA + delta * 0.5f;
+
+                            // Calculate the penetration in x-axis
+                            const auto penetrationX = halfSizeA.X + halfSizeB.X - Math::Abs(delta.X);
+                            // Calculate the penetration in y-axis
+                            const auto penetrationY = halfSizeA.Y + halfSizeB.Y - Math::Abs(delta.Y);
+
+                            if (penetrationX < penetrationY)
+                            {
+                                contactSolver.Normal = delta.X > 0 ? 
+                                    Math::Vec2F::Right() : Math::Vec2F::Left();
+
+                                contactSolver.Penetration = penetrationX;
+                            }
+                            else
+                            {
+                                contactSolver.Normal = delta.Y > 0 ?
+                                    Math::Vec2F::Up() : Math::Vec2F::Down();
+
+                                contactSolver.Penetration = penetrationY;
+                            }
+                        }
+
                         break;
                     } // Case rectangle B.
 

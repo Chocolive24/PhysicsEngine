@@ -41,7 +41,7 @@ namespace PhysicsEngine
 
         void resolveBroadPhase() noexcept;
         void resolveNarrowPhase() noexcept;
-        [[nodiscard]] bool detectContact(Collider& colA, Collider& colB, ContactSolver& contactSolver) noexcept;
+        bool detectContact(Collider& colA, Collider& colB, ContactSolver& contactSolver) noexcept;
 
     public:
         World() noexcept = default;

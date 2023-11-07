@@ -23,39 +23,51 @@ void CollisionSample::onInit() noexcept
     const auto windowSizeInMeters = Metrics::PixelsToMeters(
         Math::Vec2F(Window::WindowWidth, Window::WindowHeight));
 
-    for (auto& colRef : _colliderRefs)
+    // Calculate the number of rows and columns in the grid based on the total object count
+    int numRows = static_cast<int>(std::sqrt(TotalColliderCount));
+    int numCols = TotalColliderCount / numRows;
+
+    // Calculate the size of each grid cell
+    Math::Vec2F cellSize(windowSizeInMeters.X / numCols, windowSizeInMeters.Y / numRows);
+
+    for (std::size_t i = 0; i < TotalColliderCount; i++)
     {
+        auto& colRef = _colliderRefs[i];
+
         const auto bodyRef = _world.CreateBody();
         auto& body = _world.GetBody(bodyRef);
 
         colRef = _world.CreateCollider(bodyRef);
         auto& collider = _world.GetCollider(colRef);
-        collider.SetShape(Math::CircleF(0.2f));
+
+        if (i < CircleColliderCount)
+        {
+            collider.SetShape(Math::CircleF(0.2f));
+        }
+        else if (i - CircleColliderCount < RectColliderCount)
+        {
+            const auto size = Math::Vec2F(0.4f, 0.4f);
+            const auto halfSize = size * 0.5f;
+
+            collider.SetShape(Math::RectangleF(Math::Vec2F::Zero() - halfSize, 
+                Math::Vec2F::Zero() + halfSize));
+        }
+
         collider.SetFriction(1.f);
         collider.SetRestitution(1.f);
 
-        auto rndPos = Math::Vec2F(Math::Random::Range(1.f, windowSizeInMeters.X),
-                                  Math::Random::Range(-1.f, windowSizeInMeters.Y));
+        // Calculate the position of the shape based on the grid cell
+        int row = i / numCols;
+        int col = i % numCols;
+        Math::Vec2F cellPos(cellSize.X * col + cellSize.X / 2, cellSize.Y * row + cellSize.Y / 2);
 
         auto rndVel = Math::Vec2F(Math::Random::Range(-2.f, 2.f),
-                                  Math::Random::Range(-2.f, 2.f));
+            Math::Random::Range(-2.f, 2.f));
 
-        body.SetPosition(rndPos);
+        body.SetPosition(cellPos);
         body.SetVelocity(rndVel);
         body.SetMass(5.f);
     }
-
-   /* const auto& collider1 = _world.GetCollider(_colliderRefs[0]);
-    auto& body1 = _world.GetBody(collider1.GetBodyRef());
-    body1.SetPosition(Math::Vec2F(2.f, -3.f));
-    body1.SetVelocity(Math::Vec2F(2, 0.f));
-    body1.SetMass(5.f);
-
-    const auto& collider2 = _world.GetCollider(_colliderRefs[1]);
-    auto& body2 = _world.GetBody(collider2.GetBodyRef());
-    body2.SetPosition(Math::Vec2F(6.f, -3.f));
-    body2.SetVelocity(Math::Vec2F(-2, 0.f));
-    body2.SetMass(5.f);*/
 }
 
 void CollisionSample::onHandleInputs(SDL_Event event, bool isMouseOnAnImGuiWindow) noexcept
@@ -95,7 +107,15 @@ void CollisionSample::onRender() noexcept
                 const auto circle = std::get<Math::CircleF>(colShape) + position;
                 GraphicGeometry::Circle(Metrics::MetersToPixels(circle.Center()),
                     Metrics::MetersToPixels(circle.Radius()),
-                    30,
+                    GraphicGeometry::CircleSegmentCount,
+                    _colors[colRef.Index]);
+                break;
+            }
+            case static_cast<int>(Math::ShapeType::Rectangle):
+            {
+                const auto rect = std::get<Math::RectangleF>(colShape) + position;
+                GraphicGeometry::FilledRectangle(Metrics::MetersToPixels(rect.Center()),
+                    Metrics::MetersToPixels(rect.Size()),
                     _colors[colRef.Index]);
                 break;
             }
@@ -126,9 +146,9 @@ void CollisionSample::OnTriggerExit(PhysicsEngine::ColliderRef ColliderRefA,
 void CollisionSample::OnCollisionEnter(PhysicsEngine::ColliderRef ColliderRefA, 
                                        PhysicsEngine::ColliderRef ColliderRefB) noexcept
 {
-    SDL_Color rndColor{ static_cast<Uint8>(Math::Random::Range(0.f, 255.f)),
-                        static_cast<Uint8>(Math::Random::Range(0.f, 255.f)),
-                        static_cast<Uint8>(Math::Random::Range(0.f, 255.f)),
+    SDL_Color rndColor{ static_cast<Uint8>(Math::Random::Range(50.f, 255.f)),
+                        static_cast<Uint8>(Math::Random::Range(50.f, 255.f)),
+                        static_cast<Uint8>(Math::Random::Range(50.f, 255.f)),
                         255 };
 
     _colors[ColliderRefA.Index] = rndColor;
@@ -188,40 +208,41 @@ void CollisionSample::maintainObjectsInWindow() noexcept
             break;
         } // Case circle.
 
-        //case static_cast<int>(Math::ShapeType::Rectangle):
-        //{
-        //    const auto halfSize = std::get<Math::RectangleF>(colShape).Size() * 0.5f;
+        case static_cast<int>(Math::ShapeType::Rectangle):
+        {
+            const auto halfSize = std::get<Math::RectangleF>(colShape).Size() * 0.5f;
 
-        //    auto& body = _world.GetBody(colRef.BodyRef);
-        //    const auto pos = body.Position();
-        //    const auto velocity = body.Velocity();
+            const auto& collider = _world.GetCollider(colRef);
+            auto& body = _world.GetBody(collider.GetBodyRef());
+            const auto pos = body.Position();
+            const auto velocity = body.Velocity();
 
-        //    if (pos.X + halfSize.X >= windowSizeInMeters.X)
-        //    {
-        //        body.SetPosition(Math::Vec2F(windowSizeInMeters.X - halfSize.X, pos.Y));
-        //        body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
-        //    }
+            if (pos.X + halfSize.X >= windowSizeInMeters.X)
+            {
+                body.SetPosition(Math::Vec2F(windowSizeInMeters.X - halfSize.X, pos.Y));
+                body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
+            }
 
-        //    if (pos.X - halfSize.X <= 0)
-        //    {
-        //        body.SetPosition(Math::Vec2F(0 + halfSize.X, pos.Y));
-        //        body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
-        //    }
+            if (pos.X - halfSize.X <= 0)
+            {
+                body.SetPosition(Math::Vec2F(0 + halfSize.X, pos.Y));
+                body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
+            }
 
-        //    if (pos.Y - halfSize.Y <= windowSizeInMeters.Y)
-        //    {
-        //        body.SetPosition(Math::Vec2F(pos.X, windowSizeInMeters.Y + halfSize.Y));
-        //        body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
-        //    }
+            if (pos.Y - halfSize.Y <= windowSizeInMeters.Y)
+            {
+                body.SetPosition(Math::Vec2F(pos.X, windowSizeInMeters.Y + halfSize.Y));
+                body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
+            }
 
-        //    if (pos.Y + halfSize.Y >= 0)
-        //    {
-        //        body.SetPosition(Math::Vec2F(pos.X, 0 - halfSize.Y));
-        //        body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
-        //    }
+            if (pos.Y + halfSize.Y >= 0)
+            {
+                body.SetPosition(Math::Vec2F(pos.X, 0 - halfSize.Y));
+                body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
+            }
 
-        //    break;
-        //} // Case Rectangle.
+            break;
+        } // Case Rectangle.
 
         //case static_cast<int>(Math::ShapeType::Polygon):
         //{

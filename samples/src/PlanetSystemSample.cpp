@@ -108,7 +108,7 @@ void PlanetSystemSample::onRender() noexcept
     {
         auto planetBodyPos = _world.GetBody(p.BodyRef).Position();
         auto planetScreenPos = Metrics::MetersToPixels(planetBodyPos);
-        GraphicGeometry::Circle(planetScreenPos, p.Radius, 15, p.Color);
+        GraphicGeometry::Circle(planetScreenPos, p.Radius, GraphicGeometry::CircleSegmentCount, p.Color);
     }
 }
 

@@ -30,8 +30,7 @@ void PhysicsEngine::ContactSolver::ResolvePostCollisionVelocity() noexcept
     const auto inversMassBodyB = bodyB->InverseMass();
     const auto totalInverseMass = inversMassBodyA + inversMassBodyB;
 
-    const auto impulse = deltaVelocity / totalInverseMass;
-    const auto impulsePerIMass = Normal * impulse;
+    const auto impulsePerIMass = Normal * deltaVelocity / totalInverseMass;
 
     if (bodyA->GetBodyType() == BodyType::Dynamic)
     {

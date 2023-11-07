@@ -215,7 +215,7 @@ namespace Math
         {
             U length = Length();
 
-            if (length == 0)
+            if (length <= Epsilon)
             {
                 throw DivisionByZeroException();
             }

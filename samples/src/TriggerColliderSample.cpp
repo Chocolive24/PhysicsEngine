@@ -107,7 +107,7 @@ void TriggerColliderSample::onRender() noexcept
                 GraphicGeometry::Circle(
                         Metrics::MetersToPixels(_world.GetBody(object.BodyRef).Position()),
                         Metrics::MetersToPixels(std::get<Math::CircleF>(colShape).Radius()),
-                        50,
+                        GraphicGeometry::CircleSegmentCount,
                         object.CollisionNbr > 0 ? _collisionColor : _noCollisionColor);
                 break;
             } // Case circle.

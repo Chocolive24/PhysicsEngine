@@ -35,10 +35,12 @@ public:
 						 PhysicsEngine::ColliderRef colliderRefB) noexcept override;
 
 private:
-	static constexpr int ColliderCount = 30;
+	static constexpr int CircleColliderCount = 10;
+	static constexpr int RectColliderCount = 10;
+	static constexpr int TotalColliderCount = CircleColliderCount + RectColliderCount;
 
-	std::array<PhysicsEngine::ColliderRef, ColliderCount> _colliderRefs;
-	std::array<SDL_Color, ColliderCount> _colors;
+	std::array<PhysicsEngine::ColliderRef, TotalColliderCount> _colliderRefs;
+	std::array<SDL_Color, TotalColliderCount> _colors;
 
 	void maintainObjectsInWindow() noexcept;
 };
