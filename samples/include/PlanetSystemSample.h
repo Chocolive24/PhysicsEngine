@@ -56,11 +56,7 @@ public:
 
     std::string Name() const noexcept override { return "Planet System"; }
 
-    std::string Description() const noexcept override
-    {
-        std::string_view description = R"({write this in string view please !!})";
-        return static_cast<std::string>(description);
-    }
+    std::string Description() const noexcept override;
 
     /**
      * @brief Init is a method that initializes the planet system sample (aka instantiates the sun and all the planets).

@@ -7,7 +7,10 @@
 
 std::string CollisionSample::Description() const noexcept
 {
-    std::string_view description = R"(write this in string view please !!)";
+    std::string_view description = R"(This sample shows the detection of physical collisions between circles. 
+As soon as two circles collide, they are assigned a random color and collision calculations are performed.
+All circles have the same mass and restitution. Collisions are therefore completely elastic, with no loss of energy.)";
+
     return static_cast<std::string>(description);
 }
 
@@ -15,7 +18,7 @@ void CollisionSample::onInit() noexcept
 {
     _world.SetContactListener(this);
 
-    std::fill(_collisionsCount.begin(), _collisionsCount.end(), 0);
+    std::fill(_colors.begin(), _colors.end(), SDL_Color{255, 255, 255, 255});
 
     const auto windowSizeInMeters = Metrics::PixelsToMeters(
         Math::Vec2F(Window::WindowWidth, Window::WindowHeight));
@@ -90,10 +93,10 @@ void CollisionSample::onRender() noexcept
             case static_cast<int>(Math::ShapeType::Circle):
             {
                 const auto circle = std::get<Math::CircleF>(colShape) + position;
-                GraphicGeometry::Circle(Metrics::MetersToPixels(circle.Center()), 
-                                        Metrics::MetersToPixels(circle.Radius()), 
-                                        30, 
-                    _collisionsCount[colRef.Index] > 0 ? _collisionColor : _noCollisionColor);
+                GraphicGeometry::Circle(Metrics::MetersToPixels(circle.Center()),
+                    Metrics::MetersToPixels(circle.Radius()),
+                    30,
+                    _colors[colRef.Index]);
                 break;
             }
         }
@@ -102,6 +105,7 @@ void CollisionSample::onRender() noexcept
 
 void CollisionSample::onDeinit() noexcept
 {
+    
 }
 
 void CollisionSample::OnTriggerEnter(PhysicsEngine::ColliderRef ColliderRefA, 
@@ -122,19 +126,19 @@ void CollisionSample::OnTriggerExit(PhysicsEngine::ColliderRef ColliderRefA,
 void CollisionSample::OnCollisionEnter(PhysicsEngine::ColliderRef ColliderRefA, 
                                        PhysicsEngine::ColliderRef ColliderRefB) noexcept
 {
-    _collisionsCount[ColliderRefA.Index]++;
-    _collisionsCount[ColliderRefB.Index]++;
+    SDL_Color rndColor{ static_cast<Uint8>(Math::Random::Range(0.f, 255.f)),
+                        static_cast<Uint8>(Math::Random::Range(0.f, 255.f)),
+                        static_cast<Uint8>(Math::Random::Range(0.f, 255.f)),
+                        255 };
 
-    std::cout << "START\n";
+    _colors[ColliderRefA.Index] = rndColor;
+    _colors[ColliderRefB.Index] = rndColor;
 }
 
 void CollisionSample::OnCollisionExit(PhysicsEngine::ColliderRef ColliderRefA, 
                                       PhysicsEngine::ColliderRef ColliderRefB) noexcept
 {
-    _collisionsCount[ColliderRefA.Index]--;
-    _collisionsCount[ColliderRefB.Index]--;
 
-    std::cout << "EXIT\n";
 }
 
 void CollisionSample::maintainObjectsInWindow() noexcept

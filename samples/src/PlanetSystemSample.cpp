@@ -9,6 +9,15 @@
 
 #include <iostream>
 
+std::string PlanetSystemSample::Description() const noexcept
+{
+    std::string_view description = R"(This sample uses Newton's gravitational law to create a simplified simulation of planets (blue circles) orbiting a sun (red circle). 
+Initially, the planets have a pre-calculated orbital velocity.
+Then, the force of gravity constantly pulls the planets towards the sun. 
+The sum of these forces creates the orbital motion.)";
+    return static_cast<std::string>(description);
+}
+
 void PlanetSystemSample::onInit() noexcept
 {
     constexpr Math::Vec2F centerOfScreen(Window::WindowWidth / 2.f, Window::WindowHeight / 2.f);

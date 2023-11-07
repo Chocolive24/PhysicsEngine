@@ -35,11 +35,7 @@ public:
 
     std::string Name() const noexcept override { return "Trigger Colliders"; }
 
-    std::string Description() const noexcept override
-    {
-        std::string_view description = R"({write this in string view please !!})";
-        return static_cast<std::string>(description);
-    }
+    std::string Description() const noexcept override;
 
     void onInit() noexcept override;
     void onHandleInputs(SDL_Event event, bool isMouseOnAnImGuiWindow) noexcept override;

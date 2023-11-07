@@ -10,6 +10,14 @@
 
 #include <iostream>
 
+std::string TriggerColliderSample::Description() const noexcept
+{
+    std::string_view description = R"(This sample shows trigger detection between colliders. 
+As soon as two trigger colliders intersect, they turn green, and as soon as they no longer intersect, they turn red again. 
+The calculation of collider intersection is simplified using a quad-tree (visible in white on the screen).)";
+    return static_cast<std::string>(description);
+}
+
 void TriggerColliderSample::onInit() noexcept
 {
     _world.SetContactListener(this);
