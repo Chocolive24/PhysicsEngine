@@ -10,7 +10,7 @@ public:
 	// Inherited via Sample
 	std::string BouncingBallSample::Name() const noexcept override
 	{
-		return "BouncingBallSample";
+		return "CollisionWithGround";
 	}
 
 	std::string Description() const noexcept override;
@@ -37,10 +37,14 @@ public:
 		PhysicsEngine::ColliderRef colliderRefB) noexcept override;
 
 private:
-	static constexpr SDL_Color RectangleColor = { 255, 255, 255, 255 };
+	static constexpr SDL_Color GroundColor = { 255, 255, 255, 255 };
 	static constexpr SDL_Color CircleColor = { 0, 0, 255, 255 };
+	static constexpr SDL_Color RectangleColor = { 255, 0, 0, 255 };
 
 	std::vector<PhysicsEngine::ColliderRef> _colliders;
 
 	void createCircle(Math::Vec2F position) noexcept;
+	void createRectangle(Math::Vec2F position) noexcept;
+
+	void removeCollidersOutOfSBottomScreen() noexcept;
 };

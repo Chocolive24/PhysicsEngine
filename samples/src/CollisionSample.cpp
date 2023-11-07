@@ -43,6 +43,7 @@ void CollisionSample::onInit() noexcept
         if (i < CircleColliderCount)
         {
             collider.SetShape(Math::CircleF(0.2f));
+            
         }
         else if (i - CircleColliderCount < RectColliderCount)
         {
@@ -51,6 +52,7 @@ void CollisionSample::onInit() noexcept
 
             collider.SetShape(Math::RectangleF(Math::Vec2F::Zero() - halfSize, 
                 Math::Vec2F::Zero() + halfSize));
+            
         }
 
         collider.SetFriction(1.f);
@@ -63,6 +65,18 @@ void CollisionSample::onInit() noexcept
 
         auto rndVel = Math::Vec2F(Math::Random::Range(-2.f, 2.f),
             Math::Random::Range(-2.f, 2.f));
+
+        /*if (i == 0)
+        {
+            body.SetPosition(Math::Vec2F(2, -2));
+            body.SetVelocity(Math::Vec2F(1, 0));
+            body.SetBodyType(PhysicsEngine::BodyType::Static);
+        }
+        else
+        {
+            body.SetPosition(Math::Vec2F(4, -2));
+            body.SetVelocity(Math::Vec2F(-1, 0));
+        }*/
 
         body.SetPosition(cellPos);
         body.SetVelocity(rndVel);
