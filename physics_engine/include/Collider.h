@@ -1,5 +1,3 @@
-#pragma once
-
 /**
  * @headerfile Collider.h
  * This file defines the Collider class and related structures for handling colliders in the physics world.
@@ -7,6 +5,7 @@
  * @author Olivier Pachoud
  */
 
+#pragma once
 
 #include "References.h"
 #include "Shape.h"
@@ -17,13 +16,13 @@
 namespace PhysicsEngine
 {
     /**
-     * @class Collider is a class that represents a generic collider.
+     * @brief Collider is a class that represents a generic collider.
      */
     class Collider
     {
     private:
         std::variant<Math::CircleF, Math::RectangleF, Math::PolygonF> _shape{
-            Math::CircleF(Math::Vec2F::Zero(), 0.f)};
+                     Math::CircleF(Math::Vec2F::Zero(), 0.f)};
         BodyRef _bodyRef{};
 
         float _restitution{-1.f};
@@ -136,120 +135,7 @@ namespace PhysicsEngine
     };
 
     /**
-     * @class CircleCollider is a class that represents a circle-shaped collider.
-     */
-    class CircleCollider
-    {
-    private:
-        float _radius{-1};
-
-    public:
-        constexpr CircleCollider() noexcept = default;
-        explicit constexpr CircleCollider(float radius) noexcept : _radius(radius) {};
-
-        /**
-         * @brief Radius is a method that gives the radius of the circle collider.
-         * @return The radius of the circle collider.
-         */
-        [[nodiscard]] constexpr float Radius() const noexcept { return _radius; }
-
-        /**
-        * @brief SetRadius is a method that replaces the current radius of the circle collider
-        * with the new radius given in parameter.
-        * @param newRadius The new radius for the circle collider.
-        */
-        constexpr void SetRadius(float newRadius) noexcept { _radius = newRadius; }
-
-        /**
-         * @brief Enabled is a method that checks if the circle collider is valid
-         * (aka if it has a radius greater than 0).
-         * @return True if the circle collider is valid.
-         */
-        [[nodiscard]] constexpr bool IsValid() const noexcept { return _radius > 0; };
-    };
-
-    /**
-    * @class RectangleCollider is a class that represents a rectangle-shaped collider.
-    */
-    class RectangleCollider
-    {
-    private:
-        Math::Vec2F _halfSize{-1.f, -1.f};
-
-    public:
-        constexpr RectangleCollider() noexcept = default;
-        explicit constexpr RectangleCollider(Math::Vec2F halfSize) noexcept : _halfSize(halfSize) {};
-
-        /**
-         * @brief HalfSize is a method that gives the half-size of the rectangle collider.
-         * @return The half-size of the rectangle collider.
-         */
-        [[nodiscard]] constexpr Math::Vec2F HalfSize() const noexcept { return _halfSize; }
-
-        /**
-        * @brief SetRadius is a method that replaces the current half-size of the rectangle collider
-        * with the new half-size given in parameter.
-        * @param newHalfSize The new half-Size for the rectangle collider.
-        */
-        constexpr void SetHalfSize(Math::Vec2F newHalfSize) noexcept { _halfSize = newHalfSize; }
-
-
-        /**
-         * @brief Enabled is a method that checks if the rectangle collider is valid
-         * (aka if it has a half-width and a half-height greater than 0).
-         * @return True if the rectangle collider is valid.
-         */
-        [[nodiscard]] constexpr bool IsValid() const noexcept
-        {
-            return _halfSize.X > 0 && _halfSize.Y > 0;
-        };
-    };
-
-    /**
-    * @class PolygonCollider is a class that represents a polygon-shaped collider.
-    */
-    class PolygonCollider
-    {
-    private:
-        std::vector<Math::Vec2F> _vertices{};
-
-    public:
-        PolygonCollider() noexcept = default;
-        explicit PolygonCollider(std::vector<Math::Vec2F>& vertices) noexcept : _vertices(std::move(vertices)) {};
-
-        /**
-         * @brief Vertices is a method that gives the vertices of the polygon collider.
-         * @return The vertices of the polygon collider.
-         */
-        [[nodiscard]] std::vector<Math::Vec2F> Vertices() const noexcept { return _vertices; }
-
-        /**
-         * @brief VerticesCount is a method that gives the number of vertices of the polygon collider.
-         * @return The number of vertices of the polygon collider.
-         */
-        [[nodiscard]] std::size_t VerticesCount() const noexcept { return _vertices.size(); }
-
-        /**
-        * @brief SetVertices is a method that replaces the current vertices of the polygon collider
-        * with the new vertices given in parameter.
-        * @param newVertices The new vertices for the polygon collider.
-        */
-        void SetVertices(std::vector<Math::Vec2F> newVertices) noexcept { _vertices = std::move(newVertices); }
-
-        /**
-         * @brief Enabled is a method that checks if the polygon collider is valid
-         * (aka if it has a at least 3 vertices).
-         * @return True if the polygon collider is valid.
-         */
-        [[nodiscard]] bool IsValid() const noexcept
-        {
-            return _vertices.size() > 2;
-        };
-    };
-
-    /**
-     * @struct ColliderPair
-     * Represents a pair of colliders for collision detection.
+     * @brief ColliderPair is a class that represents a pair of colliders for collision detection.
      */
     struct ColliderPair
     {
@@ -269,16 +155,25 @@ namespace PhysicsEngine
     };
 
     /**
-    * @struct ColliderHash
-    * Provides a custom hash function for ColliderPair objects.
-    */
+      * @brief ColliderHash is a custom hash function for the 'ColliderPair' objects 
+      * used as keys in unordered containers.
+      */
     struct ColliderHash
     {
+        /**
+         * @brief A custom hash operator that calculates the hash value for a `ColliderPair`.
+         * @param pair The `ColliderPair` object for which to calculate the hash.
+         * @return The hash value for the `ColliderPair`.
+         */
         std::size_t operator()(const ColliderPair& pair) const noexcept
         {
+            // Calculate the hash for the ColliderA's index.
             const std::size_t hash1 = std::hash<int>{}(static_cast<int>(pair.ColliderA.Index));
+
+            // Calculate the hash for the ColliderB's index.
             const std::size_t hash2 = std::hash<int>{}(static_cast<int>(pair.ColliderB.Index));
 
+            // Combine the two hash values to create a unique hash value for the ColliderPair.
             return hash1 + hash2;
         }
     };

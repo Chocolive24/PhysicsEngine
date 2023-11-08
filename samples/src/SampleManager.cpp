@@ -6,18 +6,18 @@
 #include "PlanetSystemSample.h"
 #include "TriggerColliderSample.h"
 #include "CollisionSample.h"
-#include "BouncingBallSample.h"
+#include "GroundCollision.h"
 
 #ifdef TRACY_ENABLE
-#include "Tracy.hpp"
+#include <Tracy.hpp>
 #endif // TRACY_ENABLE
 
 void SampleManager::Init() noexcept
 {
-    _samples[2] = MakeUnique<Sample>(TriggerColliderSample());
+    _samples[0] = MakeUnique<Sample>(TriggerColliderSample());
     _samples[1] = MakeUnique<Sample>(PlanetSystemSample());
     _samples[3] = MakeUnique<Sample>(CollisionSample());
-    _samples[0] = MakeUnique<Sample>(BouncingBallSample());
+    _samples[2] = MakeUnique<Sample>(GroundCollisionSample());
 
     _samples[_currentSampleIdx]->Init();
 }

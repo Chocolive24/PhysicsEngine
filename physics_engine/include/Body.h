@@ -1,5 +1,3 @@
-#pragma once
-
 /**
  * @headerfile Body.h
  * This file defines the Body class that represents a physical body with attributes such as position, velocity, mass
@@ -8,10 +6,16 @@
  * @author Olivier Pachoud
  */
 
+#pragma once
+
 #include "Vec2.h"
 
 namespace PhysicsEngine
 {
+    /**
+     * @brief BodyType is an enumeration that represents the type of a physical body: 
+     * Dynamic, Kinematic, Static, or None.
+     */
     enum class BodyType
     {
         Dynamic,
@@ -20,6 +24,10 @@ namespace PhysicsEngine
         None
     };
 
+    /*
+    * @brief The Body class represents a physical body with attributes including position, 
+    * velocity, mass, and applied forces.
+    */
     class Body
     {
     private:
@@ -123,6 +131,14 @@ namespace PhysicsEngine
          * in parameter.
          * @param newBodyType The new body-type for the body. 
          */
-        constexpr void SetBodyType(const BodyType newBodyType) noexcept { _bodyType = newBodyType; }
+        constexpr void SetBodyType(const BodyType newBodyType) noexcept 
+        { 
+            _bodyType = newBodyType; 
+
+            if (newBodyType == BodyType::Static || newBodyType == BodyType::Kinematic)
+            {
+                _inverseMass = 0.f;
+            }
+        }
     };
 }

@@ -20,7 +20,7 @@ The sum of these forces creates the orbital motion.)";
 
 void PlanetSystemSample::onInit() noexcept
 {
-    constexpr Math::Vec2F centerOfScreen(Window::WindowWidth / 2.f, Window::WindowHeight / 2.f);
+    constexpr Math::Vec2F centerOfScreen(AppWindow::WindowWidth / 2.f, AppWindow::WindowHeight / 2.f);
     constexpr Math::Vec2F sunPos = Metrics::PixelsToMeters(centerOfScreen);
 
     // Create the sun.

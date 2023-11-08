@@ -1,11 +1,7 @@
-//
-// Created by Olivier on 20.10.2023.
-//
-
 #include "TriggerColliderSample.h"
 #include "Metrics.h"
 #include "GraphicGeometry.h"
-#include "Window.h"
+#include "AppWindow.h"
 #include "Random.h"
 
 #include <iostream>
@@ -23,7 +19,7 @@ void TriggerColliderSample::onInit() noexcept
     _world.SetContactListener(this);
 
     const auto windowSizeInMeters = Metrics::PixelsToMeters(
-            Math::Vec2F(Window::WindowWidth, Window::WindowHeight));
+            Math::Vec2F(AppWindow::WindowWidth, AppWindow::WindowHeight));
 
     _gameObjects.reserve(_totalObjectCount);
 
@@ -267,7 +263,7 @@ void TriggerColliderSample::addPolygon(Math::Vec2F centerPos,
 void TriggerColliderSample::maintainObjectsInWindow() noexcept
 {
     const auto windowSizeInMeters = Metrics::PixelsToMeters(
-            Math::Vec2F(Window::WindowWidth, Window::WindowHeight));
+            Math::Vec2F(AppWindow::WindowWidth, AppWindow::WindowHeight));
 
     for (auto &object: _gameObjects)
     {

@@ -1,3 +1,11 @@
+/**
+ * @headerfile ContactSolver.h
+ * This header file defines the ContactSolver class which resolves the contact between two
+ * physical bodies.
+ * 
+ * @author Olivier Pachoud
+ */
+
 #pragma once
 
 #include "Vec2.h"
@@ -8,7 +16,7 @@
 namespace PhysicsEngine
 {
 	/**
-	* @struct ContactSolver is a struct that contains all the data and methods needed to calculates 
+	* @brief ContactSolver is a struct that contains all the data and methods needed to calculates 
 	* all the behaviors of a physical contact.
 	*/
 	struct ContactSolver

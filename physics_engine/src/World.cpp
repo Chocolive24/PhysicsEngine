@@ -2,12 +2,13 @@
  * @author Olivier
  */
 
+#include "World.h"
+
 #ifdef TRACY_ENABLE
 #include <Tracy.hpp>
 #include <TracyC.h>
 #endif // TRACY_ENABLE
 
-#include "World.h"
 #include <iostream>
 
 namespace PhysicsEngine
@@ -44,7 +45,7 @@ namespace PhysicsEngine
             {
                 case BodyType::Dynamic:
                 {
-                    body.ApplyForce(_gravity * body.Mass());
+                    body.ApplyForce(_gravity);
 
                     // a = F / m
                     // TODO: * inverMass -> pour opti un peu.
@@ -219,10 +220,8 @@ namespace PhysicsEngine
             ZoneScoped;
     #endif
 
-    #ifdef TRACY_ENABLE
-            ZoneNamedN(DetectOverlap, "Detect Overlap", true);
-    #endif
-        std::unordered_set<ColliderPair, ColliderHash> newColliderPairs;
+        // todo: transformer en vector et tester.
+        //std::unordered_set<ColliderPair, ColliderHash> newColliderPairs;
 
         const auto& newPossiblePairs = _quadTree.PossiblePairs();
 
@@ -265,7 +264,12 @@ namespace PhysicsEngine
                 }
                 else
                 {
-                    if (!colliderA.IsTrigger() && !colliderB.IsTrigger())
+                    if (colliderA.IsTrigger() || colliderB.IsTrigger())
+                    {
+                        _contactListener->OnTriggerStay(possiblePair.ColliderA,
+                            possiblePair.ColliderB);
+                    }
+                    else
                     {
                         contactSolver.ResolveContact();
                     }

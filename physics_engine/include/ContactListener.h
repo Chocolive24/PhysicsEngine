@@ -1,11 +1,12 @@
-#pragma once
-
 /**
  * @headerfile ContactListener.h
- * This header file defines the ContactListener class in which is an interface for handling collider collision events.
+ * This header file defines the ContactListener class which is an interface for 
+ * handling collider collision events.
  *
  * @author Olivier Pachoud
  */
+
+#pragma once
 
 #include "Collider.h"
 #include "Vec2.h"
@@ -13,7 +14,7 @@
 namespace PhysicsEngine
 {
     /**
-     * @class ContactListener is an abstract base class for handling collider collision events.
+     * @brief ContactListener is an abstract base class for handling collider collision events.
      */
     class ContactListener
     {

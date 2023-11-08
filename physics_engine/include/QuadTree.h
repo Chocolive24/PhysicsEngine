@@ -1,3 +1,11 @@
+/**
+ * @headerfile QuadTree.h
+ * This header file defines the various data required to calculate the quad-tree which is an 
+ * algorithm that divides the physical world into sub-spaces to facilitate comparison between physical objects.
+ *
+ * @author Olivier Pachoud
+ */
+
 #pragma once
 
 #include "Allocator.h"
@@ -9,7 +17,7 @@
 namespace PhysicsEngine
 {
     /**
-     * @struct SimplifiedCollider is a struct that stores the data of a collider in a simplified way (aka it stores
+     * @brief SimplifiedCollider is a struct that stores the data of a collider in a simplified way (aka it stores
      * its collider reference in the world and its shape in a rectangle form).
      */
     struct SimplifiedCollider
@@ -19,8 +27,8 @@ namespace PhysicsEngine
     };
 
     /**
-     * @struct QuadNode is a struct representing a node in a quad-tree data structure used for spatial partitioning
-     * in a 2D space.
+     * @brief QuadNode is a struct representing a node in a quad-tree data structure used for spatial 
+     partitioning in a 2D space.
      */
     struct QuadNode
     {
@@ -36,7 +44,7 @@ namespace PhysicsEngine
         static constexpr int BoundaryDivisionCount = 4;
 
         Math::RectangleF Boundary{Math::Vec2F::Zero(), Math::Vec2F::Zero()};
-        std::array<QuadNode*, BoundaryDivisionCount> Children{};
+        std::array<QuadNode*, BoundaryDivisionCount> Children{ nullptr, nullptr, nullptr, nullptr };
         AllocVector<SimplifiedCollider> Colliders{};
 
         //constexpr QuadNode() noexcept = default;
@@ -44,15 +52,15 @@ namespace PhysicsEngine
     };
 
     /**
-     * @class QuadTree is a class that represents a quad-tree used for spatial partitioning of colliders.
+     * @brief QuadTree is a class that represents a quad-tree used for spatial partitioning of colliders.
      */
     class QuadTree
     {
     private:
-        UniquePtr<HeapAllocator> _heapAllocator = MakeUnique(HeapAllocator());
+        HeapAllocator _heapAllocator;
 
-        AllocVector<QuadNode> _nodes{ StandardAllocator<QuadNode> {*_heapAllocator} };
-        AllocVector<ColliderPair> _possiblePairs{ StandardAllocator<ColliderPair> {*_heapAllocator} };
+        AllocVector<QuadNode> _nodes{ StandardAllocator<QuadNode> {_heapAllocator} };
+        AllocVector<ColliderPair> _possiblePairs{ StandardAllocator<ColliderPair> {_heapAllocator} };
 
         int _nodeIndex = 1;
 

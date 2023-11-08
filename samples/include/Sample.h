@@ -8,7 +8,7 @@
  */
 
 #include "World.h"
-#include "Window.h"
+#include "AppWindow.h"
 #include "Timer.h"
 
 #include "SDL.h"

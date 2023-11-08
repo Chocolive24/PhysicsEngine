@@ -4,11 +4,11 @@
 #include "ContactListener.h"
 #include "References.h"
 
-class BouncingBallSample final : public Sample, public PhysicsEngine::ContactListener
+class GroundCollisionSample final : public Sample, public PhysicsEngine::ContactListener
 {
 public:
 	// Inherited via Sample
-	std::string BouncingBallSample::Name() const noexcept override
+	std::string GroundCollisionSample::Name() const noexcept override
 	{
 		return "CollisionWithGround";
 	}

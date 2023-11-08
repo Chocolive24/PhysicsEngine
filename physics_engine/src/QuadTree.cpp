@@ -10,11 +10,6 @@
 
 namespace PhysicsEngine
 {
-    /*explicit QuadNode::QuadNode(Allocator& allocator) noexcept : Colliders(StandardAllocator<SimplifiedCollider>(allocator))
-    {
-        
-    }*/
-
     template<typename T>
     constexpr T QuadCount(T depth)
     {
@@ -34,7 +29,7 @@ namespace PhysicsEngine
             ZoneScoped;
     #endif // TRACY_ENABLE
   
-        _nodes.resize(QuadCount(_maxDepth), QuadNode({ *_heapAllocator }));
+        _nodes.resize(QuadCount(_maxDepth), QuadNode({ _heapAllocator }));
 
         for (auto& node : _nodes)
         {
@@ -65,6 +60,8 @@ namespace PhysicsEngine
             // If the node has fewer colliders than the max number and the depth is not equal to the max depth.
             if (node.Colliders.size() > QuadNode::MaxColliderNbr && depth != _maxDepth)
             {
+                // todo: ZoneNamed subdivision.
+
                 // Subdivide the node rectangle in 4 rectangle.
                 const auto center = node.Boundary.Center();
                 const auto halfSize = node.Boundary.HalfSize();
@@ -88,7 +85,7 @@ namespace PhysicsEngine
 
                 _nodeIndex += 4;
 
-                AllocVector<SimplifiedCollider> remainingColliders{ {*_heapAllocator} };
+                AllocVector<SimplifiedCollider> remainingColliders{ {_heapAllocator} };
                 //TODO: std::array avec max col nbr.
 
                 for (const auto& col : node.Colliders)
@@ -154,6 +151,9 @@ namespace PhysicsEngine
 
     void QuadTree::CalculatePossiblePairs() noexcept
     {
+    #ifdef TRACY_ENABLE
+            ZoneScoped;
+    #endif
         calculateNodePossiblePairs(_nodes[0]);
     }
 
@@ -171,25 +171,15 @@ namespace PhysicsEngine
             {
                 auto& simplColB = node.Colliders[j];
 
-                if (simplColA.ColRef == simplColB.ColRef) continue;
-
-                /*if (Math::Intersect(simplColA.Rectangle, simplColB.Rectangle))
-                {*/
-                    _possiblePairs.push_back(ColliderPair{ simplColA.ColRef, simplColB.ColRef });
-                //}
+                _possiblePairs.push_back(ColliderPair{ simplColA.ColRef, simplColB.ColRef });
             }
 
-            // If the node has children, we need to compare the simplified collider with the colliders in the children nodes.
+            // If the node has children, we need to compare the simplified collider with the 
+            // colliders in the children nodes.
             if (node.Children[0] != nullptr)
             {
                 for (const auto& childNode : node.Children)
                 {
-                    // Check the collision only if the collider touche the children boundary.
-                    /*if (Math::Intersect(simplColA.Rectangle, node.Boundary))
-                    {
-                        calculateChildrenNodePossiblePairs(*childNode, simplColA);
-                    }*/
-
                     calculateChildrenNodePossiblePairs(*childNode, simplColA);
                 }
             }
@@ -210,25 +200,11 @@ namespace PhysicsEngine
     #ifdef TRACY_ENABLE
             ZoneScoped;
     #endif
-        //// If the current node has children, we need to compare the simplified collider from its parent node with its children.
-        //if (node.Children[0] != nullptr)
-        //{
-        //    for (const auto& child : node.Children)
-        //    {
-        //        if (Math::Intersect(simplCol.Rectangle, child->Boundary))
-        //        {
-        //            calculateChildrenNodePossiblePairs(*child, simplCol);
-        //        }
-        //    }
-        //}
 
         // For each colliders in the current node, compare it with the simplified collider from its parent node.
         for (const auto& nodeSimplCol : node.Colliders)
         {
-            /*if (Math::Intersect(simplCol.Rectangle, nodeSimplCol.Rectangle))
-            {*/
-                _possiblePairs.push_back(ColliderPair{ simplCol.ColRef, nodeSimplCol.ColRef });
-            //}
+             _possiblePairs.push_back(ColliderPair{ simplCol.ColRef, nodeSimplCol.ColRef });
         }
 
         // If the current node has children, we need to compare the simplified collider from its parent node with its children.

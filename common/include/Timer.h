@@ -1,5 +1,3 @@
-#pragma once
-
 /**
  * @headerfile Timer.h
  * This file defines the Timer class which is a naive timer using the <chrono> standard library.
@@ -7,8 +5,14 @@
  * @author Olivier
  */
 
+#pragma once
+
 #include <chrono>
 
+/*
+* @brief Timer is a simple timer using the <chrono> library which calculates the time 
+* elapsing between each frame and since the timer was created.
+*/
 class Timer
 {
 private:

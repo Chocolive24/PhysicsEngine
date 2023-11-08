@@ -103,7 +103,7 @@ foreach(test_file ${PHYSICS_TEST_FILES} )
 
     add_executable(${test_name} ${test_file})
 
-    target_link_libraries(${test_name} PRIVATE physics)
+    target_link_libraries(${test_name} PRIVATE physics common math)
     target_link_libraries(${test_name} PRIVATE GTest::gtest GTest::gtest_main)
 endforeach()
 
@@ -115,6 +115,6 @@ foreach(test_file ${COMMON_TEST_FILES} )
 
     add_executable(${test_name} ${test_file})
 
-    target_link_libraries(${test_name} PRIVATE common)
+    target_link_libraries(${test_name} PRIVATE common math)
     target_link_libraries(${test_name} PRIVATE GTest::gtest GTest::gtest_main)
 endforeach()

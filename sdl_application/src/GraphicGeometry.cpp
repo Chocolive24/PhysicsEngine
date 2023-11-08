@@ -1,8 +1,3 @@
-//
-// Created by Olivier on 18.10.2023.
-//
-
-#include <iostream>
 #include "GraphicGeometry.h"
 #include "Shape.h"
 

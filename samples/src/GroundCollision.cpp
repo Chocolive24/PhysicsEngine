@@ -1,14 +1,14 @@
-#include "BouncingBallSample.h"
+#include "GroundCollision.h"
 #include "Metrics.h"
 #include "GraphicGeometry.h"
 #include <iostream>
 
-std::string BouncingBallSample::Description() const noexcept
+std::string GroundCollisionSample::Description() const noexcept
 {
     return std::string();
 }
 
-void BouncingBallSample::onInit() noexcept
+void GroundCollisionSample::onInit() noexcept
 {
     _gravity = Math::Vec2F(0.f, -9.f);
     _world.SetGravity(_gravity);
@@ -18,7 +18,7 @@ void BouncingBallSample::onInit() noexcept
     _colliders.reserve(_startBodyCount);
 
     constexpr auto windowSizeInMeters = Metrics::PixelsToMeters(
-        Math::Vec2F(Window::WindowWidth, Window::WindowHeight));
+        Math::Vec2F(AppWindow::WindowWidth, AppWindow::WindowHeight));
 
     constexpr auto halfWindowSizeInMeters = windowSizeInMeters * 0.5f;
 
@@ -36,12 +36,12 @@ void BouncingBallSample::onInit() noexcept
     collider.SetShape(Math::RectangleF(
         Math::Vec2F::Zero() - halfSize, Math::Vec2F::Zero() + halfSize));
 
-    collider.SetRestitution(0.f);
+    collider.SetRestitution(1.f);
 
     _colliders.push_back(colRef);
 }
 
-void BouncingBallSample::onHandleInputs(SDL_Event event, 
+void GroundCollisionSample::onHandleInputs(SDL_Event event, 
                                         bool isMouseOnAnImGuiWindow) noexcept
 {
     switch (event.type)
@@ -73,7 +73,7 @@ void BouncingBallSample::onHandleInputs(SDL_Event event,
     }
 }
 
-void BouncingBallSample::onUpdate() noexcept
+void GroundCollisionSample::onUpdate() noexcept
 {
     removeCollidersOutOfSBottomScreen();
 
@@ -84,7 +84,7 @@ void BouncingBallSample::onUpdate() noexcept
     std::cout << body.Velocity().X << " " << body.Velocity().Y << "\n";*/
 }
 
-void BouncingBallSample::onRender() noexcept
+void GroundCollisionSample::onRender() noexcept
 {
     for (const auto& colRef : _colliders)
     {
@@ -124,37 +124,37 @@ void BouncingBallSample::onRender() noexcept
     }
 }
 
-void BouncingBallSample::onDeinit() noexcept
+void GroundCollisionSample::onDeinit() noexcept
 {
     _colliders.clear();
 }
 
-void BouncingBallSample::OnTriggerEnter(PhysicsEngine::ColliderRef colliderRefA, 
+void GroundCollisionSample::OnTriggerEnter(PhysicsEngine::ColliderRef colliderRefA, 
     PhysicsEngine::ColliderRef colliderRefB) noexcept
 {
 }
 
-void BouncingBallSample::OnTriggerStay(PhysicsEngine::ColliderRef colliderRefA, 
+void GroundCollisionSample::OnTriggerStay(PhysicsEngine::ColliderRef colliderRefA, 
     PhysicsEngine::ColliderRef colliderRefB) noexcept
 {
 }
 
-void BouncingBallSample::OnTriggerExit(PhysicsEngine::ColliderRef colliderRefA, 
+void GroundCollisionSample::OnTriggerExit(PhysicsEngine::ColliderRef colliderRefA, 
     PhysicsEngine::ColliderRef colliderRefB) noexcept
 {
 }
 
-void BouncingBallSample::OnCollisionEnter(PhysicsEngine::ColliderRef colliderRefA, 
+void GroundCollisionSample::OnCollisionEnter(PhysicsEngine::ColliderRef colliderRefA, 
     PhysicsEngine::ColliderRef colliderRefB) noexcept
 {
 }
 
-void BouncingBallSample::OnCollisionExit(PhysicsEngine::ColliderRef colliderRefA, 
+void GroundCollisionSample::OnCollisionExit(PhysicsEngine::ColliderRef colliderRefA, 
     PhysicsEngine::ColliderRef colliderRefB) noexcept
 {
 }
 
-void BouncingBallSample::createCircle(Math::Vec2F position) noexcept
+void GroundCollisionSample::createCircle(Math::Vec2F position) noexcept
 {
     const auto bodyRef = _world.CreateBody();
     auto& body = _world.GetBody(bodyRef);
@@ -167,12 +167,12 @@ void BouncingBallSample::createCircle(Math::Vec2F position) noexcept
     collider.SetShape(Math::CircleF(0.2f));
 
     collider.SetRestitution(1.f);
-    collider.SetFriction(1.f);
+    //collider.SetFriction(1.f);
 
     _colliders.push_back(colRef);
 }
 
-void BouncingBallSample::createRectangle(Math::Vec2F position) noexcept
+void GroundCollisionSample::createRectangle(Math::Vec2F position) noexcept
 {
     const auto bodyRef = _world.CreateBody();
     auto& body = _world.GetBody(bodyRef);
@@ -188,15 +188,15 @@ void BouncingBallSample::createRectangle(Math::Vec2F position) noexcept
         Math::Vec2F::Zero() - halfSize, Math::Vec2F::Zero() + halfSize));
 
     collider.SetRestitution(1.f);
-    collider.SetFriction(1.f);
+    //collider.SetFriction(0.f);
 
     _colliders.push_back(colRef);
 }
 
-void BouncingBallSample::removeCollidersOutOfSBottomScreen() noexcept
+void GroundCollisionSample::removeCollidersOutOfSBottomScreen() noexcept
 {
     constexpr auto windowSizeInMeters = Metrics::PixelsToMeters(
-        Math::Vec2F(Window::WindowWidth, Window::WindowHeight));
+        Math::Vec2F(AppWindow::WindowWidth, AppWindow::WindowHeight));
 
     for (auto& colRef : _colliders)
     {

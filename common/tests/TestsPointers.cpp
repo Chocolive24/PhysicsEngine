@@ -19,22 +19,6 @@ TEST_P(FloatFixture, UniquePtrConstructorAndDereference)
     EXPECT_FLOAT_EQ(*(uniquePtr.Get()), value);
 }
 
-TEST_P(FloatFixture, UniquePtrDestructor)
-{
-    auto param = GetParam();
-    auto* floatPtr = new float(param);
-
-    // Expect that the value is the same.
-    EXPECT_FLOAT_EQ(*floatPtr, param);
-
-    {
-        UniquePtr<float> ptr(floatPtr);
-    } // Call the destructor.
-
-    // Expect that the value is undefined.
-    EXPECT_NE(*floatPtr, param);
-}
-
 TEST_P(FloatFixture, UniquePtrArrowOperator)
 {
     struct TestStruct
@@ -52,7 +36,7 @@ TEST_P(FloatFixture, UniquePtrCast)
 {
     auto value = GetParam();
 
-    UniquePtr<float> uniquePtr = UniquePtr<float>::MakeUnique(value);
+    UniquePtr<float> uniquePtr = MakeUnique(value);
 
     EXPECT_FLOAT_EQ(*uniquePtr, value);
     EXPECT_FLOAT_EQ(*(uniquePtr.Get()), value);
@@ -62,7 +46,7 @@ TEST_P(FloatFixture, UniquePtrMakeUnique)
 {
     auto value = GetParam();
 
-    UniquePtr<float> uniquePtr = UniquePtr<float>::MakeUnique(value);
+    UniquePtr<float> uniquePtr = MakeUnique(value);
 
     EXPECT_FLOAT_EQ(*uniquePtr, value);
     EXPECT_FLOAT_EQ(*(uniquePtr.Get()), value);
@@ -138,9 +122,6 @@ TEST_P(FloatFixture, SharedPtrDestructor)
 
         EXPECT_EQ(ptr.SharedCount(), 1);
     } // Call the ptr destructor.
-
-    // Expect that the value is undefined.
-    EXPECT_NE(*floatPtr, param);
 }
 
 TEST_P(FloatFixture, SharedPtrArrowOperator)

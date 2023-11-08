@@ -1,12 +1,12 @@
-#pragma once
-
 /**
  * @headerfile DrawableGeometry.h
- * This file defines the DrawableGeometry namespace that lets you create displayable geometric shapes using vertices
- * and indices.
- * 
+ * This file defines the DrawableGeometry namespace that lets you create displayable geometric
+ * shapes using vertices and indices.
+ *
  * @author Olivier Pachoud
  */
+
+#pragma once
 
 #include "Vec2.h"
 
@@ -14,6 +14,10 @@
 
 #include <vector>
 
+ /**
+  * @brief DrawableGeometry is a namespace that lets you create displayable geometric
+  * shapes using vertices and indices.
+  */
 namespace GraphicGeometry
 {
     /**
@@ -31,7 +35,7 @@ namespace GraphicGeometry
      * a circle in a good quality for most of the size it can have.
      * @note It could be not enough if the circle you want to draw is big.
      */
-    static constexpr int CircleSegmentCount = 30;
+    static constexpr int CircleSegmentCount = 40;
 
     /**
      * @brief ClearGeometry is a method that deletes all vertices and indices.

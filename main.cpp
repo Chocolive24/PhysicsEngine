@@ -3,6 +3,7 @@
 
 #include "SampleManager.h"
 #include "GraphicGeometry.h"
+#include "AppWindow.h"
 
 #ifdef TRACY_ENABLE
 #include <Tracy.hpp>
@@ -13,9 +14,10 @@
 
 #include <iostream>
 
+
 int main([[maybe_unused]] int argc, [[maybe_unused]] char* args[])
 {
-    Window window;
+    AppWindow window;
     window.Init();
 
     SampleManager sampleManager;
@@ -59,10 +61,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char* args[])
         SDL_RenderClear(window.Renderer());
 
         SDL_SetRenderDrawColor(window.Renderer(),
-            Window::BackgroundColor.r,
-            Window::BackgroundColor.g,
-            Window::BackgroundColor.b,
-            Window::BackgroundColor.a);
+            AppWindow::BackgroundColor.r,
+            AppWindow::BackgroundColor.g,
+            AppWindow::BackgroundColor.b,
+            AppWindow::BackgroundColor.a);
 
         sampleManager.UpdateCurrentSample();
 

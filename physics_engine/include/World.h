@@ -1,10 +1,10 @@
-#pragma once
-
 /**
  * @headerfile World.h
  * This header defines the world class which handles the physical state of the bodies.
  * @author Olivier Pachoud
  */
+
+#pragma once
 
 #include "Body.h"
 #include "Collider.h"
@@ -19,7 +19,7 @@
 namespace PhysicsEngine
 {
     /**
-     * @class World is a class that contains all the physical bodies in the program and calculates
+     * @brief World is a class that contains all the physical bodies in the program and calculates
      * their movements and changes in physical state.
      */
     class World
@@ -35,7 +35,12 @@ namespace PhysicsEngine
         std::vector<Collider> _colliders{};
         std::vector<std::size_t> _collidersGenIndices{};
 
-        std::unordered_set<ColliderPair, ColliderHash> _colliderPairs{};
+        HeapAllocator _heapAllocator;
+
+        std::unordered_set<ColliderPair, 
+            ColliderHash, 
+            std::equal_to<ColliderPair>, 
+            StandardAllocator<ColliderPair>> _colliderPairs{ StandardAllocator<ColliderPair>{_heapAllocator} };
 
         QuadTree _quadTree;
 

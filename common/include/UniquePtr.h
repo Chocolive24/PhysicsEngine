@@ -1,14 +1,18 @@
-#pragma once
-
 /**
  * @headerfile UniquePtr.h
- * This file defines the UniquePtr class which is a naive implementation of the std::unique_ptr standard library class.
+ * This file defines the UniquePtr class which is a naive implementation of the
+ * std::unique_ptr standard library class.
  *
  * @author Olivier Pachoud
  */
 
+#pragma once
+
 #include <algorithm>
 
+/*
+* @brief UniquePtr is a naive implementation of the std::unique_ptr standard library class. 
+*/
 template<typename T>
 class UniquePtr
 {
@@ -51,7 +55,6 @@ public:
 
     /**
      * @brief Get is a method that gives the pointer inside the unique pointer object.
-     * @param value The value to point with the unique pointer.
      * @return The pointer inside the unique pointer object.
      */
     [[nodiscard]] constexpr T* Get() const noexcept { return _ptr; }

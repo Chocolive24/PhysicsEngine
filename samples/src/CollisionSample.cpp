@@ -20,15 +20,15 @@ void CollisionSample::onInit() noexcept
 
     std::fill(_colors.begin(), _colors.end(), SDL_Color{255, 255, 255, 255});
 
-    const auto windowSizeInMeters = Metrics::PixelsToMeters(
-        Math::Vec2F(Window::WindowWidth, Window::WindowHeight));
+    const auto AppWindowSizeInMeters = Metrics::PixelsToMeters(
+        Math::Vec2F(AppWindow::WindowWidth, AppWindow::WindowHeight));
 
     // Calculate the number of rows and columns in the grid based on the total object count
     int numRows = static_cast<int>(std::sqrt(TotalColliderCount));
     int numCols = TotalColliderCount / numRows;
 
     // Calculate the size of each grid cell
-    Math::Vec2F cellSize(windowSizeInMeters.X / numCols, windowSizeInMeters.Y / numRows);
+    Math::Vec2F cellSize(AppWindowSizeInMeters.X / numCols, AppWindowSizeInMeters.Y / numRows);
 
     for (std::size_t i = 0; i < TotalColliderCount; i++)
     {
@@ -84,7 +84,7 @@ void CollisionSample::onInit() noexcept
     }
 }
 
-void CollisionSample::onHandleInputs(SDL_Event event, bool isMouseOnAnImGuiWindow) noexcept
+void CollisionSample::onHandleInputs(SDL_Event event, bool isMouseOnAnImGuiAppWindow) noexcept
 {
     
 }
@@ -177,8 +177,8 @@ void CollisionSample::OnCollisionExit(PhysicsEngine::ColliderRef ColliderRefA,
 
 void CollisionSample::maintainObjectsInWindow() noexcept
 {
-    const auto windowSizeInMeters = Metrics::PixelsToMeters(
-        Math::Vec2F(Window::WindowWidth, Window::WindowHeight));
+    const auto AppWindowSizeInMeters = Metrics::PixelsToMeters(
+        Math::Vec2F(AppWindow::WindowWidth, AppWindow::WindowHeight));
 
     for (auto& colRef : _colliderRefs)
     {
@@ -195,9 +195,9 @@ void CollisionSample::maintainObjectsInWindow() noexcept
 
             const auto radius = std::get<Math::CircleF>(colShape).Radius();
 
-            if (pos.X + radius >= windowSizeInMeters.X)
+            if (pos.X + radius >= AppWindowSizeInMeters.X)
             {
-                body.SetPosition(Math::Vec2F(windowSizeInMeters.X - radius, pos.Y));
+                body.SetPosition(Math::Vec2F(AppWindowSizeInMeters.X - radius, pos.Y));
                 body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
             }
 
@@ -207,9 +207,9 @@ void CollisionSample::maintainObjectsInWindow() noexcept
                 body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
             }
 
-            if (pos.Y - radius <= windowSizeInMeters.Y)
+            if (pos.Y - radius <= AppWindowSizeInMeters.Y)
             {
-                body.SetPosition(Math::Vec2F(pos.X, windowSizeInMeters.Y + radius));
+                body.SetPosition(Math::Vec2F(pos.X, AppWindowSizeInMeters.Y + radius));
                 body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
             }
 
@@ -231,9 +231,9 @@ void CollisionSample::maintainObjectsInWindow() noexcept
             const auto pos = body.Position();
             const auto velocity = body.Velocity();
 
-            if (pos.X + halfSize.X >= windowSizeInMeters.X)
+            if (pos.X + halfSize.X >= AppWindowSizeInMeters.X)
             {
-                body.SetPosition(Math::Vec2F(windowSizeInMeters.X - halfSize.X, pos.Y));
+                body.SetPosition(Math::Vec2F(AppWindowSizeInMeters.X - halfSize.X, pos.Y));
                 body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
             }
 
@@ -243,9 +243,9 @@ void CollisionSample::maintainObjectsInWindow() noexcept
                 body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
             }
 
-            if (pos.Y - halfSize.Y <= windowSizeInMeters.Y)
+            if (pos.Y - halfSize.Y <= AppWindowSizeInMeters.Y)
             {
-                body.SetPosition(Math::Vec2F(pos.X, windowSizeInMeters.Y + halfSize.Y));
+                body.SetPosition(Math::Vec2F(pos.X, AppWindowSizeInMeters.Y + halfSize.Y));
                 body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
             }
 
@@ -267,9 +267,9 @@ void CollisionSample::maintainObjectsInWindow() noexcept
 
         //    for (auto& vertex : vertices)
         //    {
-        //        if (pos.X + vertex.X >= windowSizeInMeters.X)
+        //        if (pos.X + vertex.X >= AppWindowSizeInMeters.X)
         //        {
-        //            body.SetPosition(Math::Vec2F(windowSizeInMeters.X - vertex.X, pos.Y));
+        //            body.SetPosition(Math::Vec2F(AppWindowSizeInMeters.X - vertex.X, pos.Y));
         //            body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
         //        }
 
@@ -279,9 +279,9 @@ void CollisionSample::maintainObjectsInWindow() noexcept
         //            body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
         //        }
 
-        //        if (pos.Y - vertex.Y <= windowSizeInMeters.Y)
+        //        if (pos.Y - vertex.Y <= AppWindowSizeInMeters.Y)
         //        {
-        //            body.SetPosition(Math::Vec2F(pos.X, windowSizeInMeters.Y + vertex.Y));
+        //            body.SetPosition(Math::Vec2F(pos.X, AppWindowSizeInMeters.Y + vertex.Y));
         //            body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
         //        }
 

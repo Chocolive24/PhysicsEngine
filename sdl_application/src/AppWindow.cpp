@@ -1,4 +1,4 @@
-#include "Window.h"
+#include "AppWindow.h"
 #include "Utility.h"
 
 #include "imgui.h"
@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-void Window::Init() noexcept
+void AppWindow::Init() noexcept
 {
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
@@ -45,12 +45,7 @@ void Window::Init() noexcept
     ImGui_ImplSDLRenderer2_Init(_renderer);
 }
 
-void Window::RunAppLoop()
-{
-   
-}
-
-void Window::Deinit() const noexcept
+void AppWindow::Deinit() const noexcept
 {
     ImGui_ImplSDL2_Shutdown();
     ImGui_ImplSDLRenderer2_Shutdown();

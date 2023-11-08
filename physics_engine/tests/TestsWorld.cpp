@@ -48,6 +48,14 @@ public:
         Stay = false;
         Exit = true;
     }
+
+    // Inherited via ContactListener
+    void OnCollisionEnter(ColliderRef colliderRefA, ColliderRef colliderRefB) noexcept override
+    {
+    }
+    void OnCollisionExit(ColliderRef colliderRefA, ColliderRef colliderRefB) noexcept override
+    {
+    }
 };
 
 INSTANTIATE_TEST_SUITE_P(World, IntFixture, testing::Values(
@@ -74,7 +82,7 @@ TEST_P(IntFixture, Init)
     int bodyCount = GetParam();
 
     World world;
-    world.Init(bodyCount);
+    world.Init(Math::Vec2F::Zero(), bodyCount);
 
     if (bodyCount < 0)
     {
@@ -88,7 +96,7 @@ TEST_P(IntFixture, Init)
 TEST(World, CreateAndDestroyBody)
 {
     World world;
-    world.Init(5);
+    world.Init(Math::Vec2F::Zero(), 5);
 
     auto bodyRef = world.CreateBody();
     auto& body = world.GetBody(bodyRef);
@@ -129,7 +137,7 @@ TEST_P(ArrayOfBody, Update)
     std::array<BodyRef, bodies.size()> bodyRefs{};
 
     World world;
-    world.Init(bodies.size());
+    world.Init(Math::Vec2F::Zero(), bodies.size());
 
     float deltaTime = 0.1f;
 
@@ -177,7 +185,7 @@ TEST_P(ArrayOfBody, Update)
 TEST(World, CreateAndDestroyCircleCollider)
 {
     World world;
-    world.Init(5);
+    world.Init(Math::Vec2F::Zero(), 5);
 
     auto bodyRef = world.CreateBody();
     auto& body = world.GetBody(bodyRef);
@@ -227,7 +235,7 @@ TEST(World, UpdateCollisionDetectionCircle)
     CircleF c2(Vec2F(0.03f, 0.03f), 0.2f);
 
     World world;
-    world.Init(2);
+    world.Init(Math::Vec2F::Zero(), 2);
 
     TestContactListener testContactListener;
     world.SetContactListener(&testContactListener);
@@ -282,7 +290,7 @@ TEST(World, UpdateCollisionDetectionRect)
     RectangleF r2(Vec2F(0.3f, 0.3f), Vec2F(0.7f, 0.7f));
 
     World world;
-    world.Init(2);
+    world.Init(Math::Vec2F::Zero(), 2);
 
     TestContactListener testContactListener;
     world.SetContactListener(&testContactListener);
@@ -339,7 +347,7 @@ TEST(World, UpdateCollisionDetectionCircleAndRect)
     RectangleF r2(Vec2F(0.3f, 0.3f), Vec2F(0.7f, 0.7f));
 
     World world;
-    world.Init(2);
+    world.Init(Math::Vec2F::Zero(), 2);
 
     TestContactListener testContactListener;
     world.SetContactListener(&testContactListener);
@@ -411,7 +419,7 @@ TEST(World, UpdateCollisionDetectionPolygon)
     PolygonF p2(v2);
 
     World world;
-    world.Init(2);
+    world.Init(Math::Vec2F::Zero(), 2);
 
     TestContactListener testContactListener;
     world.SetContactListener(&testContactListener);
@@ -474,7 +482,7 @@ TEST(World, UpdateCollisionDetectionPolygonAndCircle)
     CircleF c2(Vec2F::Zero(), 0.5f);
 
     World world;
-    world.Init(2);
+    world.Init(Math::Vec2F::Zero(), 2);
 
     TestContactListener testContactListener;
     world.SetContactListener(&testContactListener);
@@ -538,7 +546,7 @@ TEST(World, UpdateCollisionDetectionPolygonAndRect)
     RectangleF r2(Vec2F(0.3f, 0.3f), Vec2F(0.7f, 0.7f));
 
     World world;
-    world.Init(2);
+    world.Init(Math::Vec2F::Zero(), 2);
 
     TestContactListener testContactListener;
     world.SetContactListener(&testContactListener);

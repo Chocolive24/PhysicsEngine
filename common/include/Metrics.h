@@ -1,11 +1,11 @@
-#pragma once
-
 /**
  * @headerfile Metrics.h
  * This file defines a collection of metrics.
  *
  * @author Olivier
  */
+
+#pragma once
 
 #include "Vec2.h"
 

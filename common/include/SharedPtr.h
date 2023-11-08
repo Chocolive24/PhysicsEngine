@@ -1,14 +1,18 @@
-#pragma once
-
 /**
  * @headerfile SharedPtr.h
- * This file defines the SharedPtr class which is a naive implementation of the std::shared_ptr standard library class.
+ * This file defines the SharedPtr class which is a naive implementation of the
+ * std::shared_ptr standard library class.
  *
  * @author Olivier
  */
 
+#pragma once
+
 #include <algorithm>
 
+/*
+*@brief SharedPtr is a naive implementation of the std::shared_ptr standard library class.
+*/
 template<typename T>
 class SharedPtr
 {
@@ -83,11 +87,37 @@ public:
         return SharedPtr<U>(ptrToCast);
     }
 
-    [[nodiscard]] static constexpr SharedPtr<T> MakeShared(T value) noexcept
-    {
-        return SharedPtr<T>(new T(value));
-    }
-
+    /**
+     * @brief Get is a method that gives the pointer inside the shared pointer object.
+     * @return The pointer inside the shared pointer object.
+     */
     [[nodiscard]] constexpr T* Get() const noexcept { return _ptr; }
+
+    /**
+     * @brief SharedCount is a method that gives the count of shared pointer pointing to the pointer inside.
+     * @return The count of shared pointer pointing to the pointer inside.
+     */
     [[nodiscard]] constexpr int SharedCount() const noexcept { return *_count; }
 };
+
+/**
+* @brief MakeShared is a method that creates a shared pointer of the type of the value in parameter.
+* @param value The value to point with the shared pointer.
+* @return The shared pointer object that points the value.
+*/
+template<typename T>
+[[nodiscard]] static constexpr SharedPtr<T> MakeShared(const T& value) noexcept
+{
+    return SharedPtr<T>(new T(value));
+}
+
+/**
+* @brief MakeShared is a method that creates a shared pointer of the type of the value in parameter.
+* @param value The value to point with the shared pointer.
+* @return The shared pointer object that points the value.
+*/
+template<typename T, typename U>
+[[nodiscard]] static constexpr SharedPtr<T> MakeShared(const U& value) noexcept
+{
+    return SharedPtr<T>(new U(value));
+}

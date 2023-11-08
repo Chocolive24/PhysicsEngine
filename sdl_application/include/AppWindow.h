@@ -1,11 +1,11 @@
-#pragma once
-
 /**
  * @headerfile Window.h
  * This file defines the Window class that creates a graphical window for the program.
- * 
+ *
  * @author Oliver Pachoud
  */
+
+#pragma once
 
 #include "Definition.h"
 #include "Vec2.h"
@@ -15,7 +15,10 @@
 #include <cstddef>
 #include <vector>
 
-class Window
+/*
+* @brief AppWindow is the application window using SDL.
+*/
+class AppWindow
 {
 private:
     SDL_Window* _window{};
@@ -33,13 +36,25 @@ public:
     static constexpr int WindowWidth = 880;
 
     /**
-     * @brief WindowHeight is the size of the window's width in pixels.
+     * @brief WindowHeight is the size of the window's height in pixels.
      */
     static constexpr int WindowHeight = 680;
 
+    /**
+     * @brief Init is a method that initialize the application window.
+     * More precisely, the method initiates SDL and ImGui, creates the window and creates the renderer. 
+     */
     void Init() noexcept;
-    void RunAppLoop();
+
+    /**
+     * @brief Deinit is a method that deinitialize the application window.
+     * More precisely, the method deinitiates SDL and ImGui, destroy the window and destroy the renderer.
+     */
     void Deinit() const noexcept;
 
+    /**
+     * @brief Renderer is a method that gives the renderer of the application window.
+     * @return The renderer of the application window.
+     */
     [[nodiscard]] constexpr SDL_Renderer* Renderer() const noexcept { return _renderer; }
 };
