@@ -18,7 +18,7 @@ struct CelestialBody
     SDL_Color Color;
 };
 
-class PlanetSystemSample : public Sample
+class PlanetSystemSample final : public Sample
 {
 private:
     std::vector<CelestialBody> _planets{};
@@ -27,7 +27,8 @@ private:
     bool _mustCreatePlanet = false;
 
     /**
-     * @brief createPlanet is a method that creates a CelestialBody representing a planet (see CelestialBody struct).
+     * @brief createPlanet is a method that creates a CelestialBody representing a planet 
+     * (see CelestialBody struct).
      * @param pos The position of the planet.
      * @param radius The radius of the planet.
      * @param color The color of the planet.
@@ -54,9 +55,10 @@ public:
 
     PlanetSystemSample() noexcept = default;
 
+    // Inherited via Sample
     std::string Name() const noexcept override { return "Planet System"; }
-
     std::string Description() const noexcept override;
+    std::string InputText() const noexcept override;
 
     /**
      * @brief Init is a method that initializes the planet system sample (aka instantiates the sun and all the planets).
@@ -73,19 +75,16 @@ public:
     void onHandleInputs(SDL_Event event, bool isMouseOnAnImGuiWindow) noexcept override;
 
     /**
-     * @brief Update is a method that updates the sample.\n
-     * - Create planets to the mouse position if the left mouse button is pressed.\n
-     * - Calls the Tick method of the timer to calculates the delta time.\n
-     * - Calls the calculatePlanetMovements method.\n
-     * - Calls the world Update method.\n
-     * - Calls the drawCelestialBodies method.\n
+     * @brief onUpdate is a method that updates the sample. 
+     * More specifically, it creates planets if the left mouse button is pressed and calculates
+     * the gravitational force to apply to each planet.
      */
     void onUpdate() noexcept override;
 
     void onRender() noexcept override;
 
     /**
-     * @brief Deinit is a method that deinitializes the sample (aka clear all the celestial bodies).
+     * @brief onDeinit is a method that deinitializes the sample (aka clear all the celestial bodies).
      */
     void onDeinit() noexcept override;
 };

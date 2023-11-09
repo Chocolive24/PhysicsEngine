@@ -11,6 +11,7 @@ public:
 	// Inherited via Sample
 	std::string Name() const noexcept override { return "Collision"; }
 	std::string Description() const noexcept override;
+	std::string InputText() const noexcept override;
 
 	void onInit() noexcept override;
 	void onHandleInputs(SDL_Event event, bool isMouseOnAnImGuiWindow) noexcept override;

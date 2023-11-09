@@ -171,7 +171,10 @@ namespace PhysicsEngine
             {
                 auto& simplColB = node.Colliders[j];
 
-                _possiblePairs.push_back(ColliderPair{ simplColA.ColRef, simplColB.ColRef });
+                //if (Math::Intersect(simplColA.Rectangle, simplColB.Rectangle))
+                //{
+                    _possiblePairs.push_back(ColliderPair{ simplColA.ColRef, simplColB.ColRef });
+                //}
             }
 
             // If the node has children, we need to compare the simplified collider with the 
@@ -204,7 +207,10 @@ namespace PhysicsEngine
         // For each colliders in the current node, compare it with the simplified collider from its parent node.
         for (const auto& nodeSimplCol : node.Colliders)
         {
-             _possiblePairs.push_back(ColliderPair{ simplCol.ColRef, nodeSimplCol.ColRef });
+            //if (Math::Intersect(simplCol.Rectangle, nodeSimplCol.Rectangle))
+            //{
+                _possiblePairs.push_back(ColliderPair{ simplCol.ColRef, nodeSimplCol.ColRef });
+            //}
         }
 
         // If the current node has children, we need to compare the simplified collider from its parent node with its children.

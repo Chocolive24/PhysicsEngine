@@ -90,14 +90,18 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char* args[])
 
         ImGui::Spacing();
 
-        ImGui::TextWrapped(sampleManager.CurrentSample()->Description().c_str());
-
-        ImGui::Spacing();
-
         if (ImGui::Button("Restart sample"))
         {
             sampleManager.RestartSample();
         }
+
+        ImGui::Spacing();
+
+        ImGui::TextWrapped(sampleManager.CurrentSample()->Description().c_str());
+
+        ImGui::Spacing();
+
+        ImGui::TextWrapped(sampleManager.CurrentSample()->InputText().c_str());
 
         ImGui::End();
 

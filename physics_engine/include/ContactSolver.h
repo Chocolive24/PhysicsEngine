@@ -9,7 +9,7 @@
 #pragma once
 
 #include "Vec2.h"
-#include "References.h"
+#include "WorldRefTypes.h"
 #include "Body.h"
 #include "Collider.h"
 

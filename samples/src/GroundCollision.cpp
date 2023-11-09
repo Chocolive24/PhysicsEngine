@@ -5,7 +5,17 @@
 
 std::string GroundCollisionSample::Description() const noexcept
 {
-    return std::string();
+    std::string_view description = R"(This sample shows collisions between shapes and a ground with gravity in the world.
+You can adjust the restitution of each shapes to change how much they will bounce on the ground.)";
+    return static_cast<std::string>(description);
+}
+
+std::string GroundCollisionSample::InputText() const noexcept
+{
+    std::string_view description = R"(Inputs :
+[Left-click] creates a circle.
+[Right-click] creates a rectangle.)";
+    return static_cast<std::string>(description);
 }
 
 void GroundCollisionSample::onInit() noexcept

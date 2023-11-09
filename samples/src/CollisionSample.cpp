@@ -7,11 +7,16 @@
 
 std::string CollisionSample::Description() const noexcept
 {
-    std::string_view description = R"(This sample shows the detection of physical collisions between circles. 
-As soon as two circles collide, they are assigned a random color and collision calculations are performed.
-All circles have the same mass and restitution. Collisions are therefore completely elastic, with no loss of energy.)";
+    std::string_view description = R"(This sample shows the detection of physical collisions between shapes. 
+As soon as two shapes collide, they are assigned a random color and collision calculations are performed.
+All shapes have the same mass and restitution. Collisions are therefore completely elastic, with no loss of energy.)";
 
     return static_cast<std::string>(description);
+}
+
+std::string CollisionSample::InputText() const noexcept
+{
+    return std::string();
 }
 
 void CollisionSample::onInit() noexcept

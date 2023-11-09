@@ -1,5 +1,5 @@
 /**
- * @headerfile References.h
+ * @headerfile WorldRefTypes.h
  * This header file defines the reference types of the PhysicsEngine.
  */
 

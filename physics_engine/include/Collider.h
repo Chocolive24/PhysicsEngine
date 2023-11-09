@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "References.h"
+#include "WorldRefTypes.h"
 #include "Shape.h"
 
 #include <variant>

@@ -18,6 +18,13 @@ The sum of these forces creates the orbital motion.)";
     return static_cast<std::string>(description);
 }
 
+std::string PlanetSystemSample::InputText() const noexcept
+{
+    std::string_view description = R"(Inputs :
+[Left-click] create planets)";
+    return static_cast<std::string>(description);
+}
+
 void PlanetSystemSample::onInit() noexcept
 {
     constexpr Math::Vec2F centerOfScreen(AppWindow::WindowWidth / 2.f, AppWindow::WindowHeight / 2.f);

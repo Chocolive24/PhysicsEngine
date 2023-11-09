@@ -2,7 +2,6 @@
 
 #include "Sample.h"
 #include "ContactListener.h"
-#include "References.h"
 
 class GroundCollisionSample final : public Sample, public PhysicsEngine::ContactListener
 {
@@ -47,4 +46,7 @@ private:
 	void createRectangle(Math::Vec2F position) noexcept;
 
 	void removeCollidersOutOfSBottomScreen() noexcept;
+
+	// Inherited via Sample
+	std::string InputText() const noexcept override;
 };

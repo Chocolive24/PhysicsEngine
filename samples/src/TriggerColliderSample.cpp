@@ -14,6 +14,11 @@ The calculation of collider intersection is simplified using a quad-tree (visibl
     return static_cast<std::string>(description);
 }
 
+std::string TriggerColliderSample::InputText() const noexcept
+{
+    return std::string();
+}
+
 void TriggerColliderSample::onInit() noexcept
 {
     _world.SetContactListener(this);

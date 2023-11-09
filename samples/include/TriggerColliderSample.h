@@ -61,4 +61,8 @@ public:
     void OnCollisionExit(PhysicsEngine::ColliderRef colliderRefA, 
                          PhysicsEngine::ColliderRef colliderRefB) noexcept override;
 
+
+    // Inherited via Sample
+    std::string InputText() const noexcept override;
+
 };

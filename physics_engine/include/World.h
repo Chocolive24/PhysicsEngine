@@ -11,7 +11,7 @@
 #include "ContactSolver.h"
 #include "ContactListener.h"
 #include "QuadTree.h"
-#include "References.h"
+#include "WorldRefTypes.h"
 
 #include <vector>
 #include <unordered_set>
@@ -27,15 +27,15 @@ namespace PhysicsEngine
     private:
         Math::Vec2F _gravity;
 
-        std::vector<Body> _bodies{};
-        std::vector<std::size_t> _bodiesGenIndices{};
+        HeapAllocator _heapAllocator;
+
+        AllocVector<Body> _bodies{ StandardAllocator<Body>{_heapAllocator} };
+        AllocVector<std::size_t> _bodiesGenIndices{ StandardAllocator<std::size_t>{_heapAllocator} };
 
         ContactListener* _contactListener = nullptr;
 
-        std::vector<Collider> _colliders{};
-        std::vector<std::size_t> _collidersGenIndices{};
-
-        HeapAllocator _heapAllocator;
+        AllocVector<Collider> _colliders{ StandardAllocator<Collider>{_heapAllocator} };
+        AllocVector<std::size_t> _collidersGenIndices{ StandardAllocator<std::size_t>{_heapAllocator} };
 
         std::unordered_set<ColliderPair, 
             ColliderHash, 

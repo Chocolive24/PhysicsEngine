@@ -12,12 +12,6 @@ struct IntFixture : public ::testing::TestWithParam<int>{};
 
 struct ArrayOfBody : public ::testing::TestWithParam<std::array<Body, 3>>{};
 
-struct PairOfCircle : public ::testing::TestWithParam<std::pair<CircleF , CircleF>>{};
-
-struct PairOfRect: public ::testing::TestWithParam<std::pair<RectangleF, RectangleF>>{};
-
-struct PairOfCircleAndRect : public ::testing::TestWithParam<std::pair<CircleF, RectangleF>>{};
-
 class TestContactListener : public ContactListener
 {
 public:
@@ -34,7 +28,7 @@ public:
     }
 
     void OnTriggerStay(PhysicsEngine::ColliderRef colliderRefA,
-                        PhysicsEngine::ColliderRef colliderRefB) noexcept override
+                       PhysicsEngine::ColliderRef colliderRefB) noexcept override
     {
         Enter = false;
         Stay = true;

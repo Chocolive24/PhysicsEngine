@@ -30,6 +30,7 @@ public:
 
     virtual std::string Name() const noexcept = 0;
     virtual std::string Description() const noexcept = 0;
+    virtual std::string InputText() const noexcept = 0;
 
     /**
      * @brief Init is a method that initializes the sample.

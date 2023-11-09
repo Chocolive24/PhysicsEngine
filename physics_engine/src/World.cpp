@@ -220,10 +220,102 @@ namespace PhysicsEngine
             ZoneScoped;
     #endif
 
-        // todo: transformer en vector et tester.
-        //std::unordered_set<ColliderPair, ColliderHash> newColliderPairs;
+            // todo: transformer en vector et tester.
+       //std::unordered_set<ColliderPair, ColliderHash> newColliderPairs;
 
         const auto& newPossiblePairs = _quadTree.PossiblePairs();
+
+        //AllocVector<ColliderPair> newPairs{ StandardAllocator<ColliderPair>{_heapAllocator} };
+        //newPairs.reserve(newPossiblePairs.size());
+
+        //for (const auto& newPossiblePair : newPossiblePairs)
+        //{
+        //    auto& colliderA = _colliders[newPossiblePair.ColliderA.Index];
+        //    auto& colliderB = _colliders[newPossiblePair.ColliderB.Index];
+
+        //    if (detectContact(colliderA, colliderB))
+        //    {
+        //        newPairs.push_back(newPossiblePair);
+        //    }
+        //}
+
+        //for (const auto& newPair : newPairs)
+        //{
+        //    auto& colliderA = _colliders[newPair.ColliderA.Index];
+        //    auto& colliderB = _colliders[newPair.ColliderB.Index];
+
+        //    // If there was no collision in the previous frame -> OnTriggerEnter.
+        //    if (_colliderPairs.find(newPair) == _colliderPairs.end())
+        //    {
+        //        if (colliderA.IsTrigger() || colliderB.IsTrigger())
+        //        {
+        //            _contactListener->OnTriggerEnter(newPair.ColliderA,
+        //                                             newPair.ColliderB);
+        //        }
+        //        else
+        //        {
+        //            ContactSolver contactSolver;
+
+        //            auto& bodyA = GetBody(colliderA.GetBodyRef());
+        //            auto& bodyB = GetBody(colliderB.GetBodyRef());
+
+        //            contactSolver.bodyA = &bodyA;
+        //            contactSolver.bodyB = &bodyB;
+        //            contactSolver.colliderA = &colliderA;
+        //            contactSolver.colliderB = &colliderB;
+
+        //            contactSolver.ResolveContact();
+        //            _contactListener->OnCollisionEnter(newPair.ColliderA,
+        //                                               newPair.ColliderB);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        _contactListener->OnTriggerStay(newPair.ColliderA,
+        //                                        newPair.ColliderB);
+        //    }
+        //}
+
+        //for (const auto& colliderPair : _colliderPairs)
+        //{
+        //    auto& colliderA = _colliders[colliderPair.ColliderA.Index];
+        //    auto& colliderB = _colliders[colliderPair.ColliderB.Index];
+
+        //    auto it = std::find(newPairs.begin(), newPairs.end(), colliderPair);
+
+        //    // If there is no collision in this frame -> OnTriggerExit.
+        //    if (it == newPairs.end())
+        //    {
+        //        if (colliderA.IsTrigger() || colliderB.IsTrigger())
+        //        {
+        //            _contactListener->OnTriggerExit(colliderPair.ColliderA,
+        //                colliderPair.ColliderB);
+        //        }
+        //        else
+        //        {
+        //            ContactSolver contactSolver;
+
+        //            auto& bodyA = GetBody(colliderA.GetBodyRef());
+        //            auto& bodyB = GetBody(colliderB.GetBodyRef());
+
+        //            contactSolver.bodyA = &bodyA;
+        //            contactSolver.bodyB = &bodyB;
+        //            contactSolver.colliderA = &colliderA;
+        //            contactSolver.colliderB = &colliderB;
+
+        //            contactSolver.ResolveContact();
+        //            _contactListener->OnCollisionExit(colliderPair.ColliderA,
+        //                colliderPair.ColliderB);
+        //        }
+        //    }
+        //}
+
+        //_colliderPairs.clear();
+
+        //for (const auto& newPair : newPairs)
+        //{
+        //    _colliderPairs.insert(newPair);
+        //}
 
         for (const auto& possiblePair : newPossiblePairs)
         {
