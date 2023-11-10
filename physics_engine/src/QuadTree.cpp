@@ -60,7 +60,9 @@ namespace PhysicsEngine
             // If the node has fewer colliders than the max number and the depth is not equal to the max depth.
             if (node.Colliders.size() > QuadNode::MaxColliderNbr && depth != _maxDepth)
             {
-                // todo: ZoneNamed subdivision.
+            #ifdef TRACY_ENABLE
+                    ZoneNamed(SubDivision, "Sub-division", true);
+            #endif
 
                 // Subdivide the node rectangle in 4 rectangle.
                 const auto center = node.Boundary.Center();

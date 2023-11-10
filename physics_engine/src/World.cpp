@@ -37,6 +37,11 @@ namespace PhysicsEngine
     #ifdef TRACY_ENABLE
             ZoneScoped;
     #endif
+
+    #ifdef TRACY_ENABLE
+            ZoneNamedN(CalculateBodiesAcceleration, "CalculateBodiesAcceleration", true);
+            ZoneValue(_bodies.size());
+    #endif
         for (auto& body : _bodies)
         {
             if (!body.IsValid()) continue;
@@ -92,16 +97,17 @@ namespace PhysicsEngine
             ZoneScoped;
     #endif
 
+    #ifdef TRACY_ENABLE
+            ZoneNamedN(SetRoodNodeBoundary, "SetRootNodeBoundary", true);
+            ZoneValue(_colliders.size());
+    #endif
+
         _quadTree.Clear();
 
         // Sets the minimum and maximum collision zone limits of the world rectangle to floating maximum and
         // lowest values.
         Math::Vec2F worldMinBound(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
         Math::Vec2F worldMaxBound(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
-
-    #ifdef TRACY_ENABLE
-        ZoneNamedN(SetRoodNodeBoundary, "SetRootNodeBoundary", true);
-    #endif
 
         // Adjust the size of the collision zone in the world rectangle to the most distant bodies.
         for (const auto& collider : _colliders)
@@ -136,6 +142,7 @@ namespace PhysicsEngine
 
     #ifdef TRACY_ENABLE
             ZoneNamedN(InsertCollidersInQuadTree, "InsertCollidersInQuadTree", true);
+            ZoneValue(_colliders.size());
     #endif
         for (std::size_t i = 0; i < _colliders.size(); i++)
         {
@@ -150,6 +157,9 @@ namespace PhysicsEngine
             {
                 case static_cast<int>(Math::ShapeType::Circle):
                 {
+                #ifdef TRACY_ENABLE
+                       ZoneNamedN(InsertCircle, "InsertCircle", true);
+                #endif
                     const auto circle = std::get<Math::CircleF>(colShape);
                     const auto radius = circle.Radius();
                     const auto simplifiedCircle = Math::RectangleF::FromCenter(
@@ -162,6 +172,10 @@ namespace PhysicsEngine
 
                 case static_cast<int>(Math::ShapeType::Rectangle):
                 {
+                #ifdef TRACY_ENABLE
+                       ZoneNamedN(InsertRectangle, "InsertRectangle", true);
+                #endif
+
                     const auto rect = std::get<Math::RectangleF>(colShape) +
                             GetBody(collider.GetBodyRef()).Position();
 
@@ -171,6 +185,10 @@ namespace PhysicsEngine
 
                 case static_cast<int>(Math::ShapeType::Polygon):
                 {
+                #ifdef TRACY_ENABLE
+                    ZoneNamedN(InsertPolygon, "InsertPolygon", true);
+                #endif
+
                     Math::Vec2F minVertex(std::numeric_limits<float>::max(), 
                                           std::numeric_limits<float>::max());
 
@@ -224,6 +242,11 @@ namespace PhysicsEngine
        //std::unordered_set<ColliderPair, ColliderHash> newColliderPairs;
 
         const auto& newPossiblePairs = _quadTree.PossiblePairs();
+
+    #ifdef TRACY_ENABLE
+            ZoneValue(newPossiblePairs.size());
+            ZoneValue(_colliders.size());
+    #endif
 
         //AllocVector<ColliderPair> newPairs{ StandardAllocator<ColliderPair>{_heapAllocator} };
         //newPairs.reserve(newPossiblePairs.size());
@@ -334,8 +357,16 @@ namespace PhysicsEngine
             
             const auto doCollidersIntersect = detectContact(colliderA, colliderB);
 
+            #ifdef TRACY_ENABLE
+                    ZoneNamedN(FindPair, "Find pair", true);
+            #endif
+
             auto it = _colliderPairs.find(possiblePair);
 
+
+            #ifdef TRACY_ENABLE
+                    ZoneNamedN(CheckIfItsANewPair, "Check if it's a new pair", true);
+            #endif
             if (it != _colliderPairs.end())
             {
                 if (!doCollidersIntersect)
@@ -352,6 +383,9 @@ namespace PhysicsEngine
                             possiblePair.ColliderB);
                     }
 
+                    #ifdef TRACY_ENABLE
+                            ZoneNamedN(ErasePair, "Erase pair", true);
+                    #endif
                     _colliderPairs.erase(it);
                 }
                 else
@@ -383,6 +417,9 @@ namespace PhysicsEngine
                             possiblePair.ColliderB);
                     }
 
+                    #ifdef TRACY_ENABLE
+                            ZoneNamedN(InsertPair, "Insert pair", true);
+                    #endif
                     _colliderPairs.insert(possiblePair);
                 }
             }
@@ -412,6 +449,11 @@ namespace PhysicsEngine
                 {
                     case static_cast<int>(Math::ShapeType::Circle):
                     {
+                    #ifdef TRACY_ENABLE
+                        std::string txt = "Circle-Circle";
+                        ZoneText(txt.c_str(), txt.size());
+                    #endif
+
                         const auto circleB = std::get<Math::CircleF>(colShapeB) + bodyB.Position();
 
                         doCollidersIntersect = Math::Intersect(circleA, circleB);
@@ -421,6 +463,10 @@ namespace PhysicsEngine
                     
                     case static_cast<int>(Math::ShapeType::Rectangle):
                     {
+                    #ifdef TRACY_ENABLE
+                            std::string txt = "Circle-Rectangle";
+                            ZoneText(txt.c_str(), txt.size());
+                    #endif
                         const auto rectB = std::get<Math::RectangleF>(colShapeB) +
                                 bodyB.Position();
 
@@ -431,6 +477,10 @@ namespace PhysicsEngine
 
                     case static_cast<int>(Math::ShapeType::Polygon):
                     {
+                    #ifdef TRACY_ENABLE
+                        std::string txt = "Circle-Polygon";
+                        ZoneText(txt.c_str(), txt.size());
+                    #endif
                         const auto polygonB = std::get<Math::PolygonF>(colShapeB) +
                                 bodyB.Position();
 
@@ -455,6 +505,11 @@ namespace PhysicsEngine
                 {
                     case static_cast<int>(Math::ShapeType::Circle):
                     {
+                    #ifdef TRACY_ENABLE
+                            std::string txt = "Rectangle-Cricle";
+                            ZoneText(txt.c_str(), txt.size());
+                    #endif
+
                         const auto circleB = std::get<Math::CircleF>(colShapeB) +
                                              bodyB.Position();
 
@@ -465,6 +520,11 @@ namespace PhysicsEngine
 
                     case static_cast<int>(Math::ShapeType::Rectangle):
                     {
+                    #ifdef TRACY_ENABLE
+                            std::string txt = "Rectangle-Rectangle";
+                            ZoneText(txt.c_str(), txt.size());
+                    #endif
+
                         const auto rectB = std::get<Math::RectangleF>(colShapeB) +
                                 bodyB.Position();
 
@@ -475,6 +535,11 @@ namespace PhysicsEngine
 
                     case static_cast<int>(Math::ShapeType::Polygon):
                     {
+                    #ifdef TRACY_ENABLE
+                            std::string txt = "Rectangle-Polygon";
+                            ZoneText(txt.c_str(), txt.size());
+                    #endif
+
                         const auto polygonB = std::get<Math::PolygonF>(colShapeB) +
                                               bodyB.Position();
 
@@ -500,6 +565,11 @@ namespace PhysicsEngine
                 {
                     case static_cast<int>(Math::ShapeType::Circle):
                     {
+                    #ifdef TRACY_ENABLE
+                            std::string txt = "Polygon-Circle";
+                            ZoneText(txt.c_str(), txt.size());
+                    #endif
+
                         const auto circleB = std::get<Math::CircleF>(colShapeB) + bodyB.Position();
 
                         doCollidersIntersect = Math::Intersect(polygonA, circleB);
@@ -508,6 +578,11 @@ namespace PhysicsEngine
 
                     case static_cast<int>(Math::ShapeType::Rectangle):
                     {
+                    #ifdef TRACY_ENABLE
+                            std::string txt = "Polygon-Rectangle";
+                            ZoneText(txt.c_str(), txt.size());
+                    #endif
+
                         const auto rectB = std::get<Math::RectangleF>(colShapeB) +
                                            bodyB.Position();
 
@@ -517,6 +592,11 @@ namespace PhysicsEngine
 
                     case static_cast<int>(Math::ShapeType::Polygon):
                     {
+                    #ifdef TRACY_ENABLE
+                            std::string txt = "Polygon-Polygon";
+                            ZoneText(txt.c_str(), txt.size());
+                    #endif
+
                         const auto polygonB = std::get<Math::PolygonF>(colShapeB) +
                                               bodyB.Position();
 

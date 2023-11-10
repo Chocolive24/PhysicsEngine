@@ -7,22 +7,17 @@
 using namespace PhysicsEngine;
 using namespace Math;
 
+static HeapAllocator TestHeapAllocator;
+
 struct BoundaryFixture : public ::testing::TestWithParam<RectangleF> {};
 
 struct ColliderNumberFixture : public ::testing::TestWithParam<int> {};
-
-INSTANTIATE_TEST_SUITE_P(QuadNode, BoundaryFixture, testing::Values(
-        RectangleF(Vec2F::Zero(), Vec2F::Zero()),
-        RectangleF(Vec2F::One(), Vec2F::One()),
-        RectangleF(Vec2F(150.234f, 8764.12232f), Vec2F(-9054.233, -0.11111f)),
-        RectangleF(Vec2F(-1, 678.31f), Vec2F(10.34f, -27.54f))
-        ));
 
 INSTANTIATE_TEST_SUITE_P(QuadTree, ColliderNumberFixture, testing::Values(0, 1, 10, 100, 100, 321, 14, 5789));
 
 TEST(QuadNode, DefaultConstructor)
 {
-    QuadNode node;
+    QuadNode node{TestHeapAllocator};
 
     EXPECT_EQ(node.Boundary.MinBound(), Vec2F::Zero());
     EXPECT_EQ(node.Boundary.MaxBound(), Vec2F::Zero());
@@ -33,16 +28,6 @@ TEST(QuadNode, DefaultConstructor)
     }
 
     EXPECT_EQ(node.Colliders.size(), 0);
-}
-
-TEST_P(BoundaryFixture, ConstructorWithBoundary)
-{
-    auto boundary = GetParam();
-
-    QuadNode node(boundary);
-
-    EXPECT_EQ(node.Boundary.MinBound(), boundary.MinBound());
-    EXPECT_EQ(node.Boundary.MaxBound(), boundary.MaxBound());
 }
 
 TEST(QuadTree, DefaultConstructor)
@@ -62,6 +47,29 @@ void InitRecursive(const QuadNode& node)
         {
             InitRecursive(*child);
         }
+    }
+}
+
+template<typename T>
+constexpr T QuadCount(T depth)
+{
+    T result = 0;
+
+    for (T i = 0; i <= depth; i++)
+    {
+        result += Math::Pow(QuadNode::BoundaryDivisionCount, i);
+    }
+
+    return result;
+}
+
+void TestInit(std::vector<QuadNode>& expectedNodes)
+{
+    expectedNodes.resize(QuadCount(QuadTree::MaxDepth()), QuadNode({ TestHeapAllocator }));
+
+    for (auto& node : expectedNodes)
+    {
+        node.Colliders.reserve(QuadNode::MaxColliderNbr + 1);
     }
 }
 
@@ -91,12 +99,15 @@ void CheckRecursive(const QuadNode& node, const QuadNode& expectedNode)
     }
 }
 
-void insertRecursive(QuadNode& node,
+void insertRecursive(std::vector<QuadNode>& expectedNodes,
+                     QuadNode& node,
                      Math::RectangleF simplifiedShape,
                      ColliderRef colliderRef,
                      int depth,
                      int maxDepth) noexcept
 {
+    int nodeIndex = 0;
+
     // If the node doesn't have any children.
     if (node.Children[0] == nullptr)
     {
@@ -118,10 +129,17 @@ void insertRecursive(QuadNode& node,
             const auto bottomLeftCorner = center - halfSize;
             const auto leftMiddle = Math::Vec2F(center.X - halfSize.X, center.Y);
 
-            node.Children[0] = new QuadNode(Math::RectangleF(leftMiddle, topMiddle));
-            node.Children[1] = new QuadNode(Math::RectangleF(center, topRightCorner));
-            node.Children[2] = new QuadNode(Math::RectangleF(bottomLeftCorner, center));
-            node.Children[3] = new QuadNode(Math::RectangleF(bottomMiddle, rightMiddle));
+            expectedNodes[nodeIndex].Boundary = Math::RectangleF(leftMiddle, topMiddle);
+            expectedNodes[nodeIndex + 1].Boundary = Math::RectangleF(center, topRightCorner);
+            expectedNodes[nodeIndex + 2].Boundary = Math::RectangleF(bottomLeftCorner, center);
+            expectedNodes[nodeIndex + 3].Boundary = Math::RectangleF(bottomMiddle, rightMiddle);
+
+            node.Children[0] = &expectedNodes[nodeIndex];
+            node.Children[1] = &expectedNodes[nodeIndex + 1];
+            node.Children[2] = &expectedNodes[nodeIndex + 2];
+            node.Children[3] = &expectedNodes[nodeIndex + 3];
+
+            nodeIndex += 4;
 
             std::vector<SimplifiedCollider> remainingColliders;
 
@@ -141,7 +159,8 @@ void insertRecursive(QuadNode& node,
 
                 if (boundInterestCount == 1)
                 {
-                    insertRecursive(*intersectNode,
+                    insertRecursive(expectedNodes,
+                                    *intersectNode,
                                     col.Rectangle,
                                     col.ColRef,
                                     depth + 1,
@@ -153,7 +172,12 @@ void insertRecursive(QuadNode& node,
                 }
             }
 
-            node.Colliders = std::move(remainingColliders);
+            node.Colliders.clear();
+
+            for (const auto& col : remainingColliders)
+            {
+                node.Colliders.push_back(col);
+            }
         }
     }
 
@@ -175,7 +199,8 @@ void insertRecursive(QuadNode& node,
         if (boundInterestCount == 1)
         {
             depth++;
-            insertRecursive(*intersectNode,
+            insertRecursive(expectedNodes,
+                            *intersectNode,
                             simplifiedShape,
                             colliderRef,
                             depth,
@@ -203,8 +228,7 @@ TEST_P(ColliderNumberFixture, Insert)
     std::vector<Collider> colliders;
     colliders.reserve(colNbr);
 
-    expectedNodes.resize(Math::Pow(QuadNode::BoundaryDivisionCount, QuadTree::MaxDepth()),
-                         QuadNode());
+    TestInit(expectedNodes);
 
     for (std::size_t i = 0; i < colNbr; i++)
     {
@@ -244,7 +268,8 @@ TEST_P(ColliderNumberFixture, Insert)
 
         quadTree.Insert(simplifiedCircle, colliderRef);
 
-        insertRecursive(expectedNodes[0],
+        insertRecursive(expectedNodes,
+                        expectedNodes[0],
                         simplifiedCircle,
                         colliderRef,
                         0,
@@ -254,17 +279,51 @@ TEST_P(ColliderNumberFixture, Insert)
     CheckRecursive(quadTree.RootNode(), expectedNodes[0]);
 }
 
+void CalculatePairsInChildrenNodes(std::vector<ColliderPair>& possiblePairs,
+    const QuadNode& node, 
+    const SimplifiedCollider& simplCol) noexcept
+{
+    // For each colliders in the current node, compare it with the simplified collider from its parent node.
+    for (const auto& nodeSimplCol : node.Colliders)
+    {
+        //if (Math::Intersect(simplCol.Rectangle, nodeSimplCol.Rectangle))
+        //{
+        possiblePairs.push_back(ColliderPair{ simplCol.ColRef, nodeSimplCol.ColRef });
+        //}
+    }
+
+    // If the current node has children, we need to compare the simplified collider from its parent node with its children.
+    if (node.Children[0] != nullptr)
+    {
+        for (const auto& child : node.Children)
+        {
+            CalculatePairsInChildrenNodes(possiblePairs, *child, simplCol);
+        }
+    }
+}
+
 void CalculatePairsInNode(std::vector<ColliderPair>& possiblePairs, const QuadNode& node) noexcept
 {
-    for (const auto& simplColA : node.Colliders)
+    for (std::size_t i = 0; i < node.Colliders.size(); i++)
     {
-        for (const auto& simplColB : node.Colliders)
-        {
-            if (simplColA.ColRef == simplColB.ColRef) continue;
+        const auto& simplColA = node.Colliders[i];
 
-            if (Math::Intersect(simplColA.Rectangle, simplColB.Rectangle))
-            {
+        for (std::size_t j = i + 1; j < node.Colliders.size(); j++)
+        {
+            const auto& simplColB = node.Colliders[j];
+
+            /*if (Math::Intersect(simplColA.Rectangle, simplColB.Rectangle))
+            {*/
                 possiblePairs.push_back(ColliderPair{simplColA.ColRef, simplColB.ColRef});
+            //}
+        }
+
+        // If the node has children.
+        if (node.Children[0] != nullptr)
+        {
+            for (const auto& child : node.Children)
+            {
+                CalculatePairsInChildrenNodes(possiblePairs, *child, simplColA);
             }
         }
     }
@@ -288,7 +347,6 @@ TEST_P(ColliderNumberFixture, CalculatePossiblePairs)
     quadTree.Init();
 
     const auto colNbr = GetParam();
-
 
     std::vector<Collider> colliders;
     colliders.reserve(colNbr);

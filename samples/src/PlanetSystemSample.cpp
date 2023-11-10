@@ -27,24 +27,29 @@ std::string PlanetSystemSample::InputText() const noexcept
 
 void PlanetSystemSample::onInit() noexcept
 {
+    _bodyRefs.reserve(_startBodyNbr);
+    _graphicCircles.reserve(_startBodyNbr);
+
     constexpr Math::Vec2F centerOfScreen(AppWindow::WindowWidth / 2.f, AppWindow::WindowHeight / 2.f);
     constexpr Math::Vec2F sunPos = Metrics::PixelsToMeters(centerOfScreen);
 
     // Create the sun.
-    _sun = { _world.CreateBody(), 5.f, {255, 0, 0, 255} };
-    auto& body = _world.GetBody(_sun.BodyRef);
-    body = PhysicsEngine::Body(sunPos, Math::Vec2F::Zero(), 100.f);
+    const auto sunBodyRef = _world.CreateBody();
+    auto& sunBody = _world.GetBody(sunBodyRef);
+    sunBody.SetPosition(sunPos);
+    sunBody.SetMass(100.f);
 
-    _planets.resize(StartPlanetNbr, CelestialBody());
+    _bodyRefs.push_back(sunBodyRef);
+    _graphicCircles.push_back(_sunGraphicCircle);
 
-    for (auto& planet : _planets)
+    for (int i = 0; i < _startPlanetNbr; i++)
     {
         Math::Vec2F rndScreenPos(Math::Random::Range(300.f, 600.f), Math::Random::Range(100.f, 500.f));
         Math::Vec2F rndPos = Metrics::PixelsToMeters(rndScreenPos);
 
-        planet = createPlanet(rndPos, Math::Random::Range(3.f, 10.f),
-            { 0, 0, static_cast<std::uint8_t>(Math::Random::Range(75, 255)),
-             255 });
+        createPlanet(rndPos,
+            Math::Random::Range(3.f, 10.f),
+            { 0, 0, static_cast<std::uint8_t>(Math::Random::Range(75, 255)), 255 });
     }
 }
 
@@ -77,7 +82,7 @@ void PlanetSystemSample::onUpdate() noexcept
         constexpr int rangeVariation = 20;
 
         if ((Metrics::PixelsToMeters(static_cast<Math::Vec2F>(mousePosition)) -
-            _world.GetBody(_sun.BodyRef).Position()).Length() > Metrics::PixelsToMeters(rangeVariation))
+            _world.GetBody(_bodyRefs[0]).Position()).Length() > Metrics::PixelsToMeters(rangeVariation))
         {
             Math::Vec2I rndMousePos(Math::Random::Range(mousePosition.X - rangeVariation,
                 mousePosition.X + rangeVariation),
@@ -87,14 +92,9 @@ void PlanetSystemSample::onUpdate() noexcept
             auto rndMousePosInMeters = Metrics::PixelsToMeters(
                 static_cast<Math::Vec2F>(rndMousePos));
 
-            auto planet = createPlanet(rndMousePosInMeters,
+            createPlanet(rndMousePosInMeters,
                 Math::Random::Range(3.f, 10.f),
-                { 0,
-                 0,
-                 static_cast<std::uint8_t>(Math::Random::Range(75, 255)),
-                 255 });
-
-            _planets.push_back(planet);
+                { 0, 0, static_cast<std::uint8_t>(Math::Random::Range(75, 255)), 255 });
         }
     }
 
@@ -103,30 +103,32 @@ void PlanetSystemSample::onUpdate() noexcept
 
 void PlanetSystemSample::onRender() noexcept
 {
-    // Draw the sun.
-    auto sunBodyPos = _world.GetBody(_sun.BodyRef).Position();
-    auto sunScreenPos = Metrics::MetersToPixels(sunBodyPos);
-    GraphicGeometry::Circle(sunScreenPos, _sun.Radius, 15, _sun.Color);
-
-    // Draw the planets.
-    for (auto& p : _planets)
+    for (const auto& bodyRef : _bodyRefs)
     {
-        auto planetBodyPos = _world.GetBody(p.BodyRef).Position();
-        auto planetScreenPos = Metrics::MetersToPixels(planetBodyPos);
-        GraphicGeometry::Circle(planetScreenPos, p.Radius, GraphicGeometry::CircleSegmentCount, p.Color);
+        const auto pos = _world.GetBody(bodyRef).Position();
+        const auto screenPos = Metrics::MetersToPixels(pos);
+
+        const auto& graphicCircle = _graphicCircles[bodyRef.Index];
+
+        GraphicGeometry::Circle(screenPos,
+            graphicCircle.first,
+            GraphicGeometry::CircleSegmentCount,
+            graphicCircle.second);
     }
 }
 
 void PlanetSystemSample::onDeinit() noexcept
 {
-    _planets.clear();
+    _graphicCircles.clear();
 }
 
-[[nodiscard]] CelestialBody PlanetSystemSample::createPlanet(Math::Vec2F pos, float radius, SDL_Color color) noexcept
+[[nodiscard]] void PlanetSystemSample::createPlanet(Math::Vec2F pos, float radius, SDL_Color color) noexcept
 {
-    const auto sunBody = _world.GetBody(_sun.BodyRef);
-    CelestialBody p = { _world.CreateBody(), radius, color };
-    auto& pBody = _world.GetBody(p.BodyRef);
+    const auto planetRef = _world.CreateBody();
+    auto& planetBody = _world.GetBody(planetRef);
+
+    // The sun is always at index 0 in the world.
+    const auto sunBody = _world.GetBody(PhysicsEngine::BodyRef{ 0, 0 });
 
     // Distance between the sun and the planet.
     Math::Vec2F r = sunBody.Position() - pos;
@@ -141,19 +143,23 @@ void PlanetSystemSample::onDeinit() noexcept
         distance = r.Length();
     }
 
-    Math::Vec2F initVel = std::sqrt(G * (sunBody.Mass() / distance)) * Math::Vec2F(-r.Y, r.X).Normalized();
+    Math::Vec2F orbitalVelocity = std::sqrt(_g * (sunBody.Mass() / distance)) * Math::Vec2F(-r.Y, r.X).Normalized();
 
-    pBody = PhysicsEngine::Body(correctedPos, initVel, 10.f);
+    planetBody.SetPosition(correctedPos);
+    planetBody.SetVelocity(orbitalVelocity);
+    planetBody.SetMass(_planetMass);
 
-    return p;
+    _bodyRefs.push_back(planetRef);
+    _graphicCircles.push_back(std::make_pair(radius, color));
 }
 
 void PlanetSystemSample::calculatePlanetMovements() noexcept
 {
-    for (auto& p : _planets)
+    const auto& sunBody = _world.GetBody(_bodyRefs[0]);
+
+    for (std::size_t i = 1; i < _bodyRefs.size(); i++)
     {
-        auto& sunBody = _world.GetBody(_sun.BodyRef);
-        PhysicsEngine::Body& planetBody = _world.GetBody(p.BodyRef);
+       auto& planetBody = _world.GetBody(_bodyRefs[i]);
 
         Math::Vec2F r = sunBody.Position() - planetBody.Position();
 
@@ -161,7 +167,7 @@ void PlanetSystemSample::calculatePlanetMovements() noexcept
 
         if (distance <= 0.01) continue;
 
-        float forceMagnitude = G * (planetBody.Mass() * sunBody.Mass() / (distance * distance));
+        float forceMagnitude = _g * (planetBody.Mass() * sunBody.Mass() / (distance * distance));
         Math::Vec2F a = forceMagnitude * r.Normalized();
 
         planetBody.ApplyForce(a);

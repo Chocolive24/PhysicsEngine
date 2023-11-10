@@ -22,7 +22,7 @@ private:
 public:
     constexpr explicit UniquePtr() noexcept = default;
 
-    constexpr explicit UniquePtr(T *ptr) noexcept: _ptr(ptr) {};
+    constexpr explicit UniquePtr(T* ptr) noexcept: _ptr(ptr) {};
 
     constexpr UniquePtr(const UniquePtr<T>& other) noexcept = delete;
 

@@ -3,6 +3,8 @@
 
 #include "gtest/gtest.h"
 
+HeapAllocator TestHeapAllocator;
+
 struct FloatFixture : public ::testing::TestWithParam<float>{};
 
 INSTANTIATE_TEST_SUITE_P(UniquePtr, FloatFixture, testing::Values(
@@ -36,7 +38,7 @@ TEST_P(FloatFixture, UniquePtrCast)
 {
     auto value = GetParam();
 
-    UniquePtr<float> uniquePtr = MakeUnique(value);
+    UniquePtr<float> uniquePtr = MakeUnique(value, TestHeapAllocator);
 
     EXPECT_FLOAT_EQ(*uniquePtr, value);
     EXPECT_FLOAT_EQ(*(uniquePtr.Get()), value);
@@ -46,7 +48,7 @@ TEST_P(FloatFixture, UniquePtrMakeUnique)
 {
     auto value = GetParam();
 
-    UniquePtr<float> uniquePtr = MakeUnique(value);
+    UniquePtr<float> uniquePtr = MakeUnique(value, TestHeapAllocator);
 
     EXPECT_FLOAT_EQ(*uniquePtr, value);
     EXPECT_FLOAT_EQ(*(uniquePtr.Get()), value);
@@ -145,7 +147,7 @@ TEST_P(FloatFixture, SharedPtrMakeShared)
 {
     auto value = GetParam();
 
-    SharedPtr<float> sharedPtr = SharedPtr<float>::MakeShared(value);
+    SharedPtr<float> sharedPtr = MakeShared(value);
 
     EXPECT_FLOAT_EQ(*sharedPtr, value);
     EXPECT_FLOAT_EQ(*(sharedPtr.Get()), value);

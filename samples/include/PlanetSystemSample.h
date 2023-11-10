@@ -6,23 +6,42 @@
 
 #include <array>
 
-/**
- * @struct CelestialBody is a struct that represent a celestial body with a reference to a body in the world,
- * a radius and a color to represent the object graphically with a circle.
- */
-struct CelestialBody
-{
-    PhysicsEngine::BodyRef BodyRef;
-    // In Pixels
-    float Radius;
-    SDL_Color Color;
-};
-
 class PlanetSystemSample final : public Sample
 {
 private:
-    std::vector<CelestialBody> _planets{};
-    CelestialBody _sun{};
+    /**
+    * @brief The gravitational constant for the physical world of the planet system.
+    */
+    static constexpr float _g = 0.0667f;
+
+    /**
+     * @brief The number of planet at the start of the sample.
+     */
+    static constexpr std::size_t _startPlanetNbr = 200;
+
+    /**
+     * @brief The number of planet + the sun.
+     */
+    static constexpr std::size_t _startBodyNbr = _startPlanetNbr + 1;
+
+    /*
+    * @brief The mass of the planets.
+    */
+    static constexpr int _planetMass = 10.f;
+
+    /*
+    * @brief The sun graphic circle.
+    */
+    static constexpr std::pair<float, SDL_Color> _sunGraphicCircle = std::make_pair(
+        5.f, SDL_Color{ 255, 0, 0, 255 });
+
+    std::vector<PhysicsEngine::BodyRef> _bodyRefs{};
+
+    /*
+    * @brief _graphicCircles is a vector that contains the data of the graphic circles
+    * (aka it contains pairs ¨containing a radius value and a SDL color).
+    */
+    std::vector<std::pair<float, SDL_Color>> _graphicCircles{};
 
     bool _mustCreatePlanet = false;
 
@@ -34,7 +53,7 @@ private:
      * @param color The color of the planet.
      * @return The CelestialBody object representing the planet.
      */
-    [[nodiscard]] CelestialBody createPlanet(Math::Vec2F pos, float radius, SDL_Color color) noexcept;
+    [[nodiscard]] void createPlanet(Math::Vec2F pos, float radius, SDL_Color color) noexcept;
 
     /**
      * @brief calculatePlanetMovements is a method that calculate the gravitational force between
@@ -43,16 +62,6 @@ private:
     void calculatePlanetMovements() noexcept;
 
 public:
-    /**
-     * @brief The gravitational constant for the physical world of the planet system.
-     */
-    static constexpr float G = 0.0667f;
-
-    /**
-     * @brief The number of planet at the start of the sample.
-     */
-    static constexpr std::size_t StartPlanetNbr = 200;
-
     PlanetSystemSample() noexcept = default;
 
     // Inherited via Sample
@@ -81,6 +90,9 @@ public:
      */
     void onUpdate() noexcept override;
 
+    /**
+     * @brief onRender is a method that renders all the graphical objets of the sample.
+     */
     void onRender() noexcept override;
 
     /**

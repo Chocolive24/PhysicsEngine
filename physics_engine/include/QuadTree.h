@@ -12,8 +12,6 @@
 #include "Collider.h"
 #include "UniquePtr.h"
 
-#include <vector>
-
 namespace PhysicsEngine
 {
     /**
