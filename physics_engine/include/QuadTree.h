@@ -65,7 +65,7 @@ namespace PhysicsEngine
         /**
          * @brief MaxDepth is the maximum depth of the quad-tree recursive space subdivision.
          */
-        static constexpr int _maxDepth = 5;
+        static constexpr int _maxDepth = 0;
 
         /**
          * @brief insertInNode is a method that insert a collider in the node given in parameter

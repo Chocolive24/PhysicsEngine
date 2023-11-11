@@ -1,6 +1,6 @@
 /**
- * @headerfile Window.h
- * This file defines the Window class that creates a graphical window for the program.
+ * @headerfile AppWindow.h
+ * This file defines the Window class that creates a graphical window for the program using SDL2.
  *
  * @author Oliver Pachoud
  */
@@ -16,7 +16,7 @@
 #include <vector>
 
 /*
-* @brief AppWindow is the application window using SDL.
+* @brief AppWindow is the application window using SDL2.
 */
 class AppWindow
 {

@@ -119,6 +119,7 @@ void PlanetSystemSample::onRender() noexcept
 
 void PlanetSystemSample::onDeinit() noexcept
 {
+    _bodyRefs.clear();
     _graphicCircles.clear();
 }
 

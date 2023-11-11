@@ -47,7 +47,7 @@ namespace PhysicsEngine
         static constexpr float _bodyAllocResizeFactor = 2.f;
 
         void resolveBroadPhase() noexcept;
-        void resolveNarrowPhase() noexcept;
+        void detectColliderPairs() noexcept;
         bool detectContact(const Collider& colA, const Collider& colB) noexcept;
 
     public:

@@ -1,0 +1,150 @@
+     	<meta charset="utf-8" emacsmode="-*- markdown -*-"><link rel="stylesheet" href="file:///C:/Users/Olivier/source/repos/BlogPosts/PhysicsEngineOptimisations/darkTemplate.css?">
+
+                        **My physics engine optimisations**
+			    Pahcoud Olivier - 11.11.2023
+
+Hello, welcome to this blog dedicated to optimization. I'm a Swiss student at the Sae Institute in Geneva and as part of a graded assignment, we've been asked to program a 2D physics engine and optimize a part of it. This specific part is the detection of intersections between colliders in trigger state. We have a scene containing physical bodies to which colliders are attached in trigger mode. The aim is to make this scene with a thousand circles run as smoothly as possible.<br>
+In this blog, I'm going to do some research to optimize my engine, show and explain them, and then do some statistical tests to prove that the changes I've made do indeed make the program faster.<br>
+The software I will use to profile my engine is "Tracy": https://github.com/wolfpld/tracy<br>
+I already implemented some ZoneScoped in my code to be able to see the hot path of my program in tracy. I will not teach you how tracy works so I let you check the documentation of Tracy if your interested by this software.
+
+TODO: montrer gifs de l'engine
+
+If you are interested in my project, here is the link to the github repo: https://github.com/Chocolive24/PhysicsEngine<br>
+You can also check my itch.io page where I post some of my projects such as the games I make in my free time and for my studies, my game jam entries and others: https://itch.io/profile/chocolive
+
+Actual state of the engine.
+==============================================================
+Let's take a look at how the trigger sample runs with 3 different total numbers of colliders, once with 100 colliders, then 500 and finally with 1000 colliders. :<br>
+
+![100 circles](gifs/100Circles.gif width=225px height=175px) ![500 circles](gifs/500Circles.gif width=225px height=175px) ![1000 circles](gifs/1000Circles.gif width=225px height=175px)
+
+The "detectColliderPairs" function iterates over my collision vector to obtain each collisionA and iterates over all subsequent colliders to obtain each colliderB. After that, my function checks whether the colliders overlap and creates a collider pair if they do. Then it checks whether I already have the pair in my colliderPair unorderset.
+When there is a lot of objects in the sample it is laggy. Let's check out the "detectColliderPairs" function and see where the problem is.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void World::detectColliderPairs() noexcept
+{
+#ifdef TRACY_ENABLE
+        ZoneScoped;
+#endif
+
+    for (std::size_t i = 0; i < _colliders.size(); i++)
+    {
+        auto& colliderA = _colliders[i];
+
+        for (std::size_t j = i + 1; j < _colliders.size(); j++)
+        {
+            auto& colliderB = _colliders[j];
+
+            ColliderPair possiblePair{ {i, _collidersGenIndices[i]}, {j, _collidersGenIndices[j]} };
+
+            const auto doCollidersIntersect = detectContact(colliderA, colliderB);
+
+            #ifdef TRACY_ENABLE
+                ZoneNamedN(FindPair, "Find pair", true);
+            #endif
+
+            auto it = _colliderPairs.find(possiblePair);
+
+            #ifdef TRACY_ENABLE
+                    ZoneNamedN(CheckIfItsANewPair, "Check if it's a new pair", true);
+            #endif
+            if (it != _colliderPairs.end())
+            {
+                if (!doCollidersIntersect)
+                {
+                    if (colliderA.IsTrigger() || colliderB.IsTrigger())
+                    {
+                        _contactListener->OnTriggerExit(possiblePair.ColliderA,
+                            possiblePair.ColliderB);
+
+                    }
+
+                    #ifdef TRACY_ENABLE
+                            ZoneNamedN(ErasePair, "Erase pair", true);
+                    #endif
+
+                    _colliderPairs.erase(it);
+                }
+                else
+                {
+                    if (colliderA.IsTrigger() || colliderB.IsTrigger())
+                    {
+                        _contactListener->OnTriggerStay(possiblePair.ColliderA,
+                            possiblePair.ColliderB);
+                    }
+                }
+            }
+            else
+            {
+                if (doCollidersIntersect)
+                {
+                    if (colliderA.IsTrigger() || colliderB.IsTrigger())
+                    {
+                        _contactListener->OnTriggerEnter(possiblePair.ColliderA,
+                            possiblePair.ColliderB);
+                    }
+
+                    #ifdef TRACY_ENABLE
+                        ZoneNamedN(InsertPair, "Insert pair", true);
+                    #endif
+
+                    _colliderPairs.insert(possiblePair);
+                }
+            }
+        }
+    }
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By now each collider is compared with each other. But it doesn't make sense to compare the colliders on the left of the screen with a collider on the right.
+
+![Example where it's not necessary to check for an overlap](images/farAwayCircles.png height=300px)
+
+It would be nice if we compare only the colliders that are in a same zone of the world space. So we need to subdivide the world space to have less check to do.
+
+
+Creation of a broad-phase.
+==============================================================
+I need to subdivide the world space to have less comparisons. Why not trying to implement a quad-tree ?
+
+Sub-dividing the world with a quad-tree.
+--------------------------------------------------------------
+
+TODO: expliquer ce qu'est un quad-tree avec schémas etc.
+
+Quad-tree implementation
+--------------------------------------------------------------
+
+### Create the root node.
+
+### Insert colliders in quad-tree.
+
+### Draw the quad-tree on screen.
+
+### Calculate all possible pair of colliders.
+
+TODO: show the code + un gif du résultat visuel.
+
+Statistics after the implementation of the quad-tree.
+--------------------------------------------------------------
+
+TODO: show tracy and compare values.
+
+Small memory usage optimizations.
+--------------------------------------------------------------
+
+TODO: montrer la pre-alloc des noeuds etc.
+
+Now here is one frame after all this work :
+![One frame traced with tracy](images/V0_frame.png)
+We see that the narrow phase is faster but still is the main time of the execution.
+
+Reduce narrow-phase execution.
+==============================================================
+Perfect, I subdivided my physical world and saved a lot of time in the narrow phase. However as we can see in the image above, my narrow phase still takes 14.82 ms on average to execute. What takes the longest to execute in my narrow phase? It is not the "detectContact" function, although it is called on average ninety thousand times, because it is nothing other than a switch-case on the shape of the collider and a mathematical calculation which checks if The colliders intersect. In my case, there are only circles and the function which checks the intersections between geometric shapes is not expensive.
+
+<style class="fallback">body{visibility:hidden}</style><script>markdeepOptions={tocStyle:'long'};</script>
+<!-- Markdeep: --><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js?" charset="utf-8"></script>
+

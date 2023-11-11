@@ -29,7 +29,7 @@ namespace PhysicsEngine
         _colliders.resize(preallocatedBodyCount, Collider());
         _collidersGenIndices.resize(preallocatedBodyCount, 0);
 
-        _quadTree.Init();
+        //_quadTree.Init();
     }
 
     void World::Update(const float deltaTime) noexcept
@@ -54,7 +54,7 @@ namespace PhysicsEngine
 
                     // a = F / m
                     // TODO: * inverMass -> pour opti un peu.
-                    Math::Vec2F acceleration = body.Forces() / body.Mass();
+                    Math::Vec2F acceleration = body.Forces() * body.InverseMass();
 
                     // Change velocity according to delta time.
                     body.SetVelocity(body.Velocity() + acceleration * deltaTime);
@@ -86,8 +86,8 @@ namespace PhysicsEngine
 
         if (_contactListener)
         {
-            resolveBroadPhase();
-            resolveNarrowPhase();
+            //resolveBroadPhase();
+            detectColliderPairs();
         }
     }
 
@@ -144,6 +144,7 @@ namespace PhysicsEngine
             ZoneNamedN(InsertCollidersInQuadTree, "InsertCollidersInQuadTree", true);
             ZoneValue(_colliders.size());
     #endif
+
         for (std::size_t i = 0; i < _colliders.size(); i++)
         {
             ColliderRef colliderRef = {i, _collidersGenIndices[i]};
@@ -232,195 +233,79 @@ namespace PhysicsEngine
         _quadTree.CalculatePossiblePairs();
     }
 
-    void World::resolveNarrowPhase() noexcept
+    void World::detectColliderPairs() noexcept
     {
     #ifdef TRACY_ENABLE
             ZoneScoped;
     #endif
 
-            // todo: transformer en vector et tester.
-       //std::unordered_set<ColliderPair, ColliderHash> newColliderPairs;
-
-        const auto& newPossiblePairs = _quadTree.PossiblePairs();
-
-    #ifdef TRACY_ENABLE
-            ZoneValue(newPossiblePairs.size());
-            ZoneValue(_colliders.size());
-    #endif
-
-        //AllocVector<ColliderPair> newPairs{ StandardAllocator<ColliderPair>{_heapAllocator} };
-        //newPairs.reserve(newPossiblePairs.size());
-
-        //for (const auto& newPossiblePair : newPossiblePairs)
-        //{
-        //    auto& colliderA = _colliders[newPossiblePair.ColliderA.Index];
-        //    auto& colliderB = _colliders[newPossiblePair.ColliderB.Index];
-
-        //    if (detectContact(colliderA, colliderB))
-        //    {
-        //        newPairs.push_back(newPossiblePair);
-        //    }
-        //}
-
-        //for (const auto& newPair : newPairs)
-        //{
-        //    auto& colliderA = _colliders[newPair.ColliderA.Index];
-        //    auto& colliderB = _colliders[newPair.ColliderB.Index];
-
-        //    // If there was no collision in the previous frame -> OnTriggerEnter.
-        //    if (_colliderPairs.find(newPair) == _colliderPairs.end())
-        //    {
-        //        if (colliderA.IsTrigger() || colliderB.IsTrigger())
-        //        {
-        //            _contactListener->OnTriggerEnter(newPair.ColliderA,
-        //                                             newPair.ColliderB);
-        //        }
-        //        else
-        //        {
-        //            ContactSolver contactSolver;
-
-        //            auto& bodyA = GetBody(colliderA.GetBodyRef());
-        //            auto& bodyB = GetBody(colliderB.GetBodyRef());
-
-        //            contactSolver.bodyA = &bodyA;
-        //            contactSolver.bodyB = &bodyB;
-        //            contactSolver.colliderA = &colliderA;
-        //            contactSolver.colliderB = &colliderB;
-
-        //            contactSolver.ResolveContact();
-        //            _contactListener->OnCollisionEnter(newPair.ColliderA,
-        //                                               newPair.ColliderB);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        _contactListener->OnTriggerStay(newPair.ColliderA,
-        //                                        newPair.ColliderB);
-        //    }
-        //}
-
-        //for (const auto& colliderPair : _colliderPairs)
-        //{
-        //    auto& colliderA = _colliders[colliderPair.ColliderA.Index];
-        //    auto& colliderB = _colliders[colliderPair.ColliderB.Index];
-
-        //    auto it = std::find(newPairs.begin(), newPairs.end(), colliderPair);
-
-        //    // If there is no collision in this frame -> OnTriggerExit.
-        //    if (it == newPairs.end())
-        //    {
-        //        if (colliderA.IsTrigger() || colliderB.IsTrigger())
-        //        {
-        //            _contactListener->OnTriggerExit(colliderPair.ColliderA,
-        //                colliderPair.ColliderB);
-        //        }
-        //        else
-        //        {
-        //            ContactSolver contactSolver;
-
-        //            auto& bodyA = GetBody(colliderA.GetBodyRef());
-        //            auto& bodyB = GetBody(colliderB.GetBodyRef());
-
-        //            contactSolver.bodyA = &bodyA;
-        //            contactSolver.bodyB = &bodyB;
-        //            contactSolver.colliderA = &colliderA;
-        //            contactSolver.colliderB = &colliderB;
-
-        //            contactSolver.ResolveContact();
-        //            _contactListener->OnCollisionExit(colliderPair.ColliderA,
-        //                colliderPair.ColliderB);
-        //        }
-        //    }
-        //}
-
-        //_colliderPairs.clear();
-
-        //for (const auto& newPair : newPairs)
-        //{
-        //    _colliderPairs.insert(newPair);
-        //}
-
-        for (const auto& possiblePair : newPossiblePairs)
+        for (std::size_t i = 0; i < _colliders.size(); i++)
         {
-            auto& colliderA = _colliders[possiblePair.ColliderA.Index];
-            auto& colliderB = _colliders[possiblePair.ColliderB.Index];
+            auto& colliderA = _colliders[i];
 
-            ContactSolver contactSolver;
-
-            auto& bodyA = GetBody(colliderA.GetBodyRef());
-            auto& bodyB = GetBody(colliderB.GetBodyRef());
-
-            contactSolver.bodyA = &bodyA;
-            contactSolver.bodyB = &bodyB;
-            contactSolver.colliderA = &colliderA;
-            contactSolver.colliderB = &colliderB;
-            
-            const auto doCollidersIntersect = detectContact(colliderA, colliderB);
-
-            #ifdef TRACY_ENABLE
-                    ZoneNamedN(FindPair, "Find pair", true);
-            #endif
-
-            auto it = _colliderPairs.find(possiblePair);
-
-
-            #ifdef TRACY_ENABLE
-                    ZoneNamedN(CheckIfItsANewPair, "Check if it's a new pair", true);
-            #endif
-            if (it != _colliderPairs.end())
+            for (std::size_t j = i + 1; j < _colliders.size(); j++)
             {
-                if (!doCollidersIntersect)
-                {
-                    if (colliderA.IsTrigger() || colliderB.IsTrigger())
-                    {
-                        _contactListener->OnTriggerExit(possiblePair.ColliderA,
-                            possiblePair.ColliderB);
+                auto& colliderB = _colliders[j];
 
+                ColliderPair possiblePair{ {i, _collidersGenIndices[i]}, {j, _collidersGenIndices[j]} };
+
+                const auto doCollidersIntersect = detectContact(colliderA, colliderB);
+
+                #ifdef TRACY_ENABLE
+                    ZoneNamedN(FindPair, "Find pair", true);
+                #endif
+
+                auto it = _colliderPairs.find(possiblePair);
+
+                #ifdef TRACY_ENABLE
+                        ZoneNamedN(CheckIfItsANewPair, "Check if it's a new pair", true);
+                #endif
+                if (it != _colliderPairs.end())
+                {
+                    if (!doCollidersIntersect)
+                    {
+                        if (colliderA.IsTrigger() || colliderB.IsTrigger())
+                        {
+                            _contactListener->OnTriggerExit(possiblePair.ColliderA,
+                                possiblePair.ColliderB);
+
+                        }
+                        else
+                        {
+                            _contactListener->OnCollisionExit(possiblePair.ColliderA,
+                                possiblePair.ColliderB);
+                        }
+
+                        #ifdef TRACY_ENABLE
+                                ZoneNamedN(ErasePair, "Erase pair", true);
+                        #endif
+                        _colliderPairs.erase(it);
                     }
                     else
                     {
-                        _contactListener->OnCollisionExit(possiblePair.ColliderA,
-                            possiblePair.ColliderB);
+                        if (colliderA.IsTrigger() || colliderB.IsTrigger())
+                        {
+                            _contactListener->OnTriggerStay(possiblePair.ColliderA,
+                                possiblePair.ColliderB);
+                        }
                     }
-
-                    #ifdef TRACY_ENABLE
-                            ZoneNamedN(ErasePair, "Erase pair", true);
-                    #endif
-                    _colliderPairs.erase(it);
                 }
                 else
                 {
-                    if (colliderA.IsTrigger() || colliderB.IsTrigger())
+                    if (doCollidersIntersect)
                     {
-                        _contactListener->OnTriggerStay(possiblePair.ColliderA,
-                            possiblePair.ColliderB);
-                    }
-                    else
-                    {
-                        contactSolver.ResolveContact();
-                    }
-                }
-            }
-            else
-            {
-                if (doCollidersIntersect)
-                {
-                    if (colliderA.IsTrigger() || colliderB.IsTrigger())
-                    {
-                        _contactListener->OnTriggerEnter(possiblePair.ColliderA,
-                            possiblePair.ColliderB);
-                    }
-                    else
-                    {
-                        contactSolver.ResolveContact();
-                        _contactListener->OnCollisionEnter(possiblePair.ColliderA,
-                            possiblePair.ColliderB);
-                    }
+                        if (colliderA.IsTrigger() || colliderB.IsTrigger())
+                        {
+                            _contactListener->OnTriggerEnter(possiblePair.ColliderA,
+                                possiblePair.ColliderB);
+                        }
 
-                    #ifdef TRACY_ENABLE
+                        #ifdef TRACY_ENABLE
                             ZoneNamedN(InsertPair, "Insert pair", true);
-                    #endif
-                    _colliderPairs.insert(possiblePair);
+                        #endif
+
+                        _colliderPairs.insert(possiblePair);
+                    }
                 }
             }
         }
@@ -636,7 +521,7 @@ namespace PhysicsEngine
 
         _contactListener = nullptr;
 
-        _quadTree.Deinit();
+        //_quadTree.Deinit();
     }
 
     [[nodiscard]] BodyRef World::CreateBody() noexcept

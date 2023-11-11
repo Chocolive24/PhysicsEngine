@@ -3,8 +3,6 @@
 
 #include "gtest/gtest.h"
 
-HeapAllocator TestHeapAllocator;
-
 struct FloatFixture : public ::testing::TestWithParam<float>{};
 
 INSTANTIATE_TEST_SUITE_P(UniquePtr, FloatFixture, testing::Values(
@@ -38,7 +36,7 @@ TEST_P(FloatFixture, UniquePtrCast)
 {
     auto value = GetParam();
 
-    UniquePtr<float> uniquePtr = MakeUnique(value, TestHeapAllocator);
+    UniquePtr<float> uniquePtr = MakeUnique(value);
 
     EXPECT_FLOAT_EQ(*uniquePtr, value);
     EXPECT_FLOAT_EQ(*(uniquePtr.Get()), value);
@@ -48,7 +46,7 @@ TEST_P(FloatFixture, UniquePtrMakeUnique)
 {
     auto value = GetParam();
 
-    UniquePtr<float> uniquePtr = MakeUnique(value, TestHeapAllocator);
+    UniquePtr<float> uniquePtr = MakeUnique(value);
 
     EXPECT_FLOAT_EQ(*uniquePtr, value);
     EXPECT_FLOAT_EQ(*(uniquePtr.Get()), value);
