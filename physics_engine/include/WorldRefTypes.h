@@ -29,8 +29,8 @@ namespace PhysicsEngine
     /**
      * @brief ColliderRef is a struct used to reference a specific collider.
      * @brief Attributes :
-     * @brief Index : The index of the collider inside the world body vector.\n\n
-     * @brief GenerationIdx : The index inside the world generation number vector.
+     * @brief Index : The index of the collider inside the world colliders vector.
+     * @brief GenerationIdx : The index inside the world colliders generation indices vector.
      */
     struct ColliderRef
     {

@@ -1,3 +1,4 @@
+#include "SampleManager.h"
 //
 // Created by Olivier on 27.10.2023.
 //
@@ -14,10 +15,10 @@
 
 void SampleManager::Init() noexcept
 {
-    _samples[0] = MakeUnique<Sample>(TriggerColliderSample());
-    _samples[1] = MakeUnique<Sample>(PlanetSystemSample());
-    _samples[3] = MakeUnique<Sample>(CollisionSample());
-    _samples[2] = MakeUnique<Sample>(GroundCollisionSample());
+    _samples[0] = MakeUnique<Sample, TriggerColliderSample>(_heapAllocator);
+    _samples[1] = MakeUnique<Sample, PlanetSystemSample>(_heapAllocator);
+    _samples[3] = MakeUnique<Sample, CollisionSample>(_heapAllocator);
+    _samples[2] = MakeUnique<Sample, GroundCollisionSample>(_heapAllocator);
 
     _samples[_currentSampleIdx]->Init();
 }

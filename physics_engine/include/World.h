@@ -27,7 +27,7 @@ namespace PhysicsEngine
     private:
         Math::Vec2F _gravity;
 
-        HeapAllocator _heapAllocator;
+        HeapAllocator _heapAllocator{};
 
         AllocVector<Body> _bodies{ StandardAllocator<Body>{_heapAllocator} };
         AllocVector<std::size_t> _bodiesGenIndices{ StandardAllocator<std::size_t>{_heapAllocator} };
@@ -37,17 +37,19 @@ namespace PhysicsEngine
         AllocVector<Collider> _colliders{ StandardAllocator<Collider>{_heapAllocator} };
         AllocVector<std::size_t> _collidersGenIndices{ StandardAllocator<std::size_t>{_heapAllocator} };
 
-        std::unordered_set<ColliderPair, 
-            ColliderHash, 
-            std::equal_to<ColliderPair>, 
-            StandardAllocator<ColliderPair>> _colliderPairs{ StandardAllocator<ColliderPair>{_heapAllocator} };
+        AllocVector<ColliderPair> _colliderPairs{ StandardAllocator<ColliderPair>{_heapAllocator} };
 
-        QuadTree _quadTree;
+        /*std::unordered_set<ColliderPair, 
+                           ColliderHash, 
+                           std::equal_to<ColliderPair>, 
+                           StandardAllocator<ColliderPair>> _colliderPairs{ StandardAllocator<ColliderPair>{_heapAllocator} };*/
+
+        QuadTree _quadTree{};
 
         static constexpr float _bodyAllocResizeFactor = 2.f;
 
         void resolveBroadPhase() noexcept;
-        void detectColliderPairs() noexcept;
+        void resolveNarrowPhase() noexcept;
         bool detectContact(const Collider& colA, const Collider& colB) noexcept;
 
     public:

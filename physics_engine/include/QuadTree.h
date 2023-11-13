@@ -20,8 +20,8 @@ namespace PhysicsEngine
      */
     struct SimplifiedCollider
     {
-        ColliderRef ColRef;
-        Math::RectangleF Rectangle;
+        ColliderRef ColRef{0, 0};
+        Math::RectangleF Rectangle{Math::Vec2F::Zero(), Math::Vec2F::Zero()};
     };
 
     /**
@@ -46,11 +46,12 @@ namespace PhysicsEngine
         AllocVector<SimplifiedCollider> Colliders{};
 
         //constexpr QuadNode() noexcept = default;
-        explicit QuadNode(Allocator& allocator) noexcept : Colliders{ StandardAllocator<SimplifiedCollider> {allocator} } {}
+        explicit QuadNode(Allocator& allocator) noexcept : 
+            Colliders{ StandardAllocator<SimplifiedCollider> {allocator} } {}
     };
 
     /**
-     * @brief QuadTree is a class that represents a quad-tree used for spatial partitioning of colliders.
+     * @brief QuadTree is a class that represents a quad-tree used for spatial partitioning of the world space.
      */
     class QuadTree
     {
@@ -65,7 +66,14 @@ namespace PhysicsEngine
         /**
          * @brief MaxDepth is the maximum depth of the quad-tree recursive space subdivision.
          */
-        static constexpr int _maxDepth = 0;
+        static constexpr int _maxDepth = 5;
+
+        /**
+         * @brief PossiblePairReserveFactor is the factor to mutliply with the total number of node in 
+         * the quad-tree to reserve this capacity in the _possiblePairs vector. 
+         * This factor totally arbitrary.
+         */
+        static constexpr float _possiblePairReserveFactor = 3.f;
 
         /**
          * @brief insertInNode is a method that insert a collider in the node given in parameter

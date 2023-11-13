@@ -28,8 +28,11 @@ namespace PhysicsEngine
     #ifdef TRACY_ENABLE
             ZoneScoped;
     #endif // TRACY_ENABLE
-  
-        _nodes.resize(QuadCount(_maxDepth), QuadNode({ _heapAllocator }));
+
+        const auto quadCount = QuadCount(_maxDepth);
+
+        _nodes.resize(quadCount, QuadNode({ _heapAllocator }));
+        //_possiblePairs.reserve(quadCount * _possiblePairReserveFactor);
 
         for (auto& node : _nodes)
         {
@@ -47,9 +50,10 @@ namespace PhysicsEngine
         ColliderRef colliderRef,
         int depth) noexcept
     {
-    #ifdef TRACY_ENABLE
-            ZoneScoped;
-    #endif
+        #ifdef TRACY_ENABLE
+                ZoneScoped;
+        #endif
+
         // If the node doesn't have any children.
         if (node.Children[0] == nullptr)
         {
@@ -75,11 +79,6 @@ namespace PhysicsEngine
                 const auto bottomLeftCorner = center - halfSize;
                 const auto leftMiddle = Math::Vec2F(center.X - halfSize.X, center.Y);
 
-                _nodes[_nodeIndex].Boundary = Math::RectangleF(leftMiddle, topMiddle);
-                _nodes[_nodeIndex + 1].Boundary = Math::RectangleF(center, topRightCorner);
-                _nodes[_nodeIndex + 2].Boundary = Math::RectangleF(bottomLeftCorner, center);
-                _nodes[_nodeIndex + 3].Boundary = Math::RectangleF(bottomMiddle, rightMiddle);
-
                 node.Children[0] = &_nodes[_nodeIndex];
                 node.Children[1] = &_nodes[_nodeIndex + 1];
                 node.Children[2] = &_nodes[_nodeIndex + 2];
@@ -87,10 +86,21 @@ namespace PhysicsEngine
 
                 _nodeIndex += 4;
 
-                AllocVector<SimplifiedCollider> remainingColliders{ {_heapAllocator} };
-                //TODO: std::array avec max col nbr.
+                node.Children[0]->Boundary = Math::RectangleF(leftMiddle, topMiddle);
+                node.Children[1]->Boundary = Math::RectangleF(center, topRightCorner);
+                node.Children[2]->Boundary = Math::RectangleF(bottomLeftCorner, center);
+                node.Children[3]->Boundary = Math::RectangleF(bottomMiddle, rightMiddle);
+                
+                std::array<SimplifiedCollider, QuadNode::MaxColliderNbr + 1> remainingColliders;
+                
+                for (std::size_t i = 0; i < QuadNode::MaxColliderNbr + 1; i++)
+                {
+                    remainingColliders[i] = node.Colliders[i];
+                }
 
-                for (const auto& col : node.Colliders)
+                node.Colliders.clear();
+
+                for (const auto& col : remainingColliders)
                 {
                     int boundInterestCount = 0;
                     QuadNode* intersectNode = nullptr;
@@ -110,15 +120,8 @@ namespace PhysicsEngine
                     }
                     else
                     {
-                        remainingColliders.push_back(col);
+                        node.Colliders.push_back(col);
                     }
-                }
-
-                node.Colliders.clear();
-
-                for (const auto& col : remainingColliders)
-                {
-                    node.Colliders.push_back(col);
                 }
             }
         }
@@ -140,8 +143,7 @@ namespace PhysicsEngine
 
             if (boundInterestCount == 1)
             {
-                depth++;
-                insertInNode(*intersectNode, simplifiedShape, colliderRef, depth);
+                insertInNode(*intersectNode, simplifiedShape, colliderRef, depth + 1);
             }
             else
             {
@@ -156,6 +158,7 @@ namespace PhysicsEngine
     #ifdef TRACY_ENABLE
             ZoneScoped;
     #endif
+
         calculateNodePossiblePairs(_nodes[0]);
     }
 
@@ -173,10 +176,10 @@ namespace PhysicsEngine
             {
                 auto& simplColB = node.Colliders[j];
 
-                //if (Math::Intersect(simplColA.Rectangle, simplColB.Rectangle))
-                //{
+                if (Math::Intersect(simplColA.Rectangle, simplColB.Rectangle))
+                {
                     _possiblePairs.push_back(ColliderPair{ simplColA.ColRef, simplColB.ColRef });
-                //}
+                }
             }
 
             // If the node has children, we need to compare the simplified collider with the 
@@ -209,10 +212,10 @@ namespace PhysicsEngine
         // For each colliders in the current node, compare it with the simplified collider from its parent node.
         for (const auto& nodeSimplCol : node.Colliders)
         {
-            //if (Math::Intersect(simplCol.Rectangle, nodeSimplCol.Rectangle))
-            //{
+            if (Math::Intersect(simplCol.Rectangle, nodeSimplCol.Rectangle))
+            {
                 _possiblePairs.push_back(ColliderPair{ simplCol.ColRef, nodeSimplCol.ColRef });
-            //}
+            }
         }
 
         // If the current node has children, we need to compare the simplified collider from its parent node with its children.
@@ -227,9 +230,9 @@ namespace PhysicsEngine
 
     void QuadTree::Clear() noexcept
     {
-#ifdef TRACY_ENABLE
+    #ifdef TRACY_ENABLE
         ZoneScoped;
-#endif // TRACY_ENABLE
+    #endif // TRACY_ENABLE
 
         for (auto& node : _nodes)
         {
@@ -248,6 +251,7 @@ namespace PhysicsEngine
 #ifdef TRACY_ENABLE
         ZoneScoped;
 #endif // TRACY_ENABLE
+
         _nodes.clear();
 
         _nodeIndex = 1;

@@ -146,7 +146,7 @@ void TriggerColliderSample::onRender() noexcept
         } // Switch case.
     } // For gameObjects range.
 
-    //drawQuadNode(_world.QuadTree().RootNode());
+    drawQuadNode(_world.QuadTree().RootNode());
 }
 
 void TriggerColliderSample::onDeinit() noexcept

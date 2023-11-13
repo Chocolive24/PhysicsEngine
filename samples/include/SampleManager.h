@@ -25,6 +25,8 @@ public:
     const Sample* GetSampleAtIndex(int index) const noexcept { return _samples[index].Get(); }
 
 private:
+    HeapAllocator _heapAllocator;
     std::array<UniquePtr<Sample>, SampleCount> _samples;
+
     int _currentSampleIdx = 0;
 };

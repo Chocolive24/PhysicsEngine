@@ -17,12 +17,12 @@ template<typename T>
 class UniquePtr
 {
 private:
-    T* _ptr = nullptr;
+    T* _ptr = nullptr;   
 
 public:
     constexpr explicit UniquePtr() noexcept = default;
 
-    constexpr explicit UniquePtr(T* ptr) noexcept: _ptr(ptr) {};
+    constexpr explicit UniquePtr(T* ptr) noexcept : _ptr(ptr) {};
 
     constexpr UniquePtr(const UniquePtr<T>& other) noexcept = delete;
 
@@ -31,7 +31,13 @@ public:
         std::swap(_ptr, other._ptr);
     }
 
-    ~UniquePtr() noexcept { delete _ptr; }
+    ~UniquePtr() noexcept 
+    {
+    #ifdef TRACY_ENABLE
+            TracyFree(_ptr);
+    #endif
+        delete _ptr;
+    }
 
     constexpr UniquePtr& operator=(const UniquePtr<T>& other) const noexcept = delete;
 
@@ -65,19 +71,24 @@ public:
 * @param value The value to point with the unique pointer.
 * @return The unique pointer object that points the value.
 */
-template<typename T>
-[[nodiscard]] UniquePtr<T> MakeUnique(const T& value) noexcept
+template<typename T, typename... Args>
+[[nodiscard]] UniquePtr<T> MakeUnique(Allocator& allocator, Args&&... args) noexcept
 {
-    return UniquePtr<T>(new T(value));
+    T* allocatedMemory = static_cast<T*>(allocator.Allocate(sizeof(T), alignof(T)));
+
+    return UniquePtr<T>(new (allocatedMemory) T(std::forward<Args>(args)...));
 }
+
 
 /**
  * @brief MakeUnique is a method that creates a unique pointer of the type of the value in parameter.
  * @param value The value to point with the unique pointer.
  * @return The unique pointer object that points the value.
  */
-template<typename T, typename U>
-[[nodiscard]] UniquePtr<T> MakeUnique(const U& value) noexcept
+template<typename T, typename U, typename... Args>
+[[nodiscard]] UniquePtr<T> MakeUnique(Allocator& allocator, Args&&... args) noexcept
 {
-    return UniquePtr<T>(new U(value));
+    U* allocatedMemory = static_cast<U*>(allocator.Allocate(sizeof(U), alignof(U)));
+
+    return UniquePtr<T>(new (allocatedMemory) U(std::forward<Args>(args)...));
 }
