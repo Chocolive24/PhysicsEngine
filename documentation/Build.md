@@ -6,7 +6,7 @@
 
 - Open CMake https://cmake.org/download/
 
-![CMake build](images/visual_studio_cmake.png)
+![CMake build](images/vsCmake.png)
 
 - Step 1: Enter Path to project
 
@@ -14,25 +14,31 @@
 
 - Step 3: Press `Generate`
 
-- Step 4: Select `Specify toolchain for cross-compiling`
+![Toolchain](images/toolchain.png)
 
-- Step 5: Press `Next`
+- Step 4: Select `Visual studio 17 2022`
 
-- Step 6: Enter Path to vcpkg.cmake https://github.com/microsoft/vcpkg
+- Step 5: Select `Specify toolchain for cross-compiling`
 
-- Step 7: Press `Finish`
+- Step 6: Press `Next`
 
-- Step 8: Press `Open Project` (if it does nothing, go to `Build` and Open `Bark.sln` with `Visual Studio`)
+![Specify vcpkg for toolchain](images/vcpkgCmake.png)
 
-![Setup Project](images/visual_studio_setup.png)
+- Step 7: Enter Path to vcpkg.cmake https://github.com/microsoft/vcpkg
 
-- Step 9: Right click on `Main`
+- Step 8: Press `Finish`
 
-- Step 10: Press `Set as Startup Project`
+![Open project](images/generateProject.png)
 
-- You can now navigate through the samples using the `ImGui` window or with `keyboard arrows` use the `Space key` to regenerate a Sample.
+- Step 9: Press `Open Project` (if it does nothing, go to `Build` and Open `Bark.sln` with `Visual Studio`)
 
+![Setup Project](images/setAsStartUpProject.png)
 
+- Step 10: Right click on `main`
+
+- Step 11: Press `Set as Startup Project`
+
+- You can now navigate through the samples using the `ImGui` window.
 
 ## CLion
 
