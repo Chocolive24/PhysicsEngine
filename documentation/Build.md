@@ -1,6 +1,6 @@
 [Return](../README.md)
 
-# Build
+# How to build the project ?
 
 ## Visual Studio
 
