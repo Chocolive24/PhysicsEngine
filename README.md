@@ -37,16 +37,16 @@ It handles forces and collisions detection.
 The samples are made with SDL2 and ImGui.
 
 ### Planet system
-![Planet system](gifs/PlanetSystemSample.gif)
+![Planet system](images/PlanetSystemSample.gif)
 
 ### Trigger colliders
-![Trigger colliders](gifs/TriggerColliderSample.gif)
+![Trigger colliders](images/TriggerColliderSample.gif)
 
 ### Physical collisions
-![Physical collisions](gifs/CollisionSample.gif)
+![Physical collisions](images/CollisionSample.gif)
 
 ### Bouncing shapes
-![Bouncing shapes](gifs/CollisionWithGroundSample.gif)
+![Bouncing shapes](images/CollisionWithGroundSample.gif)
 
 ## Documentation
 - [How to build the project ?](documentation/Build.md)
