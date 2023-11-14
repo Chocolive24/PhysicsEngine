@@ -38,19 +38,19 @@ The samples are made with SDL2 and ImGui.
 
 ### Planet system
 
-![Planet system](gifs/PlanetSystemSample.png)
+![Planet system](gifs/PlanetSystemSample.gif)
 
 ### Trigger colliders
 
-![Trigger colliders](gifs/TriggerColliderSample.png)
+![Trigger colliders](gifs/TriggerColliderSample.gif)
 
 ### Physical collisions
 
-![Physical collisions](gifs/CollisionSample.png)
+![Physical collisions](gifs/CollisionSample.gif)
 
 ### Bouncing shapes
 
-![Bouncing shapes](gifs/CollisionWithGroundSample.png)
+![Bouncing shapes](gifs/CollisionWithGroundSample.gif)
 
 ## Documentation
 - [How to build the project ?](documentation/Build.md)
