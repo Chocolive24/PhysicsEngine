@@ -46,7 +46,7 @@ void GroundCollisionSample::onInit() noexcept
     collider.SetShape(Math::RectangleF(
         Math::Vec2F::Zero() - halfSize, Math::Vec2F::Zero() + halfSize));
 
-    collider.SetRestitution(1.f);
+    collider.SetRestitution(0.75f);
 
     _colliders.push_back(colRef);
 }
