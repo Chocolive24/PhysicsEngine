@@ -65,7 +65,7 @@ public:
     PlanetSystemSample() noexcept = default;
 
     // Inherited via Sample
-    std::string Name() const noexcept override { return "Planet System"; }
+    std::string Name() const noexcept override { return "Planet system"; }
     std::string Description() const noexcept override;
     std::string InputText() const noexcept override;
 

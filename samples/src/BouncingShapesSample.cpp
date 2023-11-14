@@ -1,15 +1,16 @@
-#include "GroundCollision.h"
+#include "BouncingShapesSample.h"
 #include "Metrics.h"
 #include "GraphicGeometry.h"
+
 #include <iostream>
 
-std::string GroundCollisionSample::Description() const noexcept
+std::string BouncingShapesSample::Description() const noexcept
 {
     std::string_view description = R"(This sample shows collisions between bouncing shapes and a ground with gravity in the world.)";
     return static_cast<std::string>(description);
 }
 
-std::string GroundCollisionSample::InputText() const noexcept
+std::string BouncingShapesSample::InputText() const noexcept
 {
     std::string_view description = R"(Inputs :
 [Left-click] creates a circle.
@@ -17,7 +18,7 @@ std::string GroundCollisionSample::InputText() const noexcept
     return static_cast<std::string>(description);
 }
 
-void GroundCollisionSample::onInit() noexcept
+void BouncingShapesSample::onInit() noexcept
 {
     _gravity = Math::Vec2F(0.f, -9.f);
     _world.SetGravity(_gravity);
@@ -50,7 +51,7 @@ void GroundCollisionSample::onInit() noexcept
     _colliders.push_back(colRef);
 }
 
-void GroundCollisionSample::onHandleInputs(SDL_Event event, 
+void BouncingShapesSample::onHandleInputs(SDL_Event event, 
                                         bool isMouseOnAnImGuiWindow) noexcept
 {
     switch (event.type)
@@ -82,12 +83,12 @@ void GroundCollisionSample::onHandleInputs(SDL_Event event,
     }
 }
 
-void GroundCollisionSample::onUpdate() noexcept
+void BouncingShapesSample::onUpdate() noexcept
 {
     removeCollidersOutOfSBottomScreen();
 }
 
-void GroundCollisionSample::onRender() noexcept
+void BouncingShapesSample::onRender() noexcept
 {
     for (const auto& colRef : _colliders)
     {
@@ -127,37 +128,37 @@ void GroundCollisionSample::onRender() noexcept
     }
 }
 
-void GroundCollisionSample::onDeinit() noexcept
+void BouncingShapesSample::onDeinit() noexcept
 {
     _colliders.clear();
 }
 
-void GroundCollisionSample::OnTriggerEnter(PhysicsEngine::ColliderRef colliderRefA, 
+void BouncingShapesSample::OnTriggerEnter(PhysicsEngine::ColliderRef colliderRefA, 
     PhysicsEngine::ColliderRef colliderRefB) noexcept
 {
 }
 
-void GroundCollisionSample::OnTriggerStay(PhysicsEngine::ColliderRef colliderRefA, 
+void BouncingShapesSample::OnTriggerStay(PhysicsEngine::ColliderRef colliderRefA, 
     PhysicsEngine::ColliderRef colliderRefB) noexcept
 {
 }
 
-void GroundCollisionSample::OnTriggerExit(PhysicsEngine::ColliderRef colliderRefA, 
+void BouncingShapesSample::OnTriggerExit(PhysicsEngine::ColliderRef colliderRefA, 
     PhysicsEngine::ColliderRef colliderRefB) noexcept
 {
 }
 
-void GroundCollisionSample::OnCollisionEnter(PhysicsEngine::ColliderRef colliderRefA, 
+void BouncingShapesSample::OnCollisionEnter(PhysicsEngine::ColliderRef colliderRefA, 
     PhysicsEngine::ColliderRef colliderRefB) noexcept
 {
 }
 
-void GroundCollisionSample::OnCollisionExit(PhysicsEngine::ColliderRef colliderRefA, 
+void BouncingShapesSample::OnCollisionExit(PhysicsEngine::ColliderRef colliderRefA, 
     PhysicsEngine::ColliderRef colliderRefB) noexcept
 {
 }
 
-void GroundCollisionSample::createCircle(Math::Vec2F position) noexcept
+void BouncingShapesSample::createCircle(Math::Vec2F position) noexcept
 {
     const auto bodyRef = _world.CreateBody();
     auto& body = _world.GetBody(bodyRef);
@@ -174,7 +175,7 @@ void GroundCollisionSample::createCircle(Math::Vec2F position) noexcept
     _colliders.push_back(colRef);
 }
 
-void GroundCollisionSample::createRectangle(Math::Vec2F position) noexcept
+void BouncingShapesSample::createRectangle(Math::Vec2F position) noexcept
 {
     const auto bodyRef = _world.CreateBody();
     auto& body = _world.GetBody(bodyRef);
@@ -194,7 +195,7 @@ void GroundCollisionSample::createRectangle(Math::Vec2F position) noexcept
     _colliders.push_back(colRef);
 }
 
-void GroundCollisionSample::removeCollidersOutOfSBottomScreen() noexcept
+void BouncingShapesSample::removeCollidersOutOfSBottomScreen() noexcept
 {
     constexpr auto windowSizeInMeters = Metrics::PixelsToMeters(
         Math::Vec2F(AppWindow::WindowWidth, AppWindow::WindowHeight));

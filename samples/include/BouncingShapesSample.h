@@ -3,13 +3,13 @@
 #include "Sample.h"
 #include "ContactListener.h"
 
-class GroundCollisionSample final : public Sample, public PhysicsEngine::ContactListener
+class BouncingShapesSample final : public Sample, public PhysicsEngine::ContactListener
 {
 public:
 	// Inherited via Sample
-	std::string GroundCollisionSample::Name() const noexcept override
+	std::string BouncingShapesSample::Name() const noexcept override
 	{
-		return "CollisionWithGround";
+		return "Bouncing shapes";
 	}
 
 	std::string Description() const noexcept override;

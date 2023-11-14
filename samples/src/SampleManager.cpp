@@ -2,7 +2,7 @@
 #include "PlanetSystemSample.h"
 #include "TriggerColliderSample.h"
 #include "CollisionSample.h"
-#include "GroundCollision.h"
+#include "BouncingShapesSample.h"
 
 #ifdef TRACY_ENABLE
 #include <Tracy.hpp>
@@ -13,7 +13,7 @@ void SampleManager::Init() noexcept
     _samples[0] = MakeUnique<Sample, PlanetSystemSample>(_heapAllocator);
     _samples[1] = MakeUnique<Sample, TriggerColliderSample>(_heapAllocator);
     _samples[2] = MakeUnique<Sample, CollisionSample>(_heapAllocator);
-    _samples[3] = MakeUnique<Sample, GroundCollisionSample>(_heapAllocator);
+    _samples[3] = MakeUnique<Sample, BouncingShapesSample>(_heapAllocator);
 
     _samples[_currentSampleIdx]->Init();
 }

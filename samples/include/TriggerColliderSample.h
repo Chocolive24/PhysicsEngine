@@ -33,7 +33,7 @@ private:
 public:
     TriggerColliderSample() noexcept = default;
 
-    std::string Name() const noexcept override { return "Trigger Colliders"; }
+    std::string Name() const noexcept override { return "Trigger colliders"; }
 
     std::string Description() const noexcept override;
 

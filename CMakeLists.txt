@@ -28,7 +28,7 @@ IF(MSVC)
     # Check if AddressSanitizer is enabled
     if(ENABLE_ADDRESS_SANITIZER)
         # Enable AddressSanitizer flags and options
-        add_compile_options(/fsanitize=address /DEBUG)
+        add_compile_options(/fsanitize=address)
     endif()
 ELSE()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -save-temps -march=haswell -ffast-math")
