@@ -235,15 +235,15 @@ namespace PhysicsEngine
 
     void World::resolveNarrowPhase() noexcept
     {
-    #ifdef TRACY_ENABLE
-            ZoneScoped;
-    #endif
+        #ifdef TRACY_ENABLE
+                ZoneScoped;
+        #endif
 
         const auto& possiblePairs = _quadTree.PossiblePairs();
 
-    #ifdef TRACY_ENABLE
-            ZoneValue(possiblePairs.size());
-    #endif
+        #ifdef TRACY_ENABLE
+                ZoneValue(possiblePairs.size());
+        #endif
 
         AllocVector<ColliderPair> newPairs{ StandardAllocator<ColliderPair>{_heapAllocator} };
         newPairs.reserve(possiblePairs.size());

@@ -1014,21 +1014,280 @@ Overall, I was able to save 1.2ms by better managing memory and allocations in m
 
 Reduce narrow-phase execution.
 ==============================================================
-I have a good broad phase that saves me a lot of time, but my narrow phase is still a bit slow:
+Now that the broad phase is fine as it is, let's take a closer look at the narrow phase:
 
-Now here is one frame after all this work :
 ![One frame traced with tracy](images/UnorderedFrame.png)
-We see that the narrow phase is faster but still is the main time of the execution.
 
-IMAGES ET STATES
+| Mean (ms) | Median (ms)  | Std dev (ms) | Observations|
+|-----------|--------------|--------------|-------------|
+| 18.5      |  18.62       |   7.47       | 381         |
+[Table: resolveNarrowPhase function statistics.]
 
-You can see that the narrow phase takes this long on average to execute. Is there any way of reducing its execution time?
+18ms to resolve the narrow phase is really too much. I need to find a way to reduce the time this part of the engine takes. As you can see, the unordered_set does a lot of allocations and deallocations. Is there a cheaper alternative?
 
 Remove unordered_set
 --------------------------------------------------------------
+Currently, I use an unordered_set to avoid having the same pair twice in my data structure, in addition to the fact that it uses the hash function to quickly find the look-up element.<br> 
+
+Current code:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ c++
+ for (auto& possiblePair : possiblePairs)
+ {
+     auto& colliderA = GetCollider(possiblePair.ColliderA);
+     auto& colliderB = GetCollider(possiblePair.ColliderB);
+
+     const auto doCollidersIntersect = detectContact(colliderA, colliderB);
+
+     #ifdef TRACY_ENABLE
+         ZoneNamedN(FindPair, "Find pair", true);
+     #endif
+
+     auto it = _colliderPairs.find(possiblePair);
+
+     #ifdef TRACY_ENABLE
+             ZoneNamedN(CheckIfItsANewPair, "Check if it's a new pair", true);
+     #endif
+
+     if (it != _colliderPairs.end())
+     {
+         if (!doCollidersIntersect)
+         {
+             if (colliderA.IsTrigger() || colliderB.IsTrigger())
+             {
+                 _contactListener->OnTriggerExit(possiblePair.ColliderA,
+                     possiblePair.ColliderB);
+
+             }
+
+             #ifdef TRACY_ENABLE
+                     ZoneNamedN(ErasePair, "Erase pair", true);
+             #endif
+
+             _colliderPairs.erase(it);
+         }
+         else
+         {
+             if (colliderA.IsTrigger() || colliderB.IsTrigger())
+             {
+                 _contactListener->OnTriggerStay(possiblePair.ColliderA,
+                     possiblePair.ColliderB);
+             }
+         }
+     }
+     else
+     {
+         if (doCollidersIntersect)
+         {
+             if (colliderA.IsTrigger() || colliderB.IsTrigger())
+             {
+                 _contactListener->OnTriggerEnter(possiblePair.ColliderA,
+                     possiblePair.ColliderB);
+             }
+
+             #ifdef TRACY_ENABLE
+                 ZoneNamedN(InsertPair, "Insert pair", true);
+             #endif
+
+             _colliderPairs.insert(possiblePair);
+         }
+     }
+ }
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+
+But now I generate the collider pairs with my quad-tree. There will never be the same pair twice. So why not use a vector ?<br>
+The problem with a vector is knowing which colliders to keep or not in the current pairs. But if we think about it carefully, in each frame, the colliders which overlap are the current new peers of the world. I just have to store them in a vector then, for each of the peers that touch each other, I just have to look if I already have this pair or not and activate the TriggerEnter event in this case.
+Then I traverse the vector through old pairs and I see if they are part of the new pairs currently in overlap. If this is not the case, I activate the TriggerExit event. Finally I set the value of the old or new peers at the end of the frame:<br>
+
+New code:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ c++
+const auto& possiblePairs = _quadTree.PossiblePairs();
+
+#ifdef TRACY_ENABLE
+        ZoneValue(possiblePairs.size());
+#endif
+
+AllocVector<ColliderPair> newPairs{ StandardAllocator<ColliderPair>{_heapAllocator} };
+newPairs.reserve(possiblePairs.size());
+
+for (const auto& possiblePair : possiblePairs)
+{
+    auto& colliderA = GetCollider(possiblePair.ColliderA);
+    auto& colliderB = GetCollider(possiblePair.ColliderB);
+
+    if (detectContact(colliderA, colliderB))
+    {
+        newPairs.push_back(possiblePair);
+    }
+}
+
+for (const auto& newPair : newPairs)
+{
+    Collider& colliderA = GetCollider(newPair.ColliderA);
+    Collider& colliderB = GetCollider(newPair.ColliderB);
+
+    const auto it = std::find(_colliderPairs.begin(), _colliderPairs.end(), newPair);
+
+    // If there was no collision in the previous frame -> OnTriggerEnter.
+    if (it == _colliderPairs.end())
+    {
+        if (colliderA.IsTrigger() || colliderB.IsTrigger())
+        {
+            _contactListener->OnTriggerEnter(newPair.ColliderA, newPair.ColliderB);
+        }
+    }
+
+    // If there was a collision in the previous frame and there is always a collision -> OnTriggerStay.
+    else
+    {
+        if (colliderA.IsTrigger() || colliderB.IsTrigger())
+        {
+            _contactListener->OnTriggerStay(newPair.ColliderA, newPair.ColliderB);
+        }
+    }
+}
+
+for (auto& colliderPair : _colliderPairs)
+{
+    Collider& colliderA = GetCollider(colliderPair.ColliderA);
+    Collider& colliderB = GetCollider(colliderPair.ColliderB);
+
+    const auto it = std::find(newPairs.begin(), newPairs.end(), colliderPair);
+
+    // If there is no collision in this frame -> OnTriggerExit.
+    if (it == newPairs.end())
+    {
+        if (colliderA.IsTrigger() || colliderB.IsTrigger())
+        {
+            _contactListener->OnTriggerExit(colliderPair.ColliderA,
+                                            colliderPair.ColliderB);
+        }
+    }
+}
+
+_colliderPairs = newPairs;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+
+Let's look at the statistics to see if our change is profitable:
+
+![One frame using a vector instead of an unordered_set.](images/VectorFrame.png)
+
+| resolveNarrowPhase  | Mean (ms) | Median (ms)  | Std dev (ms) | Observations|
+|---------------------|-----------|--------------|--------------|-------------|
+|  First version      | 18.5      |  18.62       |   7.47       | 381         |
+|  Last version       | 7.95      |  7.85        |   1.29       | 515         |
+
+|P(T<=t) two-tail |
+|-----------------|
+|3,30e-92         | 
+[Table: Student T-Test Values using P = 5%.]
+
+| Mean Difference (ms) | Standard error (ms) | Margin of error (ms) | Lower limit (ms) | Greater Limit (ms) |
+|----------------------|---------------------|----------------------|------------------|--------------------|
+|10,55676636           |  0,38869982         |   0,7641910525       | 9,792575305      | 11,32095741        |
+[Table: Difference of means and confidance interval (confidence level 95%) [lower limit ; greater limit]]
+
+
+We notice a huge difference in time between the two versions of the narrow phase. Already thanks to the value of the t-test which proves it but above all thanks to the limits of the confidence interval which shows the time saving of around 10ms.<br>
+This proves that the unordered_set allocations were not the most optimal. On the other hand, what resets long is the search for peers in the vector of current pairs. Let's see if we can reduce the number of pairs to search for.
 
 Reduce the number of pairs to find.
 --------------------------------------------------------------
+To find an element in a data structure such as the vector, you have to go through the elements from the beginning until you find the element in question. If our vector contains a lot of elements, it will take a long time to do a std::find on it. In fact, the longer the vector, the less chance there is of having the value stored in one of the caches. Otherwise it means a lot of cache miss so is slow access to the value.<br>
+
+I used tracy's "ZoneValue" option to display the size of my possible pair vector coming out of the quad-tree:
+
+![The number of pairs over which the narrow phase iterate on a frame -> 98502](images/100000Pairs.png)
+
+We need to find a way to filter out pairs that really have overlap potential in the quad-tree.<br>
+Currently the quad-tree works as follows:
+The colliders of the parent nodes are compared with all the colliders of the child nodes. However, most of these comparisons are useless because the collider in question can be very far from the colliders of child nodes. Maybe it's easier to understand with a diagram:
+
+![Case where we generate useless pairs](images/OptiCase.png)
+
+So to avoid creating useless pairs, we can only interest the pair of colliders which have their simplified shape which overlaps. 
+This way we avoid a large number of unnecessary comparisons and can reduce our memory accesses:
+
+QuadTree.cpp -> calculateNodePossiblePairs()
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ c++
+// begin of calculateNodePossiblePairs function.
+
+for (std::size_t i = 0; i < node.Colliders.size(); i++)
+{
+    auto& simplColA = node.Colliders[i];
+
+    for (std::size_t j = i + 1; j < node.Colliders.size(); j++)
+    {
+        auto& simplColB = node.Colliders[j];
+
+        if (Math::Intersect(simplColA.Rectangle, simplColB.Rectangle))
+        {
+            _possiblePairs.push_back(ColliderPair{ simplColA.ColRef, simplColB.ColRef });
+        }
+    }
+
+    // rest of calculateNodePossiblePairs function.
+}
+
+...
+
+// begin of calculateChildrenNodePossiblePairs function.
+
+// For each colliders in the current node, compare it with the simplified collider from its parent node.
+for (const auto& nodeSimplCol : node.Colliders)
+{
+    if (Math::Intersect(simplCol.Rectangle, nodeSimplCol.Rectangle))
+    {
+        _possiblePairs.push_back(ColliderPair{ simplCol.ColRef, nodeSimplCol.ColRef });
+    }
+
+    // rest of calculateChildrenNodePossiblePairs function.
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+Let's look at how many possible pairs are generated now:
+
+![The new number of pairs over which the narrow phase iterate on a frame -> 2184](images/2184Pairs.png)
+
+Oh wow, this significantly reduces memory accesses. It's time to do the statistical tests to see how much time this saves us:
+
+| resolveNarrowPhase  | Mean (ms) | Median (ms)  | Std dev (ms) | Observations|
+|---------------------|-----------|--------------|--------------|-------------|
+|  previous version   | 7.95      |  7.85        |   1.29       | 515         |
+|  new version        | 1.45      |  1.27        |   0.506      | 1291        |
+  
+|P(T<=t) two-tail |
+|-----------------|
+|0                | 
+[Table: Student T-Test Values using P = 5%.]
+
+| Mean Difference (ms) | Standard error (ms) | Margin of error (ms) | Lower limit (ms) | Greater Limit (ms) |
+|----------------------|---------------------|----------------------|------------------|--------------------|
+|6,488111856           |  0,05908054316      |   0,1160378747       | 6,372073981      | 6,60414973         |
+[Table: Difference of means and confidance interval (confidence level 95%) [lower limit ; greater limit]]
+
+The t-test returns the value 0. That says it all. There is no way that the previous version would be faster than the current one. The time saving is estimated at around 6.45ms with a very small margin of error. We have therefore indeed shortened the time taken by the narrow phase.
+
+Final state of the narrow phase.
+--------------------------------------------------------------
+We have greatly improved the execution speed of the narrow phase. Let's analyze the statistical differences between the first implementation of the narrow phase and the last.
+
+![One frame with the final version of the narrow phase](images/FullOptiFrame.png)
+
+| resolveNarrowPhase   | Mean (ms) | Median (ms)  | Std dev (ms) | Observations|
+|---------------------|-----------|--------------|--------------|-------------|
+|  First version      | 18.5      |  18.62       |   7.47       | 381         |
+|  Last version       | 1.45      |  1.27        |   0.506      | 1291        |
+
+|P(T<=t) two-tail |
+|-----------------|
+|1,08e-150        | 
+[Table: Student T-Test Values using P = 5%.]
+
+| Mean Difference (ms) | Standard error (ms) | Margin of error (ms) | Lower limit (ms) | Greater Limit (ms) |
+|----------------------|---------------------|----------------------|------------------|--------------------|
+|17,02925156           |  0,3861128878       |   0,7592111286       | 16,27004043      | 17,78846269        |
+[Table: Difference of means and confidance interval (confidence level 95%) [lower limit ; greater limit]]
+
+We can see that the narrow phase has been greatly improved. By choosing a less expensive data structure and having optimized the number of memory accesses, we were able to reduce the duration of the narrow phase by 16ms.
 
 Conclusion
 ==============================================================
