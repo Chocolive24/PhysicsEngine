@@ -20,26 +20,6 @@ if (USE_TRACY)
     add_library(tracyClient STATIC externals/tracy_profiler/TracyClient.cpp)
 endif()
 
-option(ENABLE_ADDRESS_SANITIZER "Enable AddressSanitizer" OFF)
-
-IF(MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX2 /Oi /Oy-")
-
-    # Check if AddressSanitizer is enabled
-    if(ENABLE_ADDRESS_SANITIZER)
-        # Enable AddressSanitizer flags and options
-        add_compile_options(/fsanitize=address)
-    endif()
-ELSE()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -save-temps -march=haswell -ffast-math")
-
-    # Check if AddressSanitizer is enabled
-    if(ENABLE_ADDRESS_SANITIZER)
-        # Enable AddressSanitizer flags and options
-        add_compile_options(-fsanitize=address)
-    endif()
-ENDIF()
-
 # Create the Math library
 file(GLOB_RECURSE MATH_SRC_FILES libs/math/include/*.h libs/math/src/*.cpp)
 add_library(math ${MATH_SRC_FILES})
