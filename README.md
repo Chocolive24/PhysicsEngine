@@ -4,6 +4,53 @@
 ## Description
 
 This is a small, basic 2D physics engine created as part of a project for the Sae Institute in Geneva.
+It handles forces and collisions detection.
+
+### Features
+
+- Creation of bodies. 
+    - Attributes:
+        - Position
+        - Velocity
+        - Mass
+    - Dynamic bodies:
+        - Forces can be applied to them.
+        - Physical collision calculations.
+    - Kinematic bodies
+         - Not impacted by forces.
+         - No physical collisions.
+    - Statics bodies
+         - Don't move.
+         - Physical collision calculations.
+- Creation of collider.
+    - Attributes
+        - Shape
+            - Circle
+            - Rectangle
+            - Polygon (only work for trigger for now)
+        - Restitution
+        - Friction
+        - trigger mode
+
+## Samples
+
+The samples are made with SDL2 and ImGui.
+
+### Planet system
+
+![Planet system](gifs/PlanetSystemSample.png)
+
+### Trigger colliders
+
+![Trigger colliders](gifs/TriggerColliderSample.png)
+
+### Physical collisions
+
+![Physical collisions](gifs/CollisionSample.png)
+
+### Bouncing shapes
+
+![Bouncing shapes](gifs/CollisionWithGroundSample.png)
 
 ## Documentation
 - [How to build the project ?](documentation/Build.md)
