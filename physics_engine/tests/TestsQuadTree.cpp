@@ -198,12 +198,11 @@ void insertRecursive(std::vector<QuadNode>& expectedNodes,
 
         if (boundInterestCount == 1)
         {
-            depth++;
             insertRecursive(expectedNodes,
                             *intersectNode,
                             simplifiedShape,
                             colliderRef,
-                            depth,
+                            depth + 1,
                             maxDepth);
         }
         else
@@ -286,10 +285,10 @@ void CalculatePairsInChildrenNodes(std::vector<ColliderPair>& possiblePairs,
     // For each colliders in the current node, compare it with the simplified collider from its parent node.
     for (const auto& nodeSimplCol : node.Colliders)
     {
-        //if (Math::Intersect(simplCol.Rectangle, nodeSimplCol.Rectangle))
-        //{
-        possiblePairs.push_back(ColliderPair{ simplCol.ColRef, nodeSimplCol.ColRef });
-        //}
+        if (Math::Intersect(simplCol.Rectangle, nodeSimplCol.Rectangle))
+        {
+            possiblePairs.push_back(ColliderPair{ simplCol.ColRef, nodeSimplCol.ColRef });
+        }
     }
 
     // If the current node has children, we need to compare the simplified collider from its parent node with its children.
@@ -312,10 +311,10 @@ void CalculatePairsInNode(std::vector<ColliderPair>& possiblePairs, const QuadNo
         {
             const auto& simplColB = node.Colliders[j];
 
-            /*if (Math::Intersect(simplColA.Rectangle, simplColB.Rectangle))
-            {*/
+            if (Math::Intersect(simplColA.Rectangle, simplColB.Rectangle))
+            {
                 possiblePairs.push_back(ColliderPair{simplColA.ColRef, simplColB.ColRef});
-            //}
+            }
         }
 
         // If the node has children.

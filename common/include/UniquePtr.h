@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "Allocator.h"
+
 #include <algorithm>
 
 /*
