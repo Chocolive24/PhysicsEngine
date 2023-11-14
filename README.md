@@ -4,7 +4,7 @@
 
 - [Build](documentation/Build.md)
 - [Naming convention](documentation/NamingConvention.md)
-- [Blog post](Blogpost/index.md.html)
+- [Blog post](Chocolive24.github.io)
 
 ## Description
 
