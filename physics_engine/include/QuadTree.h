@@ -45,7 +45,6 @@ namespace PhysicsEngine
         std::array<QuadNode*, BoundaryDivisionCount> Children{ nullptr, nullptr, nullptr, nullptr };
         AllocVector<SimplifiedCollider> Colliders{};
 
-        //constexpr QuadNode() noexcept = default;
         explicit QuadNode(Allocator& allocator) noexcept : 
             Colliders{ StandardAllocator<SimplifiedCollider> {allocator} } {}
     };

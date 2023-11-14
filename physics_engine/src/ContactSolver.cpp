@@ -1,21 +1,34 @@
 #include "ContactSolver.h"
 
-void PhysicsEngine::ContactSolver::CalculateContactProperties() noexcept
+namespace PhysicsEngine
 {
-    const auto colShapeA = colliderA->Shape(); 
-    const auto colShapeB = colliderB->Shape();
-
-    switch (colShapeA.index())
+    void ContactSolver::InitContactActors(Body& bodyA, 
+        Body& bodyB, 
+        Collider& colA, 
+        Collider& colB) noexcept
     {
-    case static_cast<int>(Math::ShapeType::Circle):
-    {
-        const auto circleA = std::get<Math::CircleF>(colShapeA) + bodyA->Position();
+        BodyA = &bodyA;
+        BodyB = &bodyB;
+        ColliderA = &colA;
+        ColliderB = &colB;
+    }
 
-        switch (colShapeB.index())
+    void ContactSolver::CalculateContactProperties() noexcept
+    {
+        const auto colShapeA = ColliderA->Shape();
+        const auto colShapeB = ColliderB->Shape();
+
+        switch (static_cast<Math::ShapeType>(colShapeA.index()))
         {
-            case static_cast<int>(Math::ShapeType::Circle):
+        case Math::ShapeType::Circle:
+        {
+            const auto circleA = std::get<Math::CircleF>(colShapeA) + BodyA->Position();
+
+            switch (static_cast<Math::ShapeType>(colShapeB.index()))
             {
-                const auto circleB = std::get<Math::CircleF>(colShapeB) + bodyB->Position();
+            case Math::ShapeType::Circle:
+            {
+                const auto circleB = std::get<Math::CircleF>(colShapeB) + BodyB->Position();
                 const auto cA = circleA.Center(), cB = circleB.Center();
                 const auto rA = circleA.Radius(), rB = circleB.Radius();
 
@@ -27,10 +40,10 @@ void PhysicsEngine::ContactSolver::CalculateContactProperties() noexcept
                 break;
             } // Case circle B.
 
-            case static_cast<int>(Math::ShapeType::Rectangle):
+            case Math::ShapeType::Rectangle:
             {
                 const auto rectB = std::get<Math::RectangleF>(colShapeB) +
-                    bodyB->Position();
+                    BodyB->Position();
 
                 const auto circleCenter = circleA.Center(), rectCenter = rectB.Center();
                 const auto rectHalfSize = rectB.HalfSize();
@@ -59,159 +72,160 @@ void PhysicsEngine::ContactSolver::CalculateContactProperties() noexcept
                 break;
             } // Case rectangle B.
 
-        case static_cast<int>(Math::ShapeType::None):
+            case Math::ShapeType::None:
+                break;
+            default:
+                break;
+            } // Switch shape collider B.
+
+            break;
+        } // Case circle A.
+
+        case Math::ShapeType::Rectangle:
+        {
+            const auto rectA = std::get<Math::RectangleF>(colShapeA) + BodyA->Position();
+
+            switch (static_cast<Math::ShapeType>(colShapeB.index()))
+            {
+            case Math::ShapeType::Circle:
+            {
+                const auto circleB = std::get<Math::CircleF>(colShapeB) +
+                    BodyB->Position();
+
+                std::swap(BodyA, BodyB);
+                std::swap(ColliderA, ColliderB);
+                CalculateContactProperties();
+
+                break;
+            } // Case circle B.
+
+            case Math::ShapeType::Rectangle:
+            {
+                const auto rectB = std::get<Math::RectangleF>(colShapeB) +
+                    BodyB->Position();
+
+                const auto cA = rectA.Center(), cB = rectB.Center();
+                const auto halfSizeA = rectA.HalfSize(), halfSizeB = rectB.HalfSize();
+
+                const auto delta = cA - cB;
+                Point = cA + delta * 0.5f;
+
+                // Calculate the penetration in x-axis
+                const auto penetrationX = halfSizeA.X + halfSizeB.X - Math::Abs(delta.X);
+                // Calculate the penetration in y-axis
+                const auto penetrationY = halfSizeA.Y + halfSizeB.Y - Math::Abs(delta.Y);
+
+                if (penetrationX < penetrationY)
+                {
+                    Normal = delta.X > 0 ?
+                        Math::Vec2F::Right() : Math::Vec2F::Left();
+
+                    Penetration = penetrationX;
+                }
+                else
+                {
+                    Normal = delta.Y > 0 ? Math::Vec2F::Up() : Math::Vec2F::Down();
+
+                    Penetration = penetrationY;
+                }
+
+                break;
+            } // Case rectangle B.
+
+            case Math::ShapeType::None:
+                break;
+            default:
+                break;
+            } // Switch shape collider B.
+
+            break;
+        } // Case rectangle A.
+
+        case Math::ShapeType::None:
             break;
         default:
             break;
-        } // Switch shape collider B.
+        } // Switch shape collider A.
+    }
 
-        break;
-    } // Case circle A.
-
-    case static_cast<int>(Math::ShapeType::Rectangle):
+    float ContactSolver::CalculateSeparatingVelocity() const noexcept
     {
-        const auto rectA = std::get<Math::RectangleF>(colShapeA) + bodyA->Position();
+        const auto relativeVelocity = BodyA->Velocity() - BodyB->Velocity();
+        const auto separatingVelocity = relativeVelocity.Dot(Normal);
 
-        switch (colShapeB.index())
+        return separatingVelocity;
+    }
+
+    void ContactSolver::ResolvePostCollisionVelocity() noexcept
+    {
+        const auto separatingVelocity = CalculateSeparatingVelocity();
+
+        // If the seperating velocity is positive, we don't need to calculate the delta velocity.
+        if (separatingVelocity > 0)
         {
-        case static_cast<int>(Math::ShapeType::Circle):
+            return;
+        }
+
+        const auto mA = BodyA->Mass(), mB = BodyB->Mass();
+        const auto eA = ColliderA->Restitution(), eB = ColliderB->Restitution();
+
+        const auto combinedRestitution = (mA * eA + mB * eB) / (mA + mB);
+
+        const auto finalSepVelocity = -separatingVelocity * combinedRestitution;
+        const auto deltaVelocity = finalSepVelocity - separatingVelocity;
+
+        const auto inversMassBodyA = BodyA->InverseMass();
+        const auto inversMassBodyB = BodyB->InverseMass();
+        const auto totalInverseMass = inversMassBodyA + inversMassBodyB;
+
+        const auto impusle = deltaVelocity / totalInverseMass;
+        const auto impulsePerIMass = Normal * impusle;
+
+        if (BodyA->GetBodyType() == BodyType::Dynamic)
         {
-            const auto circleB = std::get<Math::CircleF>(colShapeB) +
-                bodyB->Position();
-                
-            std::swap(bodyA, bodyB);
-            std::swap(colliderA, colliderB);
-            CalculateContactProperties();
+            BodyA->SetVelocity(BodyA->Velocity() + impulsePerIMass * inversMassBodyA);
+        }
 
-            break;
-        } // Case circle B.
-
-        case static_cast<int>(Math::ShapeType::Rectangle):
+        if (BodyB->GetBodyType() == BodyType::Dynamic)
         {
-            const auto rectB = std::get<Math::RectangleF>(colShapeB) +
-                bodyB->Position();
-
-            const auto cA = rectA.Center(), cB = rectB.Center();
-            const auto halfSizeA = rectA.HalfSize(), halfSizeB = rectB.HalfSize();
-
-            const auto delta = cA - cB;
-            Point = cA + delta * 0.5f;
-
-            // Calculate the penetration in x-axis
-            const auto penetrationX = halfSizeA.X + halfSizeB.X - Math::Abs(delta.X);
-            // Calculate the penetration in y-axis
-            const auto penetrationY = halfSizeA.Y + halfSizeB.Y - Math::Abs(delta.Y);
-
-            if (penetrationX < penetrationY)
-            {
-                Normal = delta.X > 0 ?
-                    Math::Vec2F::Right() : Math::Vec2F::Left();
-
-                Penetration = penetrationX;
-            }
-            else
-            {
-                Normal = delta.Y > 0 ? Math::Vec2F::Up() : Math::Vec2F::Down();
-
-                Penetration = penetrationY;
-            }
-
-            break;
-        } // Case rectangle B.
-
-        case static_cast<int>(Math::ShapeType::None):
-            break;
-        default:
-            break;
-        } // Switch shape collider B.
-
-        break;
-    } // Case rectangle A.
-
-    case static_cast<int>(Math::ShapeType::None):
-        break;
-    default:
-        break;
-    } // Switch shape collider A.
-}
-
-float PhysicsEngine::ContactSolver::CalculateSeparatingVelocity() const noexcept
-{
-    const auto relativeVelocity = bodyA->Velocity() - bodyB->Velocity();
-    const auto separatingVelocity = relativeVelocity.Dot(Normal);
-
-    return separatingVelocity;
-}
-
-void PhysicsEngine::ContactSolver::ResolvePostCollisionVelocity() noexcept
-{
-    const auto separatingVelocity = CalculateSeparatingVelocity();
-
-    // If the seperating velocity is positive, we don't need to calculate the delta velocity.
-    if (separatingVelocity > 0)
-    {
-        return;
+            BodyB->SetVelocity(BodyB->Velocity() - impulsePerIMass * inversMassBodyB);
+        }
     }
 
-    const auto mA = bodyA->Mass(), mB = bodyB->Mass();
-    const auto eA = colliderA->Restitution(), eB = colliderB->Restitution();
-
-    const auto combinedRestitution = (mA * eA + mB * eB) / (mA + mB);
-
-    const auto finalSepVelocity = -separatingVelocity * combinedRestitution;
-    const auto deltaVelocity = finalSepVelocity - separatingVelocity;
-
-    const auto inversMassBodyA = bodyA->InverseMass();
-    const auto inversMassBodyB = bodyB->InverseMass();
-    const auto totalInverseMass = inversMassBodyA + inversMassBodyB;
-
-    const auto impusle = deltaVelocity / totalInverseMass;
-    const auto impulsePerIMass = Normal * impusle;
-
-    if (bodyA->GetBodyType() == BodyType::Dynamic)
+    void ContactSolver::ResolvePostCollisionPosition() noexcept
     {
-        bodyA->SetVelocity(bodyA->Velocity() + impulsePerIMass * inversMassBodyA);
+        if (Penetration <= 0) return;
+
+        const auto inversMassBodyA = BodyA->InverseMass();
+        const auto inversMassBodyB = BodyB->InverseMass();
+        const auto totalInverseMass = inversMassBodyA + inversMassBodyB;
+
+        if (totalInverseMass <= 0) return;
+
+        const auto movePerIMass = Normal * (Penetration / totalInverseMass);
+
+        if (BodyA->GetBodyType() == BodyType::Dynamic)
+        {
+            BodyA->SetPosition(BodyA->Position() + movePerIMass * inversMassBodyA);
+        }
+
+        if (BodyB->GetBodyType() == BodyType::Dynamic)
+        {
+            BodyB->SetPosition(BodyB->Position() - movePerIMass * inversMassBodyB);
+        }
     }
 
-    if (bodyB->GetBodyType() == BodyType::Dynamic)
+    void ContactSolver::ResolveContact() noexcept
     {
-        bodyB->SetVelocity(bodyB->Velocity() - impulsePerIMass * inversMassBodyB);
+        CalculateContactProperties();
+
+        if (BodyA->GetBodyType() == BodyType::Static)
+        {
+            std::swap(BodyA, BodyB);
+            Normal = -Normal;
+        }
+
+        ResolvePostCollisionVelocity();
+        ResolvePostCollisionPosition();
     }
-}
-
-void PhysicsEngine::ContactSolver::ResolvePostCollisionPosition() noexcept
-{
-    if (Penetration <= 0) return;
-
-    const auto inversMassBodyA = bodyA->InverseMass();
-    const auto inversMassBodyB = bodyB->InverseMass();
-    const auto totalInverseMass = inversMassBodyA + inversMassBodyB;
-
-    if (totalInverseMass <= 0) return;
-
-    const auto movePerIMass = Normal * (Penetration / totalInverseMass);
-
-    if (bodyA->GetBodyType() == BodyType::Dynamic)
-    {
-        bodyA->SetPosition(bodyA->Position() + movePerIMass * inversMassBodyA);
-    }
-
-    if (bodyB->GetBodyType() == BodyType::Dynamic)
-    {
-        bodyB->SetPosition(bodyB->Position() - movePerIMass * inversMassBodyB);
-    }
-}
-
-void PhysicsEngine::ContactSolver::ResolveContact() noexcept
-{
-    CalculateContactProperties();
-
-    if (bodyA->GetBodyType() == BodyType::Static)
-    {
-        std::swap(bodyA, bodyB);
-        Normal = -Normal;
-    }
-
-    ResolvePostCollisionVelocity();
-    ResolvePostCollisionPosition();
 }

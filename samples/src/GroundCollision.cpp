@@ -5,8 +5,7 @@
 
 std::string GroundCollisionSample::Description() const noexcept
 {
-    std::string_view description = R"(This sample shows collisions between shapes and a ground with gravity in the world.
-You can adjust the restitution of each shapes to change how much they will bounce on the ground.)";
+    std::string_view description = R"(This sample shows collisions between bouncing shapes and a ground with gravity in the world.)";
     return static_cast<std::string>(description);
 }
 
@@ -86,12 +85,6 @@ void GroundCollisionSample::onHandleInputs(SDL_Event event,
 void GroundCollisionSample::onUpdate() noexcept
 {
     removeCollidersOutOfSBottomScreen();
-
-  /*  const auto& collider = _world.GetCollider(_colliders.back());
-    const auto& body = _world.GetBody(collider.GetBodyRef());
-
-
-    std::cout << body.Velocity().X << " " << body.Velocity().Y << "\n";*/
 }
 
 void GroundCollisionSample::onRender() noexcept
@@ -177,7 +170,6 @@ void GroundCollisionSample::createCircle(Math::Vec2F position) noexcept
     collider.SetShape(Math::CircleF(0.2f));
 
     collider.SetRestitution(1.f);
-    //collider.SetFriction(1.f);
 
     _colliders.push_back(colRef);
 }
@@ -198,7 +190,6 @@ void GroundCollisionSample::createRectangle(Math::Vec2F position) noexcept
         Math::Vec2F::Zero() - halfSize, Math::Vec2F::Zero() + halfSize));
 
     collider.SetRestitution(1.f);
-    //collider.SetFriction(0.f);
 
     _colliders.push_back(colRef);
 }
@@ -215,9 +206,9 @@ void GroundCollisionSample::removeCollidersOutOfSBottomScreen() noexcept
 
         const auto& colShape = collider.Shape();
 
-        switch (colShape.index())
+        switch (static_cast<Math::ShapeType>(colShape.index()))
         {
-            case static_cast<int>(Math::ShapeType::Circle):
+            case Math::ShapeType::Circle:
             {
                 const auto radius = std::get<Math::CircleF>(colShape).Radius();
 
@@ -234,7 +225,7 @@ void GroundCollisionSample::removeCollidersOutOfSBottomScreen() noexcept
                 break;
             }
 
-            case static_cast<int>(Math::ShapeType::Rectangle):
+            case Math::ShapeType::Rectangle:
             {
                 const auto halfSize = std::get<Math::RectangleF>(colShape).HalfSize();
 

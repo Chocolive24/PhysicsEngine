@@ -49,21 +49,21 @@ namespace PhysicsEngine
         /**
          * @brief SetShape is a method that replaces the current mathematical shape of the collider
          * with a circle shape given in parameter.
-         * @param circle The new mathematical shape for the collider.
+         * @param circle The new circle shape for the collider.
          */
         void SetShape(Math::CircleF circle) noexcept { _shape = circle; }
 
         /**
          * @brief SetShape is a method that replaces the current mathematical shape of the collider
          * with rectangle shape given in parameter.
-         * @param rectangle The new mathematical shape for the collider.
+         * @param rectangle The new rectangle shape for the collider.
          */
         void SetShape(Math::RectangleF rectangle) noexcept { _shape = rectangle; }
 
         /**
          * @brief SetShape is a method that replaces the current mathematical shape of the collider
          * with a polygon shape given in parameter.
-         * @param polygon The new mathematical shape for the collider.
+         * @param polygon The new polygon shape for the collider.
          */
         void SetShape(Math::PolygonF polygon) noexcept { _shape = polygon; }
 
@@ -178,4 +178,3 @@ namespace PhysicsEngine
         }
     };
 }
-

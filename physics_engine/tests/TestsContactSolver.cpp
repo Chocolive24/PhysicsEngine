@@ -102,15 +102,15 @@ void SetBodyAndColliderValues(const CollidingBodies& cb1,
 		break;
 	}
 
-	testedContactSolver.bodyA = &body1;
-	testedContactSolver.bodyB = &body2;
-	testedContactSolver.colliderA = &collider1;
-	testedContactSolver.colliderB = &collider2;
+	testedContactSolver.BodyA = &body1;
+	testedContactSolver.BodyB = &body2;
+	testedContactSolver.ColliderA = &collider1;
+	testedContactSolver.ColliderB = &collider2;
 
-	expectedContactSolver.bodyA = &body1;
-	expectedContactSolver.bodyB = &body2;
-	expectedContactSolver.colliderA = &collider1;
-	expectedContactSolver.colliderB = &collider2;
+	expectedContactSolver.BodyA = &body1;
+	expectedContactSolver.BodyB = &body2;
+	expectedContactSolver.ColliderA = &collider1;
+	expectedContactSolver.ColliderB = &collider2;
 }
 
 void CalculateTestContactProperties(Body& body1, 
@@ -275,10 +275,10 @@ void CalculateTestPostColVel(const ContactSolver& testedContactSolver, ContactSo
 		return;
 	}
 
-	auto* body1 = expectedContactSolver.bodyA;
-	auto* body2 = expectedContactSolver.bodyB;
-	auto* collider1 = expectedContactSolver.colliderA;
-	auto* collider2 = expectedContactSolver.colliderB;
+	auto* body1 = expectedContactSolver.BodyA;
+	auto* body2 = expectedContactSolver.BodyB;
+	auto* collider1 = expectedContactSolver.ColliderA;
+	auto* collider2 = expectedContactSolver.ColliderB;
 
 	const auto mA = body1->Mass(), mB = body2->Mass();
 	const auto eA = collider1->Restitution(), eB = collider2->Restitution();
@@ -308,10 +308,10 @@ void CalculateTestPostColVel(const ContactSolver& testedContactSolver, ContactSo
 
 void CalculateTestPostColPos(const ContactSolver& testedContactSolver, ContactSolver& expectedContactSolver)
 {
-	auto* body1 = expectedContactSolver.bodyA;
-	auto* body2 = expectedContactSolver.bodyB;
-	auto* collider1 = expectedContactSolver.colliderA;
-	auto* collider2 = expectedContactSolver.colliderB;
+	auto* body1 = expectedContactSolver.BodyA;
+	auto* body2 = expectedContactSolver.BodyB;
+	auto* collider1 = expectedContactSolver.ColliderA;
+	auto* collider2 = expectedContactSolver.ColliderB;
 
 	if (expectedContactSolver.Penetration <= 0) return;
 
@@ -427,8 +427,8 @@ TEST_P(PairOfCollidingBodies, CalculatePostCollisionVelocity)
 
 	CalculateTestPostColVel(testedContactSolver, expectedContactSolver);
 
-	EXPECT_EQ(testedContactSolver.bodyA->Velocity(), body1.Velocity());
-	EXPECT_EQ(testedContactSolver.bodyB->Velocity(), body2.Velocity());
+	EXPECT_EQ(testedContactSolver.BodyA->Velocity(), body1.Velocity());
+	EXPECT_EQ(testedContactSolver.BodyB->Velocity(), body2.Velocity());
 }
 
 TEST_P(PairOfCollidingBodies, CalculatePostCollisionPosition)
@@ -459,8 +459,8 @@ TEST_P(PairOfCollidingBodies, CalculatePostCollisionPosition)
 
 	CalculateTestPostColPos(testedContactSolver, expectedContactSolver);
 
-	EXPECT_EQ(testedContactSolver.bodyA->Position(), body1.Position());
-	EXPECT_EQ(testedContactSolver.bodyB->Position(), body2.Position());
+	EXPECT_EQ(testedContactSolver.BodyA->Position(), body1.Position());
+	EXPECT_EQ(testedContactSolver.BodyB->Position(), body2.Position());
 }
 
 TEST_P(PairOfCollidingBodies, ResolveContact)
@@ -504,9 +504,9 @@ TEST_P(PairOfCollidingBodies, ResolveContact)
 	EXPECT_EQ(testedContactSolver.Point, expectedContactSolver.Point);
 	EXPECT_EQ(testedContactSolver.Penetration, expectedContactSolver.Penetration);
 
-	EXPECT_EQ(testedContactSolver.bodyA->Velocity(), body1.Velocity());
-	EXPECT_EQ(testedContactSolver.bodyB->Velocity(), body2.Velocity());
+	EXPECT_EQ(testedContactSolver.BodyA->Velocity(), body1.Velocity());
+	EXPECT_EQ(testedContactSolver.BodyB->Velocity(), body2.Velocity());
 
-	EXPECT_EQ(testedContactSolver.bodyA->Position(), body1.Position());
-	EXPECT_EQ(testedContactSolver.bodyB->Position(), body2.Position());
+	EXPECT_EQ(testedContactSolver.BodyA->Position(), body1.Position());
+	EXPECT_EQ(testedContactSolver.BodyB->Position(), body2.Position());
 }

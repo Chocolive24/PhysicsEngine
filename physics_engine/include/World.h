@@ -32,25 +32,40 @@ namespace PhysicsEngine
         AllocVector<Body> _bodies{ StandardAllocator<Body>{_heapAllocator} };
         AllocVector<std::size_t> _bodiesGenIndices{ StandardAllocator<std::size_t>{_heapAllocator} };
 
-        ContactListener* _contactListener = nullptr;
-
         AllocVector<Collider> _colliders{ StandardAllocator<Collider>{_heapAllocator} };
         AllocVector<std::size_t> _collidersGenIndices{ StandardAllocator<std::size_t>{_heapAllocator} };
 
         AllocVector<ColliderPair> _colliderPairs{ StandardAllocator<ColliderPair>{_heapAllocator} };
 
-        /*std::unordered_set<ColliderPair, 
-                           ColliderHash, 
-                           std::equal_to<ColliderPair>, 
-                           StandardAllocator<ColliderPair>> _colliderPairs{ StandardAllocator<ColliderPair>{_heapAllocator} };*/
+        ContactListener* _contactListener = nullptr;
 
         QuadTree _quadTree{};
 
+        /*
+        * @brief BodyAllocResizeFactor is the factor to mulitply with 
+        * the current size of a vector to allocate it a larger size.
+        */
         static constexpr float _bodyAllocResizeFactor = 2.f;
-
+      
+        /*
+        * @brief ResolveBroadPhase is a method that reduces the number of potential collision pairs 
+        * to a manageable subset using a quad-tree.
+        */
         void resolveBroadPhase() noexcept;
+
+        /*
+        * @brief ResolveNarrowPhase is a method that determines the precise details 
+        * of the collisions between pairs of objects identified in the broad phase.
+        */
         void resolveNarrowPhase() noexcept;
-        bool detectContact(const Collider& colA, const Collider& colB) noexcept;
+
+        /*
+        * @brief DetectOverlap is a function that check if the two colliders given in parameter overlap.
+        * @param colA The collider A.
+        * @param colB The collider B.
+        * @return True if the two colliders overlap.
+        */
+        bool detectOverlap(const Collider& colA, const Collider& colB) noexcept;
 
     public:
         World() noexcept = default;

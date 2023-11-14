@@ -130,11 +130,25 @@
         typedef T value_type;
 
         StandardAllocator(Allocator& allocator);
+
         template <class U>
         StandardAllocator(const StandardAllocator<U>& allocator) noexcept : 
             _allocator(allocator.GetAllocator()) {}
 
+        /**
+         * @brief allocate is a method that calls the referenced allocator's Allocate method
+         * that allocates a given amount of memory.
+         * @param n The size of the allocation to do.
+         * @return A pointer pointing to the memory (aka a T*).
+         */
         T* allocate(std::size_t n);
+
+        /**
+         * @brief deallocate is a method that calls the referenced allocator's Deallocate method
+         * that deallocates a block of memory given in parameter.
+         * @param ptr The pointer to the memory block to deallocates.
+         * * @param n The size of the pointer to deallocate.
+         */
         void deallocate(T* ptr, std::size_t n);
 
         [[nodiscard]] Allocator& GetAllocator() const { return _allocator; }

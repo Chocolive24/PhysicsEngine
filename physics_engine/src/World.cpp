@@ -53,7 +53,6 @@ namespace PhysicsEngine
                     body.ApplyForce(_gravity);
 
                     // a = F / m
-                    // TODO: * inverMass -> pour opti un peu.
                     Math::Vec2F acceleration = body.Forces() * body.InverseMass();
 
                     // Change velocity according to delta time.
@@ -154,9 +153,9 @@ namespace PhysicsEngine
 
             const auto colShape = collider.Shape();
 
-            switch (colShape.index())
+            switch (static_cast<Math::ShapeType>(colShape.index()))
             {
-                case static_cast<int>(Math::ShapeType::Circle):
+                case Math::ShapeType::Circle:
                 {
                 #ifdef TRACY_ENABLE
                        ZoneNamedN(InsertCircle, "InsertCircle", true);
@@ -171,7 +170,7 @@ namespace PhysicsEngine
                     break;
                 } // Case circle.
 
-                case static_cast<int>(Math::ShapeType::Rectangle):
+                case Math::ShapeType::Rectangle:
                 {
                 #ifdef TRACY_ENABLE
                        ZoneNamedN(InsertRectangle, "InsertRectangle", true);
@@ -184,7 +183,7 @@ namespace PhysicsEngine
                     break;
                 } // Case rectangle.
 
-                case static_cast<int>(Math::ShapeType::Polygon):
+                case Math::ShapeType::Polygon:
                 {
                 #ifdef TRACY_ENABLE
                     ZoneNamedN(InsertPolygon, "InsertPolygon", true);
@@ -253,7 +252,7 @@ namespace PhysicsEngine
             auto& colliderA = GetCollider(possiblePair.ColliderA);
             auto& colliderB = GetCollider(possiblePair.ColliderB);
 
-            if (detectContact(colliderA, colliderB))
+            if (detectOverlap(colliderA, colliderB))
             {
                 newPairs.push_back(possiblePair);
             }
@@ -277,10 +276,10 @@ namespace PhysicsEngine
                 else
                 {
                     ContactSolver contactSolver;
-                    contactSolver.bodyA = &GetBody(colliderA.GetBodyRef());
-                    contactSolver.bodyB = &GetBody(colliderB.GetBodyRef());
-                    contactSolver.colliderA = &colliderA;
-                    contactSolver.colliderB = &colliderB;
+                    contactSolver.InitContactActors(GetBody(colliderA.GetBodyRef()),
+                                                    GetBody(colliderB.GetBodyRef()),
+                                                    colliderA,
+                                                    colliderB);
 
                     contactSolver.ResolveContact();
                     _contactListener->OnCollisionEnter(newPair.ColliderA, newPair.ColliderB);
@@ -296,10 +295,10 @@ namespace PhysicsEngine
                 else
                 {
                     ContactSolver contactSolver;
-                    contactSolver.bodyA = &GetBody(colliderA.GetBodyRef());
-                    contactSolver.bodyB = &GetBody(colliderB.GetBodyRef());
-                    contactSolver.colliderA = &colliderA;
-                    contactSolver.colliderB = &colliderB;
+                    contactSolver.InitContactActors(GetBody(colliderA.GetBodyRef()),
+                                                    GetBody(colliderB.GetBodyRef()),
+                                                    colliderA,
+                                                    colliderB);
 
                     contactSolver.ResolveContact();
                 }
@@ -324,10 +323,10 @@ namespace PhysicsEngine
                 else
                 {
                     ContactSolver contactSolver;
-                    contactSolver.bodyA = &GetBody(colliderA.GetBodyRef());
-                    contactSolver.bodyB = &GetBody(colliderB.GetBodyRef());
-                    contactSolver.colliderA = &colliderA;
-                    contactSolver.colliderB = &colliderB;
+                    contactSolver.InitContactActors(GetBody(colliderA.GetBodyRef()),
+                                                    GetBody(colliderB.GetBodyRef()),
+                                                    colliderA,
+                                                    colliderB);
 
                     contactSolver.ResolveContact();
                     _contactListener->OnCollisionExit(colliderPair.ColliderA,
@@ -337,74 +336,9 @@ namespace PhysicsEngine
         }
 
         _colliderPairs = newPairs;
-
-       /* for (auto& possiblePair : possiblePairs)
-        {
-            auto& colliderA = GetCollider(possiblePair.ColliderA);
-            auto& colliderB = GetCollider(possiblePair.ColliderB);
-
-            const auto doCollidersIntersect = detectContact(colliderA, colliderB);
-
-            #ifdef TRACY_ENABLE
-                ZoneNamedN(FindPair, "Find pair", true);
-            #endif
-
-            auto it = _colliderPairs.find(possiblePair);
-
-            #ifdef TRACY_ENABLE
-                    ZoneNamedN(CheckIfItsANewPair, "Check if it's a new pair", true);
-            #endif
-            if (it != _colliderPairs.end())
-            {
-                if (!doCollidersIntersect)
-                {
-                    if (colliderA.IsTrigger() || colliderB.IsTrigger())
-                    {
-                        _contactListener->OnTriggerExit(possiblePair.ColliderA,
-                            possiblePair.ColliderB);
-
-                    }
-                    else
-                    {
-                        _contactListener->OnCollisionExit(possiblePair.ColliderA,
-                            possiblePair.ColliderB);
-                    }
-
-                    #ifdef TRACY_ENABLE
-                            ZoneNamedN(ErasePair, "Erase pair", true);
-                    #endif
-                    _colliderPairs.erase(it);
-                }
-                else
-                {
-                    if (colliderA.IsTrigger() || colliderB.IsTrigger())
-                    {
-                        _contactListener->OnTriggerStay(possiblePair.ColliderA,
-                            possiblePair.ColliderB);
-                    }
-                }
-            }
-            else
-            {
-                if (doCollidersIntersect)
-                {
-                    if (colliderA.IsTrigger() || colliderB.IsTrigger())
-                    {
-                        _contactListener->OnTriggerEnter(possiblePair.ColliderA,
-                            possiblePair.ColliderB);
-                    }
-
-                    #ifdef TRACY_ENABLE
-                        ZoneNamedN(InsertPair, "Insert pair", true);
-                    #endif
-
-                    _colliderPairs.insert(possiblePair);
-                }
-            }
-        }*/
     }
 
-    bool World::detectContact(const Collider& colA, const Collider& colB) noexcept
+    bool World::detectOverlap(const Collider& colA, const Collider& colB) noexcept
     {
     #ifdef TRACY_ENABLE
             ZoneScoped;
@@ -417,15 +351,15 @@ namespace PhysicsEngine
 
         bool doCollidersIntersect = false;
 
-        switch (colShapeA.index())
+        switch (static_cast<Math::ShapeType>(colShapeA.index()))
         {
-            case static_cast<int>(Math::ShapeType::Circle):
+            case Math::ShapeType::Circle:
             {
                 const auto circleA = std::get<Math::CircleF>(colShapeA) + bodyA.Position();
 
-                switch (colShapeB.index())
+                switch (static_cast<Math::ShapeType>(colShapeB.index()))
                 {
-                    case static_cast<int>(Math::ShapeType::Circle):
+                    case Math::ShapeType::Circle:
                     {
                     #ifdef TRACY_ENABLE
                         std::string txt = "Circle-Circle";
@@ -439,7 +373,7 @@ namespace PhysicsEngine
                         break;
                     } // Case circle B.
                     
-                    case static_cast<int>(Math::ShapeType::Rectangle):
+                    case Math::ShapeType::Rectangle:
                     {
                     #ifdef TRACY_ENABLE
                             std::string txt = "Circle-Rectangle";
@@ -453,7 +387,7 @@ namespace PhysicsEngine
                         break;
                     } // Case rectangle B.
 
-                    case static_cast<int>(Math::ShapeType::Polygon):
+                    case Math::ShapeType::Polygon:
                     {
                     #ifdef TRACY_ENABLE
                         std::string txt = "Circle-Polygon";
@@ -466,7 +400,7 @@ namespace PhysicsEngine
                         break;
                     } // Case polygon B.
 
-                    case static_cast<int>(Math::ShapeType::None):
+                    case Math::ShapeType::None:
                         break;
                     default:
                         break;
@@ -475,13 +409,13 @@ namespace PhysicsEngine
                 break;
             } // Case circle A.
 
-            case static_cast<int>(Math::ShapeType::Rectangle):
+            case Math::ShapeType::Rectangle:
             {
                 const auto rectA = std::get<Math::RectangleF>(colShapeA) + bodyA.Position();
 
-                switch (colShapeB.index())
+                switch (static_cast<Math::ShapeType>(colShapeB.index()))
                 {
-                    case static_cast<int>(Math::ShapeType::Circle):
+                    case Math::ShapeType::Circle:
                     {
                     #ifdef TRACY_ENABLE
                             std::string txt = "Rectangle-Cricle";
@@ -496,7 +430,7 @@ namespace PhysicsEngine
                         break;
                     } // Case circle B.
 
-                    case static_cast<int>(Math::ShapeType::Rectangle):
+                    case Math::ShapeType::Rectangle:
                     {
                     #ifdef TRACY_ENABLE
                             std::string txt = "Rectangle-Rectangle";
@@ -511,7 +445,7 @@ namespace PhysicsEngine
                         break;
                     } // Case rectangle B.
 
-                    case static_cast<int>(Math::ShapeType::Polygon):
+                    case Math::ShapeType::Polygon:
                     {
                     #ifdef TRACY_ENABLE
                             std::string txt = "Rectangle-Polygon";
@@ -525,7 +459,7 @@ namespace PhysicsEngine
                         break;
                     } // Case polygon B.
 
-                    case static_cast<int>(Math::ShapeType::None):
+                    case Math::ShapeType::None:
                         break;
                     default:
                         break;
@@ -534,14 +468,14 @@ namespace PhysicsEngine
                 break;
             } // Case rectangle A.
 
-            case static_cast<int>(Math::ShapeType::Polygon):
+            case Math::ShapeType::Polygon:
             {
                 const auto polygonA = std::get<Math::PolygonF>(colShapeA) +
                                       bodyA.Position();
 
-                switch (colShapeB.index())
+                switch (static_cast<Math::ShapeType>(colShapeB.index()))
                 {
-                    case static_cast<int>(Math::ShapeType::Circle):
+                    case Math::ShapeType::Circle:
                     {
                     #ifdef TRACY_ENABLE
                             std::string txt = "Polygon-Circle";
@@ -554,7 +488,7 @@ namespace PhysicsEngine
                         break;
                     } // Case circle B.
 
-                    case static_cast<int>(Math::ShapeType::Rectangle):
+                    case Math::ShapeType::Rectangle:
                     {
                     #ifdef TRACY_ENABLE
                             std::string txt = "Polygon-Rectangle";
@@ -568,7 +502,7 @@ namespace PhysicsEngine
                         break;
                     } // Case rectangle B.
 
-                    case static_cast<int>(Math::ShapeType::Polygon):
+                    case Math::ShapeType::Polygon:
                     {
                     #ifdef TRACY_ENABLE
                             std::string txt = "Polygon-Polygon";
@@ -582,7 +516,7 @@ namespace PhysicsEngine
                         break;
                     } // Case polygon B.
 
-                    case static_cast<int>(Math::ShapeType::None):
+                    case Math::ShapeType::None:
                         break;
                     default:
                         break;
@@ -591,7 +525,7 @@ namespace PhysicsEngine
                 break;
             } // Case Polygon A.
 
-            case static_cast<int>(Math::ShapeType::None):
+            case Math::ShapeType::None:
                 break;
             default:
                 break;
@@ -605,6 +539,7 @@ namespace PhysicsEngine
 #ifdef TRACY_ENABLE
         ZoneScoped;
 #endif // TRACY_ENABLE
+
         _bodies.clear();
         _bodiesGenIndices.clear();
 

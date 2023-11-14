@@ -1,9 +1,4 @@
 #include "SampleManager.h"
-//
-// Created by Olivier on 27.10.2023.
-//
-
-#include "SampleManager.h"
 #include "PlanetSystemSample.h"
 #include "TriggerColliderSample.h"
 #include "CollisionSample.h"
@@ -43,6 +38,7 @@ void SampleManager::RenderCurrentSample() const noexcept
 #ifdef TRACY_ENABLE
     ZoneScoped;
 #endif // TRACY_ENABLE
+
     _samples[_currentSampleIdx]->Render();
 }
 

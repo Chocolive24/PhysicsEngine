@@ -21,13 +21,23 @@ namespace PhysicsEngine
 	*/
 	struct ContactSolver
 	{
-		Body* bodyA = nullptr;
-		Body* bodyB = nullptr;
-		Collider* colliderA = nullptr;
-		Collider* colliderB = nullptr;
+		Body* BodyA = nullptr;
+		Body* BodyB = nullptr;
+		Collider* ColliderA = nullptr;
+		Collider* ColliderB = nullptr;
 		Math::Vec2F Normal;
 		Math::Vec2F Point;
 		float Penetration;
+
+		/**
+		* @brief InitContactActors is a method that initialize the two actors of the contact.
+		* The actors are represetend by a body and a collider.
+		* @param bodyA The body of the actor A.
+		* @param bodyB The body of the actor B.
+		* @param colA The collider of the actor A.
+		* @param colB The collider of the actor B.
+		*/
+		void InitContactActors(Body& bodyA, Body& bodyB, Collider& colA, Collider& colB) noexcept;
 
 		/**
 		* @brief CalculateContactProperties is a method that calculates the normal, the point and the 

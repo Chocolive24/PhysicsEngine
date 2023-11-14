@@ -101,9 +101,9 @@ void TriggerColliderSample::onRender() noexcept
     {
         const auto colShape = _world.GetCollider(object.ColRef).Shape();
 
-        switch (colShape.index())
+        switch (static_cast<Math::ShapeType>(colShape.index()))
         {
-            case static_cast<int>(Math::ShapeType::Circle):
+            case Math::ShapeType::Circle:
             {
                 GraphicGeometry::Circle(
                         Metrics::MetersToPixels(_world.GetBody(object.BodyRef).Position()),
@@ -113,7 +113,7 @@ void TriggerColliderSample::onRender() noexcept
                 break;
             } // Case circle.
 
-            case static_cast<int>(Math::ShapeType::Rectangle):
+            case Math::ShapeType::Rectangle:
             {
                 GraphicGeometry::FilledRectangle(
                         Metrics::MetersToPixels(_world.GetBody(object.BodyRef).Position()),
@@ -122,7 +122,7 @@ void TriggerColliderSample::onRender() noexcept
                 break;
             } // Case rectangle.
 
-            case static_cast<int>(Math::ShapeType::Polygon):
+            case Math::ShapeType::Polygon:
             {
                 const auto poly = std::get<Math::PolygonF>(colShape);
                 const auto verticesInMeters = poly.Vertices();
@@ -274,9 +274,9 @@ void TriggerColliderSample::maintainObjectsInWindow() noexcept
     {
         const auto colShape = _world.GetCollider(object.ColRef).Shape();
 
-        switch (colShape.index())
+        switch (static_cast<Math::ShapeType>(colShape.index()))
         {
-            case static_cast<int>(Math::ShapeType::Circle):
+            case Math::ShapeType::Circle:
             {
                 auto &body = _world.GetBody(object.BodyRef);
                 const auto pos = body.Position();
@@ -311,7 +311,7 @@ void TriggerColliderSample::maintainObjectsInWindow() noexcept
                 break;
             } // Case circle.
 
-            case static_cast<int>(Math::ShapeType::Rectangle):
+            case Math::ShapeType::Rectangle:
             {
                 const auto halfSize = std::get<Math::RectangleF>(colShape).Size() * 0.5f;
 
@@ -346,7 +346,7 @@ void TriggerColliderSample::maintainObjectsInWindow() noexcept
                 break;
             } // Case Rectangle.
 
-            case static_cast<int>(Math::ShapeType::Polygon):
+            case Math::ShapeType::Polygon:
             {
                 const auto& vertices = std::get<Math::PolygonF>(colShape).Vertices();
                 auto& body = _world.GetBody(object.BodyRef);

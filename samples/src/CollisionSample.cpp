@@ -71,18 +71,6 @@ void CollisionSample::onInit() noexcept
         auto rndVel = Math::Vec2F(Math::Random::Range(-2.f, 2.f),
             Math::Random::Range(-2.f, 2.f));
 
-        /*if (i == 0)
-        {
-            body.SetPosition(Math::Vec2F(2, -2));
-            body.SetVelocity(Math::Vec2F(1, 0));
-            body.SetBodyType(PhysicsEngine::BodyType::Static);
-        }
-        else
-        {
-            body.SetPosition(Math::Vec2F(4, -2));
-            body.SetVelocity(Math::Vec2F(-1, 0));
-        }*/
-
         body.SetPosition(cellPos);
         body.SetVelocity(rndVel);
         body.SetMass(5.f);
@@ -106,8 +94,6 @@ void CollisionSample::onUpdate() noexcept
 
         totalVel += body.Velocity().Length();
     }
-
-    //std::cout << totalVel << "\n";
 }
 
 void CollisionSample::onRender() noexcept
@@ -189,114 +175,79 @@ void CollisionSample::maintainObjectsInWindow() noexcept
     {
         const auto colShape = _world.GetCollider(colRef).Shape();
 
-        switch (colShape.index())
+        switch (static_cast<Math::ShapeType>(colShape.index()))
         {
-        case static_cast<int>(Math::ShapeType::Circle):
-        {
-            const auto& collider = _world.GetCollider(colRef);
-            auto& body = _world.GetBody(collider.GetBodyRef());
-            const auto pos = body.Position();
-            const auto velocity = body.Velocity();
-
-            const auto radius = std::get<Math::CircleF>(colShape).Radius();
-
-            if (pos.X + radius >= AppWindowSizeInMeters.X)
+            case Math::ShapeType::Circle:
             {
-                body.SetPosition(Math::Vec2F(AppWindowSizeInMeters.X - radius, pos.Y));
-                body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
-            }
+                const auto& collider = _world.GetCollider(colRef);
+                auto& body = _world.GetBody(collider.GetBodyRef());
+                const auto pos = body.Position();
+                const auto velocity = body.Velocity();
 
-            if (pos.X - radius <= 0)
+                const auto radius = std::get<Math::CircleF>(colShape).Radius();
+
+                if (pos.X + radius >= AppWindowSizeInMeters.X)
+                {
+                    body.SetPosition(Math::Vec2F(AppWindowSizeInMeters.X - radius, pos.Y));
+                    body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
+                }
+
+                if (pos.X - radius <= 0)
+                {
+                    body.SetPosition(Math::Vec2F(0 + radius, pos.Y));
+                    body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
+                }
+
+                if (pos.Y - radius <= AppWindowSizeInMeters.Y)
+                {
+                    body.SetPosition(Math::Vec2F(pos.X, AppWindowSizeInMeters.Y + radius));
+                    body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
+                }
+
+                if (pos.Y + radius >= 0)
+                {
+                    body.SetPosition(Math::Vec2F(pos.X, 0 - radius));
+                    body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
+                }
+
+                break;
+            } // Case circle.
+
+            case Math::ShapeType::Rectangle:
             {
-                body.SetPosition(Math::Vec2F(0 + radius, pos.Y));
-                body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
-            }
+                const auto halfSize = std::get<Math::RectangleF>(colShape).Size() * 0.5f;
 
-            if (pos.Y - radius <= AppWindowSizeInMeters.Y)
-            {
-                body.SetPosition(Math::Vec2F(pos.X, AppWindowSizeInMeters.Y + radius));
-                body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
-            }
+                const auto& collider = _world.GetCollider(colRef);
+                auto& body = _world.GetBody(collider.GetBodyRef());
+                const auto pos = body.Position();
+                const auto velocity = body.Velocity();
 
-            if (pos.Y + radius >= 0)
-            {
-                body.SetPosition(Math::Vec2F(pos.X, 0 - radius));
-                body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
-            }
+                if (pos.X + halfSize.X >= AppWindowSizeInMeters.X)
+                {
+                    body.SetPosition(Math::Vec2F(AppWindowSizeInMeters.X - halfSize.X, pos.Y));
+                    body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
+                }
 
-            break;
-        } // Case circle.
+                if (pos.X - halfSize.X <= 0)
+                {
+                    body.SetPosition(Math::Vec2F(0 + halfSize.X, pos.Y));
+                    body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
+                }
 
-        case static_cast<int>(Math::ShapeType::Rectangle):
-        {
-            const auto halfSize = std::get<Math::RectangleF>(colShape).Size() * 0.5f;
+                if (pos.Y - halfSize.Y <= AppWindowSizeInMeters.Y)
+                {
+                    body.SetPosition(Math::Vec2F(pos.X, AppWindowSizeInMeters.Y + halfSize.Y));
+                    body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
+                }
 
-            const auto& collider = _world.GetCollider(colRef);
-            auto& body = _world.GetBody(collider.GetBodyRef());
-            const auto pos = body.Position();
-            const auto velocity = body.Velocity();
+                if (pos.Y + halfSize.Y >= 0)
+                {
+                    body.SetPosition(Math::Vec2F(pos.X, 0 - halfSize.Y));
+                    body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
+                }
 
-            if (pos.X + halfSize.X >= AppWindowSizeInMeters.X)
-            {
-                body.SetPosition(Math::Vec2F(AppWindowSizeInMeters.X - halfSize.X, pos.Y));
-                body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
-            }
-
-            if (pos.X - halfSize.X <= 0)
-            {
-                body.SetPosition(Math::Vec2F(0 + halfSize.X, pos.Y));
-                body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
-            }
-
-            if (pos.Y - halfSize.Y <= AppWindowSizeInMeters.Y)
-            {
-                body.SetPosition(Math::Vec2F(pos.X, AppWindowSizeInMeters.Y + halfSize.Y));
-                body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
-            }
-
-            if (pos.Y + halfSize.Y >= 0)
-            {
-                body.SetPosition(Math::Vec2F(pos.X, 0 - halfSize.Y));
-                body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
-            }
-
-            break;
-        } // Case Rectangle.
-
-        //case static_cast<int>(Math::ShapeType::Polygon):
-        //{
-        //    const auto& vertices = std::get<Math::PolygonF>(colShape).Vertices();
-        //    auto& body = _world.GetBody(colRef.BodyRef);
-        //    const auto pos = body.Position();
-        //    const auto velocity = body.Velocity();
-
-        //    for (auto& vertex : vertices)
-        //    {
-        //        if (pos.X + vertex.X >= AppWindowSizeInMeters.X)
-        //        {
-        //            body.SetPosition(Math::Vec2F(AppWindowSizeInMeters.X - vertex.X, pos.Y));
-        //            body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
-        //        }
-
-        //        if (pos.X - vertex.X <= 0)
-        //        {
-        //            body.SetPosition(Math::Vec2F(0 + vertex.X, pos.Y));
-        //            body.SetVelocity(Math::Vec2F(-velocity.X, velocity.Y));
-        //        }
-
-        //        if (pos.Y - vertex.Y <= AppWindowSizeInMeters.Y)
-        //        {
-        //            body.SetPosition(Math::Vec2F(pos.X, AppWindowSizeInMeters.Y + vertex.Y));
-        //            body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
-        //        }
-
-        //        if (pos.Y + vertex.Y >= 0)
-        //        {
-        //            body.SetPosition(Math::Vec2F(pos.X, 0 - vertex.Y));
-        //            body.SetVelocity(Math::Vec2F(velocity.X, -velocity.Y));
-        //        }
-        //    }
-        //} // Case polygon.
+                break;
+            } // Case Rectanglee
         } // Switch case.
     } // For range.
 }

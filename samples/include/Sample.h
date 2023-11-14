@@ -48,6 +48,9 @@ protected:
 
     static constexpr int _startBodyCount = 100;
 
+    /*
+    * @brief onInit is an abstract method that initiliaze the sample that overrides it.
+    */
     virtual void onInit() noexcept = 0;
     virtual void onHandleInputs(SDL_Event event, bool isMouseOnAnImGuiWindow) noexcept = 0;
     virtual void onUpdate() noexcept = 0;
