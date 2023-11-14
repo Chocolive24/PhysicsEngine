@@ -71,23 +71,7 @@ void TriggerColliderSample::onInit() noexcept
 
 void TriggerColliderSample::onHandleInputs(const SDL_Event event, const bool isMouseOnAnImGuiWindow) noexcept
 {
-    switch (event.type)
-    {
-        case SDL_MOUSEBUTTONDOWN:
-        {
-            if (event.button.button == SDL_BUTTON_LEFT)
-            {
-                Math::Vec2I mousePosition;
-                SDL_GetMouseState(&mousePosition.X, &mousePosition.Y);
 
-                auto mousePosF = static_cast<Math::Vec2F>(mousePosition);
-                auto mM = Metrics::PixelsToMeters(mousePosF);
-
-                addCircle(mM, Math::Vec2F::Zero());
-            }
-            break;
-        }
-    }
 }
 
 void TriggerColliderSample::onUpdate() noexcept
